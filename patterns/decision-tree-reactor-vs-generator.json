@@ -1,0 +1,221 @@
+{
+  "version": "1.0.0",
+  "id": "reactor-vs-generator",
+  "name": "Reactor vs Generator Decision Tree",
+  "description": "Decision tree for choosing between Reactor (safe) and Generator (efficient) for energy production",
+  "category": "economic",
+  "priority": "high",
+  "root": {
+    "id": "start",
+    "question": "Do you need energy production?",
+    "type": "boolean",
+    "true": {
+      "id": "has-alpha-matter",
+      "question": "Do you have Alpha Matter?",
+      "type": "boolean",
+      "true": {
+        "id": "risk-tolerance",
+        "question": "What is your risk tolerance?",
+        "type": "choice",
+        "options": [
+          {
+            "value": "low",
+            "label": "Low Risk - Need Reliability",
+            "result": {
+              "recommendation": "Reactor",
+              "reason": "Reactors are safer and more reliable",
+              "rate": 1,
+              "formula": "Energy (kW) = Alpha Matter (grams) × 1",
+              "risk": "low",
+              "bestFor": ["beginners", "reliable operations", "network stability"]
+            }
+          },
+          {
+            "value": "medium",
+            "label": "Medium Risk - Balance Safety and Efficiency",
+            "result": {
+              "id": "generator-type-medium",
+              "question": "Which generator type?",
+              "type": "choice",
+              "options": [
+                {
+                  "value": "field-generator",
+                  "label": "Field Generator (2x efficiency)",
+                  "result": {
+                    "recommendation": "Field Generator",
+                    "reason": "2x efficiency with manageable risk",
+                    "rate": 2,
+                    "formula": "Energy (kW) = Alpha Matter (grams) × 2",
+                    "risk": "high",
+                    "efficiency": "200% of Reactor"
+                  }
+                },
+                {
+                  "value": "reactor",
+                  "label": "Reactor (safer)",
+                  "result": {
+                    "recommendation": "Reactor",
+                    "reason": "Safer option for medium risk tolerance",
+                    "rate": 1,
+                    "formula": "Energy (kW) = Alpha Matter (grams) × 1",
+                    "risk": "low"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "value": "high",
+            "label": "High Risk - Maximum Efficiency",
+            "result": {
+              "id": "generator-type-high",
+              "question": "Which generator type for maximum efficiency?",
+              "type": "choice",
+              "options": [
+                {
+                  "value": "field-generator",
+                  "label": "Field Generator (2x efficiency)",
+                  "result": {
+                    "recommendation": "Field Generator",
+                    "reason": "2x efficiency, acceptable risk",
+                    "rate": 2,
+                    "formula": "Energy (kW) = Alpha Matter (grams) × 2",
+                    "risk": "high",
+                    "efficiency": "200% of Reactor"
+                  }
+                },
+                {
+                  "value": "continental-power-plant",
+                  "label": "Continental Power Plant (5x efficiency)",
+                  "result": {
+                    "recommendation": "Continental Power Plant",
+                    "reason": "5x efficiency, high risk",
+                    "rate": 5,
+                    "formula": "Energy (kW) = Alpha Matter (grams) × 5",
+                    "risk": "high",
+                    "efficiency": "500% of Reactor"
+                  }
+                },
+                {
+                  "value": "world-engine",
+                  "label": "World Engine (10x efficiency)",
+                  "result": {
+                    "recommendation": "World Engine",
+                    "reason": "10x efficiency, very high risk",
+                    "rate": 10,
+                    "formula": "Energy (kW) = Alpha Matter (grams) × 10",
+                    "risk": "high",
+                    "efficiency": "1000% of Reactor"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "false": {
+        "id": "need-alpha-matter",
+        "recommendation": "Mine and refine Alpha Ore first",
+        "reason": "Need Alpha Matter before energy production",
+        "nextSteps": [
+          "Mine Alpha Ore from planet",
+          "Refine Alpha Ore to Alpha Matter",
+          "Then return to this decision tree"
+        ]
+      }
+    },
+    "false": {
+      "id": "no-energy-needed",
+      "recommendation": "No energy production needed",
+      "reason": "You don't need energy production right now"
+    }
+  },
+  "comparison": {
+    "reactor": {
+      "rate": 1,
+      "formula": "Energy (kW) = Alpha Matter (grams) × 1",
+      "risk": "low",
+      "designIntent": "network-stability",
+      "bestFor": ["beginners", "reliable operations", "network stability"],
+      "pros": ["Safe", "Reliable", "Predictable", "Lower risk"],
+      "cons": ["Lower efficiency", "1x output"]
+    },
+    "fieldGenerator": {
+      "rate": 2,
+      "formula": "Energy (kW) = Alpha Matter (grams) × 2",
+      "risk": "high",
+      "designIntent": "higher-returns-inflation-control",
+      "bestFor": ["experienced players", "maximum efficiency", "acceptable risk"],
+      "pros": ["2x efficiency", "Higher output"],
+      "cons": ["Higher risk", "Less reliable"]
+    },
+    "continentalPowerPlant": {
+      "rate": 5,
+      "formula": "Energy (kW) = Alpha Matter (grams) × 5",
+      "risk": "high",
+      "designIntent": "higher-returns-inflation-control",
+      "bestFor": ["high-risk strategies", "maximum efficiency", "experienced players"],
+      "pros": ["5x efficiency", "Very high output"],
+      "cons": ["Very high risk", "Less reliable"]
+    },
+    "worldEngine": {
+      "rate": 10,
+      "formula": "Energy (kW) = Alpha Matter (grams) × 10",
+      "risk": "high",
+      "designIntent": "higher-returns-inflation-control",
+      "bestFor": ["maximum risk/reward", "extreme efficiency", "experienced players"],
+      "pros": ["10x efficiency", "Extremely high output"],
+      "cons": ["Extremely high risk", "Less reliable"]
+    }
+  },
+  "examples": {
+    "reactorExample": {
+      "input": "100 grams Alpha Matter",
+      "output": "100 kW Energy",
+      "formula": "100 × 1 = 100 kW",
+      "risk": "low"
+    },
+    "fieldGeneratorExample": {
+      "input": "100 grams Alpha Matter",
+      "output": "200 kW Energy",
+      "formula": "100 × 2 = 200 kW",
+      "risk": "high"
+    },
+    "continentalPowerPlantExample": {
+      "input": "100 grams Alpha Matter",
+      "output": "500 kW Energy",
+      "formula": "100 × 5 = 500 kW",
+      "risk": "high"
+    },
+    "worldEngineExample": {
+      "input": "100 grams Alpha Matter",
+      "output": "1000 kW Energy",
+      "formula": "100 × 10 = 1000 kW",
+      "risk": "high"
+    }
+  },
+  "energyProperties": {
+    "ephemeral": true,
+    "description": "Energy must be consumed immediately upon production. Cannot be stored.",
+    "shared": true,
+    "description2": "Energy is shared across all Structs connected to the same power source."
+  },
+  "bestPractices": {
+    "chooseReactorForSafety": {
+      "priority": "high",
+      "reason": "Reactors are safer (lower risk)",
+      "action": "Use Reactors when reliability is important"
+    },
+    "chooseGeneratorForEfficiency": {
+      "priority": "high",
+      "reason": "Generators are more efficient (2x, 5x, or 10x)",
+      "action": "Use Generators when you can handle risk for efficiency"
+    },
+    "planConsumption": {
+      "priority": "critical",
+      "reason": "Energy must be consumed immediately",
+      "action": "Plan what you'll use energy for before producing it"
+    }
+  }
+}
+

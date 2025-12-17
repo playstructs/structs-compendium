@@ -1,0 +1,219 @@
+{
+  "version": "1.0.0",
+  "id": "trading",
+  "name": "Trading Task",
+  "description": "Complete workflow for trading Alpha Matter and Energy on the marketplace",
+  "category": "economic",
+  "priority": "high",
+  "estimatedTime": "5-15 minutes",
+  "prerequisites": {
+    "playerOnline": true,
+    "hasResources": true,
+    "resources": {
+      "alphaMatter": {
+        "minimum": 1,
+        "unit": "grams",
+        "description": "Alpha Matter to trade"
+      },
+      "energy": {
+        "minimum": 1,
+        "unit": "kW",
+        "description": "Energy to trade (must be consumed immediately)",
+        "note": "Energy is ephemeral - trade quickly"
+      }
+    }
+  },
+  "tradingOptions": {
+    "tradeAlphaMatter": {
+      "name": "Trade Alpha Matter",
+      "description": "Buy or sell Alpha Matter on marketplace",
+      "security": {
+        "alphaMatterStealable": false,
+        "note": "Alpha Matter cannot be stolen - safe to trade"
+      },
+      "steps": [
+        {
+          "step": 1,
+          "name": "Query Market Data",
+          "description": "Get current market prices for Alpha Matter",
+          "action": "GET /structs/market/AlphaMatter",
+          "result": {
+            "currentPrice": "Current market price",
+            "supply": "Market supply",
+            "demand": "Market demand",
+            "trend": "Price trend (rising, falling, stable)"
+          }
+        },
+        {
+          "step": 2,
+          "name": "Analyze Market Conditions",
+          "description": "Determine if conditions are favorable for trading",
+          "factors": [
+            "Current price vs historical average",
+            "Supply and demand balance",
+            "Price trend direction",
+            "Market volatility"
+          ],
+          "decision": {
+            "buy": "Buy if price is low and trend is rising",
+            "sell": "Sell if price is high and trend is falling",
+            "wait": "Wait if conditions are uncertain"
+          }
+        },
+        {
+          "step": 3,
+          "name": "Execute Trade",
+          "description": "Place market order or execute immediate trade",
+          "action": "MsgTradeAlphaMatter or MsgPlaceMarketOrder",
+          "options": {
+            "immediateTrade": {
+              "action": "MsgTradeAlphaMatter",
+              "description": "Execute trade immediately at current market price"
+            },
+            "placeOrder": {
+              "action": "MsgPlaceMarketOrder",
+              "description": "Place order at specific price (may take time to fill)"
+            }
+          },
+          "result": {
+            "tradeExecuted": true,
+            "resourcesUpdated": true
+          }
+        }
+      ]
+    },
+    "tradeEnergy": {
+      "name": "Trade Energy",
+      "description": "Buy or sell Energy on marketplace or through agreements",
+      "security": {
+        "energyEphemeral": true,
+        "note": "Energy must be consumed immediately - cannot be stored"
+      },
+      "steps": [
+        {
+          "step": 1,
+          "name": "Query Energy Market",
+          "description": "Get current energy market data",
+          "action": "GET /structs/market/Energy",
+          "result": {
+            "currentPrice": "Current energy price (Alpha Matter per kW)",
+            "supply": "Available energy supply",
+            "demand": "Energy demand",
+            "agreements": "Available energy agreements"
+          }
+        },
+        {
+          "step": 2,
+          "name": "Choose Trading Method",
+          "description": "Decide between marketplace or automated agreement",
+          "options": {
+            "marketplace": {
+              "description": "Immediate trade on marketplace",
+              "bestFor": "One-time trades, immediate needs"
+            },
+            "agreement": {
+              "description": "Automated energy agreement",
+              "bestFor": "Long-term supply, consistent revenue",
+              "action": "MsgAgreementOpen",
+              "structs:deprecated": "MsgAgreementCreate (deprecated - use MsgAgreementOpen)"
+            }
+          }
+        },
+        {
+          "step": 3,
+          "name": "Execute Trade",
+          "description": "Execute energy trade or create agreement",
+          "action": "MsgTradeEnergy or MsgAgreementCreate",
+          "result": {
+            "tradeExecuted": true,
+            "energyReceived": "Energy amount (must consume immediately)",
+            "ephemeral": true
+          }
+        }
+      ]
+    }
+  },
+  "tradingStrategies": {
+    "buyLowSellHigh": {
+      "name": "Buy Low, Sell High",
+      "description": "Buy when prices are low, sell when prices are high",
+      "strategy": {
+        "monitorPrices": true,
+        "identifyTrends": true,
+        "timePurchases": "low prices",
+        "timeSales": "high prices"
+      }
+    },
+    "marketTiming": {
+      "name": "Market Timing",
+      "description": "Time trades based on market cycles",
+      "phases": {
+        "expansion": "High demand, rising prices - sell",
+        "consolidation": "Balanced market, stable prices - trade normally",
+        "conflict": "Price volatility - buy if supply available",
+        "recovery": "Market normalization - buy low"
+      }
+    },
+    "arbitrage": {
+      "name": "Arbitrage",
+      "description": "Profit from price differences",
+      "strategy": {
+        "identifyPriceDifferences": true,
+        "buyLowMarket": true,
+        "sellHighMarket": true,
+        "profitMargin": "price difference"
+      }
+    }
+  },
+  "bestPractices": {
+    "monitorMarket": {
+      "priority": "high",
+      "reason": "Market prices fluctuate based on supply and demand",
+      "action": "Track prices over time to identify trends"
+    },
+    "timeTrades": {
+      "priority": "high",
+      "reason": "Market timing affects profitability",
+      "action": "Buy during low-demand periods, sell during high-demand periods"
+    },
+    "energyImmediate": {
+      "priority": "critical",
+      "reason": "Energy is ephemeral and must be consumed immediately",
+      "action": "Have consumption ready before trading energy"
+    },
+    "establishAgreements": {
+      "priority": "medium",
+      "reason": "Automated agreements provide consistent supply/revenue",
+      "action": "Set up agreements for long-term trading relationships"
+    }
+  },
+  "commonErrors": {
+    "insufficientResources": {
+      "code": "INSUFFICIENT_RESOURCES",
+      "description": "Not enough resources to complete trade",
+      "solution": "Check resource balance, mine more resources, or reduce trade quantity"
+    },
+    "invalidPrice": {
+      "code": "INVALID_PRICE",
+      "description": "Price is outside acceptable range",
+      "solution": "Check current market prices, adjust price"
+    },
+    "energyExpired": {
+      "code": "ENERGY_EXPIRED",
+      "description": "Energy expired before trade completed (ephemeral)",
+      "solution": "Trade energy quickly, have consumption ready",
+      "prevention": "Consume energy immediately or trade very quickly"
+    },
+    "orderNotFound": {
+      "code": "ORDER_NOT_FOUND",
+      "description": "Order ID does not exist",
+      "solution": "Verify order ID, check order status"
+    }
+  },
+  "nextSteps": {
+    "useResources": "Use traded resources for operations",
+    "establishAgreement": "Set up automated agreement for consistent trading",
+    "monitorMarket": "Continue monitoring market for opportunities"
+  }
+}
+

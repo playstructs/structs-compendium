@@ -1,0 +1,321 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "id": "entity-relationships",
+  "type": "relationship",
+  "title": "Entity Relationship Graph",
+  "description": "Complete entity relationship graph showing all entity types and their connections",
+  "category": "system",
+  "entities": [
+    {
+      "id": "player",
+      "label": "Player",
+      "entityType": "Player",
+      "schemaReference": "schemas/entities.json#/definitions/Player",
+      "metadata": {
+        "category": "core",
+        "endpoint": "/structs/player/{id}"
+      }
+    },
+    {
+      "id": "planet",
+      "label": "Planet",
+      "entityType": "Planet",
+      "schemaReference": "schemas/entities.json#/definitions/Planet",
+      "metadata": {
+        "category": "core",
+        "endpoint": "/structs/planet/{id}"
+      }
+    },
+    {
+      "id": "struct",
+      "label": "Struct",
+      "entityType": "Struct",
+      "schemaReference": "schemas/entities.json#/definitions/Struct",
+      "metadata": {
+        "category": "core",
+        "endpoint": "/structs/struct/{id}"
+      }
+    },
+    {
+      "id": "struct-type",
+      "label": "Struct Type",
+      "entityType": "StructType",
+      "schemaReference": "schemas/entities.json#/definitions/StructType",
+      "metadata": {
+        "category": "core",
+        "endpoint": "/structs/struct_type/{id}"
+      }
+    },
+    {
+      "id": "fleet",
+      "label": "Fleet",
+      "entityType": "Fleet",
+      "schemaReference": "schemas/entities.json#/definitions/Fleet",
+      "metadata": {
+        "category": "core",
+        "endpoint": "/structs/fleet/{id}"
+      }
+    },
+    {
+      "id": "guild",
+      "label": "Guild",
+      "entityType": "Guild",
+      "schemaReference": "schemas/entities.json#/definitions/Guild",
+      "metadata": {
+        "category": "social",
+        "endpoint": "/structs/guild/{id}"
+      }
+    },
+    {
+      "id": "reactor",
+      "label": "Reactor",
+      "entityType": "Reactor",
+      "schemaReference": "schemas/entities.json#/definitions/Reactor",
+      "metadata": {
+        "category": "resource",
+        "endpoint": "/structs/reactor/{id}"
+      }
+    },
+    {
+      "id": "substation",
+      "label": "Substation",
+      "entityType": "Substation",
+      "schemaReference": "schemas/entities.json#/definitions/Substation",
+      "metadata": {
+        "category": "resource",
+        "endpoint": "/structs/substation/{id}"
+      }
+    },
+    {
+      "id": "provider",
+      "label": "Provider",
+      "entityType": "Provider",
+      "schemaReference": "schemas/entities.json#/definitions/Provider",
+      "metadata": {
+        "category": "economic",
+        "endpoint": "/structs/provider/{id}"
+      }
+    },
+    {
+      "id": "agreement",
+      "label": "Agreement",
+      "entityType": "Agreement",
+      "schemaReference": "schemas/entities.json#/definitions/Agreement",
+      "metadata": {
+        "category": "economic",
+        "endpoint": "/structs/agreement/{id}"
+      }
+    },
+    {
+      "id": "planet-attribute",
+      "label": "Planet Attribute",
+      "entityType": "PlanetAttribute",
+      "schemaReference": "schemas/entities.json#/definitions/PlanetAttribute",
+      "metadata": {
+        "category": "core",
+        "endpoint": "/structs/planet_attribute/{planetId}/{attributeType}"
+      }
+    },
+    {
+      "id": "struct-attribute",
+      "label": "Struct Attribute",
+      "entityType": "StructAttribute",
+      "schemaReference": "schemas/entities.json#/definitions/StructAttribute",
+      "metadata": {
+        "category": "core",
+        "endpoint": "/structs/struct_attribute/{structId}/{attributeType}"
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "id": "r1",
+      "from": "player",
+      "to": "planet",
+      "type": "owns",
+      "label": "owns",
+      "direction": "directed",
+      "cardinality": "one-to-one",
+      "metadata": {
+        "note": "Players can only own one planet at a time"
+      }
+    },
+    {
+      "id": "r2",
+      "from": "player",
+      "to": "struct",
+      "type": "owns",
+      "label": "owns",
+      "direction": "directed",
+      "cardinality": "one-to-many"
+    },
+    {
+      "id": "r3",
+      "from": "player",
+      "to": "fleet",
+      "type": "owns",
+      "label": "owns",
+      "direction": "directed",
+      "cardinality": "one-to-many"
+    },
+    {
+      "id": "r4",
+      "from": "player",
+      "to": "reactor",
+      "type": "owns",
+      "label": "owns",
+      "direction": "directed",
+      "cardinality": "one-to-many"
+    },
+    {
+      "id": "r5",
+      "from": "player",
+      "to": "substation",
+      "type": "owns",
+      "label": "owns",
+      "direction": "directed",
+      "cardinality": "one-to-many"
+    },
+    {
+      "id": "r6",
+      "from": "player",
+      "to": "provider",
+      "type": "owns",
+      "label": "owns",
+      "direction": "directed",
+      "cardinality": "one-to-many"
+    },
+    {
+      "id": "r7",
+      "from": "player",
+      "to": "guild",
+      "type": "memberOf",
+      "label": "member of",
+      "direction": "directed",
+      "cardinality": "many-to-one"
+    },
+    {
+      "id": "r8",
+      "from": "planet",
+      "to": "struct",
+      "type": "contains",
+      "label": "contains",
+      "direction": "directed",
+      "cardinality": "one-to-many"
+    },
+    {
+      "id": "r9",
+      "from": "planet",
+      "to": "reactor",
+      "type": "contains",
+      "label": "contains",
+      "direction": "directed",
+      "cardinality": "one-to-many"
+    },
+    {
+      "id": "r10",
+      "from": "planet",
+      "to": "substation",
+      "type": "contains",
+      "label": "contains",
+      "direction": "directed",
+      "cardinality": "one-to-many"
+    },
+    {
+      "id": "r11",
+      "from": "planet",
+      "to": "planet-attribute",
+      "type": "hasAttributes",
+      "label": "has attributes",
+      "direction": "directed",
+      "cardinality": "one-to-many"
+    },
+    {
+      "id": "r12",
+      "from": "struct",
+      "to": "struct-type",
+      "type": "typeOf",
+      "label": "type of",
+      "direction": "directed",
+      "cardinality": "many-to-one"
+    },
+    {
+      "id": "r13",
+      "from": "struct",
+      "to": "planet",
+      "type": "locatedOn",
+      "label": "located on",
+      "direction": "directed",
+      "cardinality": "many-to-one"
+    },
+    {
+      "id": "r14",
+      "from": "struct",
+      "to": "fleet",
+      "type": "locatedOn",
+      "label": "located on",
+      "direction": "directed",
+      "cardinality": "many-to-one"
+    },
+    {
+      "id": "r15",
+      "from": "struct",
+      "to": "struct-attribute",
+      "type": "hasAttributes",
+      "label": "has attributes",
+      "direction": "directed",
+      "cardinality": "one-to-many"
+    },
+    {
+      "id": "r16",
+      "from": "fleet",
+      "to": "struct",
+      "type": "contains",
+      "label": "contains",
+      "direction": "directed",
+      "cardinality": "one-to-many"
+    },
+    {
+      "id": "r17",
+      "from": "provider",
+      "to": "agreement",
+      "type": "hasAgreements",
+      "label": "has agreements",
+      "direction": "directed",
+      "cardinality": "one-to-many"
+    },
+    {
+      "id": "r18",
+      "from": "reactor",
+      "to": "planet",
+      "type": "locatedOn",
+      "label": "located on",
+      "direction": "directed",
+      "cardinality": "many-to-one"
+    },
+    {
+      "id": "r19",
+      "from": "substation",
+      "to": "planet",
+      "type": "locatedOn",
+      "label": "located on",
+      "direction": "directed",
+      "cardinality": "many-to-one"
+    }
+  ],
+  "relatedSchemas": [
+    "schemas/entities.json"
+  ],
+  "relatedEndpoints": [
+    "/structs/player",
+    "/structs/planet",
+    "/structs/struct",
+    "/structs/fleet",
+    "/structs/guild"
+  ],
+  "relatedDiagrams": [
+    "visuals/graphs/resource-flow.json"
+  ]
+}
+

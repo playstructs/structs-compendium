@@ -1,0 +1,35 @@
+version: "1.0.0"
+lastUpdated: "2025-01-XX"
+baseUrl: "http://localhost:1317"
+basePath: "/structs"
+category: "query"
+entity: "Reactor"
+
+endpoints:
+  - id: "reactor-by-id"
+    method: "GET"
+    path: "/structs/reactor/{id}"
+    description: "Get reactor by ID"
+    category: "query"
+    entity: "Reactor"
+    parameters:
+      - name: "id"
+        type: "string"
+        required: true
+        format: "entity-id"
+        pattern: "^3-[0-9]+$"
+        description: "Reactor identifier in format 'type-index' (e.g., '3-1' for reactor type 3, index 1). Type 3 = Reactor."
+    response:
+      schema: "schemas/entities/reactor.json"
+      contentType: "application/json"
+  
+  - id: "reactor-list"
+    method: "GET"
+    path: "/structs/reactor"
+    description: "List all reactors"
+    category: "query"
+    entity: "Reactor"
+    pagination: true
+    response:
+      schema: "schemas/entities/reactor.json[]"
+      contentType: "application/json"

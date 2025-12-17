@@ -1,0 +1,109 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "structs:workflow": "authenticated-guild-query",
+  "description": "Authenticate and query current player's guild information",
+  "category": "authentication",
+  "prerequisites": [
+    "webapp_username",
+    "webapp_password"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "endpoint": "webapp-auth-login",
+      "method": "POST",
+      "url": "http://localhost:8080/api/auth/login",
+      "description": "Authenticate with webapp",
+      "request": {
+        "body": {
+          "username": "{{webapp_username}}",
+          "password": "{{webapp_password}}"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      },
+      "extract": {
+        "session_cookie": "response.headers.Set-Cookie",
+        "session_id": "response.headers.Set-Cookie | extract PHPSESSID value"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "schema": "schemas/responses.json#/definitions/AuthResponse"
+      },
+      "errorHandling": {
+        "401": "Invalid credentials - verify username/password",
+        "500": "Server error - retry with exponential backoff"
+      }
+    },
+    {
+      "step": 2,
+      "endpoint": "webapp-guild-current",
+      "method": "GET",
+      "url": "http://localhost:8080/api/guild/this",
+      "description": "Get current player's guild",
+      "request": {
+        "headers": {
+          "Cookie": "{{step1.extract.session_cookie}}",
+          "Accept": "application/json"
+        }
+      },
+      "extract": {
+        "guild_id": "response.body.id",
+        "guild_name": "response.body.name"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "schema": "schemas/entities.json#/definitions/Guild"
+      },
+      "errorHandling": {
+        "401": "Session expired - re-authenticate (go to step 1)",
+        "404": "Player not in a guild",
+        "500": "Server error - retry with exponential backoff"
+      }
+    },
+    {
+      "step": 3,
+      "endpoint": "webapp-guild-member-count",
+      "method": "GET",
+      "url": "http://localhost:8080/api/guild/{{step2.extract.guild_id}}/members/count",
+      "description": "Get guild member count",
+      "request": {
+        "headers": {
+          "Cookie": "{{step1.extract.session_cookie}}",
+          "Accept": "application/json"
+        }
+      },
+      "extract": {
+        "member_count": "response.body.count"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "schema": "schemas/responses.json#/definitions/CountResponse"
+      }
+    }
+  ],
+  "result": {
+    "guild": {
+      "id": "{{step2.extract.guild_id}}",
+      "name": "{{step2.extract.guild_name}}",
+      "member_count": "{{step3.extract.member_count}}"
+    },
+    "session": {
+      "cookie": "{{step1.extract.session_cookie}}"
+    }
+  },
+  "errorHandling": {
+    "step1": {
+      "401": "Invalid credentials - cannot proceed",
+      "500": "Server error - retry with exponential backoff"
+    },
+    "step2": {
+      "401": "Session expired - re-authenticate and retry",
+      "404": "Player not in a guild - result.guild will be null"
+    }
+  },
+  "notes": "This workflow demonstrates authentication followed by authenticated API calls. The session cookie from step 1 is used in subsequent requests."
+}
+

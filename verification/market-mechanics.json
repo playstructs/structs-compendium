@@ -1,0 +1,103 @@
+{
+  "version": "1.0.0",
+  "id": "market-mechanics",
+  "name": "Market Mechanics Verification Status",
+  "description": "Verification status for market mechanics in Structs",
+  "lastUpdated": "2025-01-XX",
+  "marketMechanics": {
+    "priceDetermination": {
+      "description": "How market prices are determined",
+      "factors": [
+        "Supply and demand",
+        "Guild activities",
+        "Combat outcomes",
+        "Resource discoveries",
+        "Player-driven trading"
+      ],
+      "verified": false,
+      "verificationDate": null,
+      "codeReference": {
+        "file": "TBD",
+        "description": "Player-driven market, exact formula needs verification"
+      },
+      "status": "needsVerification",
+      "notes": "Prices are player-driven. Exact formula depends on market implementation."
+    },
+    "supplyDemand": {
+      "description": "How supply and demand affect prices",
+      "mechanism": "High demand increases prices, excess supply decreases prices",
+      "verified": false,
+      "verificationDate": null,
+      "codeReference": {
+        "file": "TBD",
+        "description": "Needs code verification"
+      },
+      "status": "needsVerification",
+      "notes": "Standard economic principle, needs code verification"
+    },
+    "marketCycles": {
+      "description": "Market cycles (expansion, consolidation, conflict, recovery)",
+      "phases": [
+        "Expansion: High demand, rising prices",
+        "Consolidation: Balanced market, stable prices",
+        "Conflict: Price volatility",
+        "Recovery: Market normalization"
+      ],
+      "verified": false,
+      "verificationDate": null,
+      "codeReference": {
+        "file": "TBD",
+        "description": "Theoretical market cycles, needs verification"
+      },
+      "status": "needsVerification",
+      "notes": "Theoretical market cycles based on gameplay patterns"
+    },
+    "automatedAgreements": {
+      "description": "Automated energy agreements with penalty protection",
+      "enforcement": {
+        "type": "automatic",
+        "onChain": true,
+        "penaltyProtection": true,
+        "selfEnforcing": true
+      },
+      "verified": true,
+      "verificationDate": "2025-01-XX",
+      "codeReference": {
+        "file": "TBD",
+        "description": "Documented in design document"
+      },
+      "status": "verified",
+      "notes": "Automatic, on-chain enforcement documented. Penalties enforced automatically by code."
+    },
+    "guildTokenMechanics": {
+      "description": "Guild token minting, trading, and revocation",
+      "security": {
+        "trustBased": true,
+        "technicalSafeguards": false,
+        "minimumCollateral": false,
+        "maxSupply": false,
+        "guildControl": "full"
+      },
+      "verified": true,
+      "verificationDate": "2025-01-XX",
+      "codeReference": {
+        "file": "TBD",
+        "description": "Documented in design document"
+      },
+      "status": "verified",
+      "notes": "Trust-based system documented. No technical safeguards."
+    }
+  },
+  "verificationSummary": {
+    "total": 5,
+    "verified": 2,
+    "needsVerification": 3,
+    "verifiedPercentage": 40
+  },
+  "nextVerificationSteps": [
+    "Verify price determination formula",
+    "Verify supply/demand mechanics",
+    "Verify market cycle implementation"
+  ]
+}
+

@@ -1,0 +1,59 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-01-XX",
+  "description": "Network configurations for Structs APIs",
+  "networks": {
+    "local": {
+      "name": "Local Development",
+      "description": "Local development environment",
+      "consensus": {
+        "rpcURL": "http://localhost:26657",
+        "apiURL": "http://localhost:1317",
+        "prefix": "structs"
+      },
+      "webapp": {
+        "baseURL": "http://localhost:8080",
+        "apiPath": "/api"
+      },
+      "streaming": {
+        "natsURL": "nats://localhost:4222",
+        "natsWebSocketURL": "ws://localhost:1443"
+      }
+    },
+    "testnet": {
+      "name": "Testnet",
+      "description": "Structs testnet network",
+      "consensus": {
+        "rpcURL": "https://rpc.testnet.structs.network:26657",
+        "apiURL": "https://api.testnet.structs.network:1317",
+        "prefix": "structs"
+      },
+      "webapp": {
+        "baseURL": "https://testnet.structs.network",
+        "apiPath": "/api"
+      },
+      "streaming": {
+        "natsURL": "nats://testnet.structs.network:4222",
+        "natsWebSocketURL": "wss://testnet.structs.network:1443"
+      }
+    },
+    "mainnet": {
+      "name": "Mainnet",
+      "description": "Structs mainnet network",
+      "consensus": {
+        "rpcURL": "https://rpc.structs.network:26657",
+        "apiURL": "https://api.structs.network:1317",
+        "prefix": "structs"
+      },
+      "webapp": {
+        "baseURL": "https://structs.network",
+        "apiPath": "/api"
+      },
+      "streaming": {
+        "natsURL": "nats://structs.network:4222",
+        "natsWebSocketURL": "wss://structs.network:1443"
+      }
+    }
+  }
+}
+

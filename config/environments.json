@@ -1,0 +1,68 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-01-XX",
+  "description": "Environment configurations for AI agents",
+  "environments": {
+    "development": {
+      "name": "Development",
+      "description": "Local development environment",
+      "network": "local",
+      "timeout": 5000,
+      "retryPolicy": {
+        "maxRetries": 3,
+        "retryDelay": 1000,
+        "retryOn": ["timeout", "5xx", "network"]
+      },
+      "logging": {
+        "level": "debug",
+        "enabled": true
+      },
+      "features": {
+        "caching": true,
+        "validation": true,
+        "errorReporting": true
+      }
+    },
+    "testnet": {
+      "name": "Testnet",
+      "description": "Testnet environment",
+      "network": "testnet",
+      "timeout": 10000,
+      "retryPolicy": {
+        "maxRetries": 5,
+        "retryDelay": 2000,
+        "retryOn": ["timeout", "5xx", "network"]
+      },
+      "logging": {
+        "level": "info",
+        "enabled": true
+      },
+      "features": {
+        "caching": true,
+        "validation": true,
+        "errorReporting": true
+      }
+    },
+    "production": {
+      "name": "Production",
+      "description": "Production environment",
+      "network": "mainnet",
+      "timeout": 15000,
+      "retryPolicy": {
+        "maxRetries": 5,
+        "retryDelay": 3000,
+        "retryOn": ["timeout", "5xx", "network"]
+      },
+      "logging": {
+        "level": "warn",
+        "enabled": true
+      },
+      "features": {
+        "caching": true,
+        "validation": true,
+        "errorReporting": true
+      }
+    }
+  }
+}
+

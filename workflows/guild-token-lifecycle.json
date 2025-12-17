@@ -1,0 +1,235 @@
+{
+  "version": "1.0.0",
+  "id": "guild-token-lifecycle",
+  "name": "Guild Token Lifecycle Workflow",
+  "description": "Complete workflow for guild token minting, trading, and management",
+  "category": "economic",
+  "estimatedTime": "10-20 minutes",
+  "prerequisites": {
+    "playerOnline": true,
+    "guildMember": true,
+    "guildPermissions": ["mintTokens", "manageBank"],
+    "hasAlphaMatter": true
+  },
+  "security": {
+    "trustBased": true,
+    "warning": "Guild tokens are trust-based. Guilds have full control. No technical safeguards."
+  },
+  "steps": [
+    {
+      "step": 1,
+      "name": "Query Guild Central Bank",
+      "description": "Get current guild central bank status",
+      "action": {
+        "method": "GET",
+        "endpoint": "/structs/guild/{guildId}/bank",
+        "responseSchema": "schemas/economics.json#/entities/GuildCentralBank"
+      },
+      "expectedResponse": {
+        "guildId": "string",
+        "collateral": "number",
+        "tokensIssued": "number",
+        "tokensInCirculation": "number",
+        "collateralRatio": "number"
+      }
+    },
+    {
+      "step": 2,
+      "name": "Lock Collateral",
+      "description": "Lock Alpha Matter as collateral for guild tokens",
+      "action": {
+        "method": "POST",
+        "endpoint": "/cosmos/tx/v1beta1/txs",
+        "messageType": "/structs.structs.MsgGuildLockCollateral"
+      },
+      "requirements": {
+        "hasAlphaMatter": true,
+        "sufficientAmount": true
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgGuildLockCollateral",
+                "creator": "structs1...",
+                "guildId": "1-1",
+                "alphaMatterAmount": "100000000"
+              }
+            ]
+          }
+        }
+      },
+      "result": {
+        "collateralLocked": true,
+        "canMintTokens": true
+      }
+    },
+    {
+      "step": 3,
+      "name": "Mint Guild Tokens",
+      "description": "Mint new guild tokens backed by collateral",
+      "action": {
+        "method": "POST",
+        "endpoint": "/cosmos/tx/v1beta1/txs",
+        "messageType": "/structs.structs.MsgGuildMintTokens"
+      },
+      "requirements": {
+        "collateralLocked": true,
+        "guildPermissions": true
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgGuildMintTokens",
+                "creator": "structs1...",
+                "guildId": "1-1",
+                "tokensToMint": "1000"
+              }
+            ]
+          }
+        }
+      },
+      "result": {
+        "tokensMinted": true,
+        "tokensInCirculation": "updated",
+        "collateralRatio": "calculated"
+      }
+    },
+    {
+      "step": 4,
+      "name": "Query Guild Token Market",
+      "description": "Get current guild token market data",
+      "action": {
+        "method": "GET",
+        "endpoint": "/structs/market/guild-token/{guildId}",
+        "responseSchema": "schemas/markets.json#/markets/GuildTokenMarketData"
+      },
+      "expectedResponse": {
+        "currentPrice": "number",
+        "marketCap": "number",
+        "tokensInCirculation": "number",
+        "collateral": "number",
+        "collateralRatio": "number",
+        "volume24h": "number",
+        "trustRating": "string"
+      }
+    },
+    {
+      "step": 5,
+      "name": "Trade Guild Tokens (Optional)",
+      "description": "Trade guild tokens on marketplace",
+      "action": {
+        "method": "POST",
+        "endpoint": "/cosmos/tx/v1beta1/txs",
+        "messageType": "/structs.structs.MsgTradeGuildToken"
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgTradeGuildToken",
+                "creator": "structs1...",
+                "guildId": "1-1",
+                "quantity": 100,
+                "price": 0.01,
+                "type": "sell"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "step": 6,
+      "name": "Monitor Token Status",
+      "description": "Monitor token supply, collateral ratio, and market value",
+      "action": {
+        "method": "GET",
+        "endpoint": "/structs/guild/{guildId}/bank",
+        "responseSchema": "schemas/economics.json#/entities/GuildCentralBank"
+      },
+      "monitor": {
+        "collateralRatio": "Maintain healthy ratio (100%+ recommended)",
+        "tokensInCirculation": "Track token supply",
+        "marketValue": "Monitor token price"
+      }
+    },
+    {
+      "step": 7,
+      "name": "Revoke Tokens (Optional - Economic Warfare)",
+      "description": "Revoke and burn tokens (can be used for economic warfare)",
+      "action": {
+        "method": "POST",
+        "endpoint": "/cosmos/tx/v1beta1/txs",
+        "messageType": "/structs.structs.MsgGuildRevokeTokens"
+      },
+      "warning": "Revocation damages reputation. Use carefully.",
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgGuildRevokeTokens",
+                "creator": "structs1...",
+                "guildId": "1-1",
+                "tokensToRevoke": "100"
+              }
+            ]
+          }
+        }
+      },
+      "result": {
+        "tokensRevoked": true,
+        "tokensBurned": true
+      }
+    }
+  ],
+  "risks": {
+    "overMinting": {
+      "description": "Minting more tokens than collateral backing",
+      "result": "Inflation, reduced token value",
+      "prevention": "Maintain healthy collateral ratio"
+    },
+    "poorManagement": {
+      "description": "Poor token management damages reputation",
+      "result": "Reduced trust, lower token value",
+      "prevention": "Transparent management, maintain collateral"
+    },
+    "revocation": {
+      "description": "Token revocation damages reputation",
+      "result": "Reduced trust, potential token devaluation",
+      "prevention": "Use revocation carefully, maintain reputation"
+    }
+  },
+  "errorHandling": {
+    "insufficientCollateral": {
+      "code": "INSUFFICIENT_COLLATERAL",
+      "step": 2,
+      "solution": "Lock more Alpha Matter as collateral",
+      "retry": true
+    },
+    "overMinting": {
+      "code": "OVER_MINTING",
+      "step": 3,
+      "solution": "Add more collateral or reduce token supply",
+      "retry": true
+    },
+    "noPermissions": {
+      "code": "NO_PERMISSIONS",
+      "step": 3,
+      "solution": "Request permissions from guild leadership",
+      "retry": false
+    }
+  },
+  "bestPractices": {
+    "maintainCollateral": "Maintain healthy collateral ratio (100%+ recommended)",
+    "transparentManagement": "Communicate token management decisions to guild members",
+    "avoidOverMinting": "Only mint tokens backed by adequate collateral",
+    "protectReputation": "Use revocation carefully, maintain good reputation"
+  }
+}
+

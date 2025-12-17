@@ -1,0 +1,154 @@
+{
+  "version": "1.0.0",
+  "name": "Mining Bot Example",
+  "description": "Example bot that mines Alpha Matter, refines ore, and converts to Watts",
+  "type": "gameplay",
+  "workflow": {
+    "name": "Resource Extraction Workflow",
+    "steps": [
+      {
+        "step": 1,
+        "action": "chart",
+        "description": "Chart planet to reveal resources",
+        "request": {
+          "action": "chart",
+          "planetId": "2-1"
+        },
+        "expectedResponse": {
+          "status": "charted",
+          "revealed": {
+            "resources": {
+              "maxOre": 5,
+              "currentOre": 5
+            },
+            "ownership": {
+              "claimed": false
+            }
+          }
+        }
+      },
+      {
+        "step": 2,
+        "action": "build",
+        "description": "Build Ore Extractor on planet",
+        "request": {
+          "action": "build",
+          "structType": "oreExtractor",
+          "locationType": 1,
+          "locationId": "2-1",
+          "slot": "land",
+          "verify": {
+            "playerOnline": true,
+            "fleetOnStation": true,
+            "commandShipOnline": true,
+            "sufficientPower": true,
+            "availableSlot": true
+          }
+        },
+        "expectedResponse": {
+          "status": "building",
+          "structId": "extractor-1",
+          "buildTime": 3600,
+          "costs": {
+            "buildPower": 500000,
+            "passivePower": 500000
+          }
+        }
+      },
+      {
+        "step": 3,
+        "action": "wait",
+        "description": "Wait for extractor to build",
+        "duration": 3600
+      },
+      {
+        "step": 4,
+        "action": "monitor",
+        "description": "Monitor mining operation",
+        "request": {
+          "action": "queryMining",
+          "planetId": "2-1",
+          "extractorId": "extractor-1"
+        },
+        "expectedResponse": {
+          "status": "mining",
+          "currentOre": 4,
+          "oreExtracted": 1,
+          "oreStored": 1,
+          "security": {
+            "needsRefinement": true,
+            "warning": "Ore can be stolen - refine immediately"
+          }
+        }
+      },
+      {
+        "step": 5,
+        "action": "refine",
+        "description": "Refine ore to Alpha Matter (secure)",
+        "request": {
+          "action": "refine",
+          "planetId": "2-1",
+          "oreAmount": 1
+        },
+        "expectedResponse": {
+          "status": "refined",
+          "oreRefined": 1,
+          "alphaMatterGained": 1,
+          "security": {
+            "alphaMatterSecure": true,
+            "cannotBeStolen": true
+          }
+        }
+      },
+      {
+        "step": 6,
+        "action": "convert",
+        "description": "Convert Alpha Matter to Watts",
+        "request": {
+          "action": "convertPower",
+          "method": "reactor",
+          "alphaMatterAmount": 1
+        },
+        "expectedResponse": {
+          "status": "converted",
+          "method": "reactor",
+          "alphaMatterUsed": 1,
+          "wattsGained": 1,
+          "rate": "1g:1kW"
+        }
+      },
+      {
+        "step": 7,
+        "action": "loop",
+        "description": "Continue mining loop",
+        "nextStep": 4
+      }
+    ]
+  },
+  "errorHandling": {
+    "insufficientPower": {
+      "action": "convertPower",
+      "check": "alphaMatterAvailable >= amount",
+      "fallback": "Wait for more Alpha Matter"
+    },
+    "oreNotRefined": {
+      "action": "refine",
+      "check": "oreStored > 0",
+      "fallback": "Refine immediately to secure resources"
+    },
+    "playerOffline": {
+      "action": "queryPower",
+      "check": "playerOnline == true",
+      "fallback": "Reduce consumption or increase capacity"
+    }
+  },
+  "optimization": {
+    "refineImmediately": true,
+    "convertWhenNeeded": true,
+    "maintainReserves": {
+      "alphaMatter": 0.2,
+      "watts": 0.2
+    }
+  }
+}
+

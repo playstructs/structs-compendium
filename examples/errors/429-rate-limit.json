@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "structs:errorType": "429-rate-limit",
+  "description": "Rate limit exceeded error example",
+  "httpStatus": 429,
+  "scenarios": [
+    {
+      "scenario": "Rate limit exceeded",
+      "endpoint": "any",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/player/1-11",
+        "headers": {
+          "Accept": "application/json"
+        }
+      },
+      "response": {
+        "status": 429,
+        "headers": {
+          "Content-Type": "application/json",
+          "Retry-After": "60",
+          "X-RateLimit-Limit": "100",
+          "X-RateLimit-Remaining": "0",
+          "X-RateLimit-Reset": "1704067260"
+        },
+        "body": {
+          "error": "Rate limit exceeded",
+          "code": 429,
+          "retry_after": 60,
+          "limit": 100,
+          "remaining": 0,
+          "reset_at": "2025-01-01T00:01:00Z"
+        }
+      },
+      "handling": {
+        "action": "Wait for retry_after seconds before retrying",
+        "retry": true,
+        "retry_after": "response.retry_after",
+        "retry_strategy": "exponential_backoff",
+        "max_retries": 3,
+        "recovery": "Implement rate limiting: reduce request frequency, use exponential backoff, respect Retry-After header"
+      }
+    }
+  ],
+  "schema": "schemas/responses.json#/definitions/RateLimitErrorResponse",
+  "bestPractices": [
+    "Implement request throttling",
+    "Respect Retry-After header",
+    "Use exponential backoff",
+    "Monitor rate limit headers",
+    "Cache responses when possible"
+  ]
+}
+

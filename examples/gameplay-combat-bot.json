@@ -1,0 +1,213 @@
+{
+  "version": "1.0.0",
+  "name": "Combat Bot Example",
+  "description": "Example bot that scouts targets, assembles forces, and executes attacks",
+  "type": "gameplay",
+  "workflow": {
+    "name": "Combat Workflow",
+    "steps": [
+      {
+        "step": 1,
+        "action": "scout",
+        "description": "Chart target planet to assess defenses",
+        "request": {
+          "action": "chart",
+          "planetId": "enemy-planet-id"
+        },
+        "expectedResponse": {
+          "status": "charted",
+          "revealed": {
+            "defenses": [
+              {
+                "type": "planetaryDefenseCannon",
+                "count": 1
+              }
+            ],
+            "structs": [
+              {
+                "type": "planetaryBattleship",
+                "count": 1
+              }
+            ],
+            "ownership": {
+              "claimed": true,
+              "owner": "enemy-player-id"
+            }
+          }
+        }
+      },
+      {
+        "step": 2,
+        "action": "assess",
+        "description": "Assess combat requirements",
+        "evaluation": {
+          "enemyDefenses": {
+            "defenseCannon": 1,
+            "battleships": 1
+          },
+          "requiredForces": {
+            "commandShips": 2,
+            "powerNeeded": 100000
+          },
+          "risk": "medium"
+        }
+      },
+      {
+        "step": 3,
+        "action": "prepare",
+        "description": "Ensure sufficient power and forces",
+        "request": {
+          "action": "queryPower",
+          "playerId": "self"
+        },
+        "expectedResponse": {
+          "powerStatus": {
+            "availableCapacity": 200000,
+            "playerOnline": true
+          }
+        },
+        "verify": {
+          "sufficientPower": true,
+          "forcesReady": true
+        }
+      },
+      {
+        "step": 4,
+        "action": "attack",
+        "description": "Execute attack on target",
+        "request": {
+          "action": "attack",
+          "type": "attack",
+          "target": "enemy-planet-id",
+          "structs": ["command-ship-1", "command-ship-2"],
+          "verify": {
+            "playerOnline": true,
+            "sufficientPower": true,
+            "structsOnline": true,
+            "validTarget": true
+          }
+        },
+        "expectedResponse": {
+          "status": "resolved",
+          "outcome": {
+            "victory": true,
+            "alphaMatterGained": 5,
+            "unitsDestroyed": ["enemy-battleship-1"],
+            "resourcesLost": {
+              "ore": 0
+            }
+          },
+          "battleDetails": {
+            "evasionChecks": 2,
+            "blockingChecks": 1,
+            "counterAttacks": 1
+          }
+        }
+      },
+      {
+        "step": 5,
+        "action": "secure",
+        "description": "Secure captured planet",
+        "request": {
+          "action": "build",
+          "structType": "planetaryDefenseCannon",
+          "locationType": 1,
+          "locationId": "enemy-planet-id",
+          "slot": "space"
+        }
+      }
+    ]
+  },
+  "raidWorkflow": {
+    "name": "Raid Workflow",
+    "steps": [
+      {
+        "step": 1,
+        "action": "moveFleet",
+        "description": "Move fleet away from station",
+        "request": {
+          "action": "moveFleet",
+          "fleetId": "fleet-id",
+          "status": "away"
+        },
+        "verify": {
+          "fleetAway": true,
+          "commandShipOnline": true
+        }
+      },
+      {
+        "step": 2,
+        "action": "raid",
+        "description": "Execute raid on target planet",
+        "request": {
+          "action": "raid",
+          "type": "raid",
+          "target": "target-planet-id",
+          "fleetId": "fleet-id",
+          "verify": {
+            "playerOnline": true,
+            "fleetAway": true,
+            "commandShipOnline": true,
+            "proofOfWork": true
+          }
+        },
+        "expectedResponse": {
+          "status": "raidComplete",
+          "outcome": {
+            "victory": true,
+            "oreStolen": 10,
+            "alphaMatterGained": 0
+          }
+        }
+      }
+    ]
+  },
+  "defenseWorkflow": {
+    "name": "Defense Workflow",
+    "steps": [
+      {
+        "step": 1,
+        "action": "buildDefenses",
+        "description": "Build defensive structures",
+        "request": {
+          "action": "build",
+          "structType": "planetaryDefenseCannon",
+          "locationType": 1,
+          "locationId": "planet-id",
+          "slot": "space"
+        }
+      },
+      {
+        "step": 2,
+        "action": "monitor",
+        "description": "Monitor for attacks",
+        "request": {
+          "action": "queryPlanet",
+          "planetId": "planet-id"
+        }
+      },
+      {
+        "step": 3,
+        "action": "respond",
+        "description": "Respond to attacks automatically",
+        "automatic": true,
+        "note": "Defensive structures fire automatically"
+      }
+    ]
+  },
+  "errorHandling": {
+    "insufficientPower": {
+      "action": "convertPower",
+      "fallback": "Convert Alpha Matter to Watts"
+    },
+    "fleetNotAway": {
+      "action": "moveFleet",
+      "fallback": "Move fleet away before raiding"
+    },
+    "commandShipOffline": {
+      "action": "activateCommandShip",
+      "fallback": "Activate Command Ship before operations"
+    }
+  }
+}
+

@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Player Essential Schema",
+  "description": "Minimal player schema for simple lookups and basic operations. Use this for ID format checks, existence verification, and basic status queries. For complete player data, use schemas/entities/player.json",
+  "type": "object",
+  "structs:category": "core",
+  "structs:minimal": true,
+  "structs:completeSchema": "schemas/entities/player.json",
+  "properties": {
+    "id": {
+      "type": "string",
+      "structs:format": "entity-id",
+      "pattern": "^1-[0-9]+$",
+      "description": "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11)"
+    },
+    "index": {
+      "type": "string",
+      "description": "Player index number"
+    },
+    "guildId": {
+      "type": "string",
+      "structs:format": "entity-id",
+      "pattern": "^0-[0-9]+$",
+      "description": "Guild ID if player is a member, empty string if not"
+    },
+    "planetId": {
+      "type": "string",
+      "structs:format": "entity-id",
+      "pattern": "^2-[0-9]+$",
+      "description": "Planet ID if player owns a planet, empty string if not"
+    },
+    "fleetId": {
+      "type": "string",
+      "structs:format": "entity-id",
+      "pattern": "^9-[0-9]+$",
+      "description": "Fleet ID if player owns a fleet, empty string if not"
+    },
+    "substationId": {
+      "type": "string",
+      "structs:format": "entity-id",
+      "pattern": "^4-[0-9]+$",
+      "description": "Substation ID if connected, empty string if not"
+    },
+    "halted": {
+      "type": "boolean",
+      "description": "Whether player is halted (cannot perform actions)"
+    }
+  },
+  "required": ["id", "index"],
+  "structs:useCases": [
+    "Check if player exists",
+    "Verify player ID format",
+    "Check basic player status (halted, guild membership)",
+    "Find player's planet/fleet/substation IDs",
+    "Quick player lookup"
+  ],
+  "structs:whenToUse": "Use this schema for simple operations that don't require full player data (grid attributes, inventory, power details, etc.)",
+  "structs:whenNotToUse": "Don't use this schema if you need: power capacity/load, ore/fuel amounts, inventory details, grid attributes, or any detailed player state"
+}
+

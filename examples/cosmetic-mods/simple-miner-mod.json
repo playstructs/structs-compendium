@@ -1,0 +1,29 @@
+{
+  "$schema": "../../schemas/cosmetic-mod.json",
+  "manifest": {
+    "modId": "simple-miner-mod-v1",
+    "name": {
+      "en": "Simple Miner Mod"
+    },
+    "version": "1.0.0",
+    "author": "Example Modder",
+    "description": {
+      "en": "A simple example mod that renames the miner struct type"
+    },
+    "compatibleGameVersion": "1.0.0",
+    "createdAt": "2025-01-15T10:00:00Z",
+    "updatedAt": "2025-01-15T10:00:00Z"
+  },
+  "structTypes": [
+    {
+      "structTypeId": "miner",
+      "names": {
+        "en": "Deep Core Extractor"
+      },
+      "lore": {
+        "en": "A specialized mining unit designed to extract valuable resources from planetary cores. The Deep Core Extractor represents the pinnacle of mining technology, capable of operating in the most extreme conditions."
+      }
+    }
+  ]
+}
+

@@ -1,0 +1,481 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Endpoint Index",
+  "description": "Complete index of all API endpoints for AI agents",
+  "type": "object",
+  "lastUpdated": "2025-01-XX",
+  "endpoints": [
+    {
+      "id": "player-by-id",
+      "method": "GET",
+      "path": "/structs/player/{id}",
+      "category": "query",
+      "entity": "Player",
+      "schema": "schemas/entities.json#/definitions/Player",
+      "protocol": "protocols/query-protocol.md#pattern-1"
+    },
+    {
+      "id": "player-list",
+      "method": "GET",
+      "path": "/structs/player",
+      "category": "query",
+      "entity": "Player",
+      "pagination": true,
+      "schema": "schemas/entities.json#/definitions/Player[]",
+      "protocol": "protocols/query-protocol.md#pattern-2"
+    },
+    {
+      "id": "planet-by-id",
+      "method": "GET",
+      "path": "/structs/planet/{id}",
+      "category": "query",
+      "entity": "Planet",
+      "schema": "schemas/entities.json#/definitions/Planet",
+      "protocol": "protocols/query-protocol.md#pattern-1"
+    },
+    {
+      "id": "planet-list",
+      "method": "GET",
+      "path": "/structs/planet",
+      "category": "query",
+      "entity": "Planet",
+      "pagination": true,
+      "schema": "schemas/entities.json#/definitions/Planet[]",
+      "protocol": "protocols/query-protocol.md#pattern-2"
+    },
+    {
+      "id": "planet-by-player",
+      "method": "GET",
+      "path": "/structs/planet_by_player/{playerId}",
+      "category": "query",
+      "entity": "Planet",
+      "schema": "schemas/entities.json#/definitions/Planet[]",
+      "protocol": "protocols/query-protocol.md#pattern-3"
+    },
+    {
+      "id": "struct-by-id",
+      "method": "GET",
+      "path": "/structs/struct/{id}",
+      "category": "query",
+      "entity": "Struct",
+      "schema": "schemas/entities.json#/definitions/Struct",
+      "protocol": "protocols/query-protocol.md#pattern-1"
+    },
+    {
+      "id": "struct-list",
+      "method": "GET",
+      "path": "/structs/struct",
+      "category": "query",
+      "entity": "Struct",
+      "pagination": true,
+      "schema": "schemas/entities.json#/definitions/Struct[]",
+      "protocol": "protocols/query-protocol.md#pattern-2"
+    },
+    {
+      "id": "fleet-by-id",
+      "method": "GET",
+      "path": "/structs/fleet/{id}",
+      "category": "query",
+      "entity": "Fleet",
+      "schema": "schemas/entities.json#/definitions/Fleet",
+      "protocol": "protocols/query-protocol.md#pattern-1"
+    },
+    {
+      "id": "fleet-list",
+      "method": "GET",
+      "path": "/structs/fleet",
+      "category": "query",
+      "entity": "Fleet",
+      "pagination": true,
+      "schema": "schemas/entities.json#/definitions/Fleet[]",
+      "protocol": "protocols/query-protocol.md#pattern-2"
+    },
+    {
+      "id": "guild-by-id",
+      "method": "GET",
+      "path": "/structs/guild/{id}",
+      "category": "query",
+      "entity": "Guild",
+      "schema": "schemas/entities.json#/definitions/Guild",
+      "protocol": "protocols/query-protocol.md#pattern-1"
+    },
+    {
+      "id": "guild-list",
+      "method": "GET",
+      "path": "/structs/guild",
+      "category": "query",
+      "entity": "Guild",
+      "pagination": true,
+      "schema": "schemas/entities.json#/definitions/Guild[]",
+      "protocol": "protocols/query-protocol.md#pattern-2"
+    },
+    {
+      "id": "reactor-by-id",
+      "method": "GET",
+      "path": "/structs/reactor/{id}",
+      "category": "query",
+      "entity": "Reactor",
+      "schema": "schemas/entities.json#/definitions/Reactor",
+      "protocol": "protocols/query-protocol.md#pattern-1"
+    },
+    {
+      "id": "reactor-list",
+      "method": "GET",
+      "path": "/structs/reactor",
+      "category": "query",
+      "entity": "Reactor",
+      "pagination": true,
+      "schema": "schemas/entities.json#/definitions/Reactor[]",
+      "protocol": "protocols/query-protocol.md#pattern-2"
+    },
+    {
+      "id": "substation-by-id",
+      "method": "GET",
+      "path": "/structs/substation/{id}",
+      "category": "query",
+      "entity": "Substation",
+      "schema": "schemas/entities.json#/definitions/Substation",
+      "protocol": "protocols/query-protocol.md#pattern-1"
+    },
+    {
+      "id": "substation-list",
+      "method": "GET",
+      "path": "/structs/substation",
+      "category": "query",
+      "entity": "Substation",
+      "pagination": true,
+      "schema": "schemas/entities.json#/definitions/Substation[]",
+      "protocol": "protocols/query-protocol.md#pattern-2"
+    },
+    {
+      "id": "provider-by-id",
+      "method": "GET",
+      "path": "/structs/provider/{id}",
+      "category": "query",
+      "entity": "Provider",
+      "schema": "schemas/entities.json#/definitions/Provider",
+      "protocol": "protocols/query-protocol.md#pattern-1"
+    },
+    {
+      "id": "provider-list",
+      "method": "GET",
+      "path": "/structs/provider",
+      "category": "query",
+      "entity": "Provider",
+      "pagination": true,
+      "schema": "schemas/entities.json#/definitions/Provider[]",
+      "protocol": "protocols/query-protocol.md#pattern-2"
+    },
+    {
+      "id": "agreement-by-id",
+      "method": "GET",
+      "path": "/structs/agreement/{id}",
+      "category": "query",
+      "entity": "Agreement",
+      "schema": "schemas/entities.json#/definitions/Agreement",
+      "protocol": "protocols/query-protocol.md#pattern-1"
+    },
+    {
+      "id": "agreement-list",
+      "method": "GET",
+      "path": "/structs/agreement",
+      "category": "query",
+      "entity": "Agreement",
+      "pagination": true,
+      "schema": "schemas/entities.json#/definitions/Agreement[]",
+      "protocol": "protocols/query-protocol.md#pattern-2"
+    },
+    {
+      "id": "agreement-by-provider",
+      "method": "GET",
+      "path": "/structs/agreement_by_provider/{providerId}",
+      "category": "query",
+      "entity": "Agreement",
+      "schema": "schemas/entities.json#/definitions/Agreement[]",
+      "protocol": "protocols/query-protocol.md#pattern-3"
+    },
+    {
+      "id": "allocation-by-id",
+      "method": "GET",
+      "path": "/structs/allocation/{id}",
+      "category": "query",
+      "entity": "Allocation",
+      "schema": "schemas/entities.json#/definitions/Allocation",
+      "protocol": "protocols/query-protocol.md#pattern-1"
+    },
+    {
+      "id": "allocation-list",
+      "method": "GET",
+      "path": "/structs/allocation",
+      "category": "query",
+      "entity": "Allocation",
+      "pagination": true,
+      "schema": "schemas/entities.json#/definitions/Allocation[]",
+      "protocol": "protocols/query-protocol.md#pattern-2"
+    },
+    {
+      "id": "allocation-by-source",
+      "method": "GET",
+      "path": "/structs/allocation_by_source/{sourceId}",
+      "category": "query",
+      "entity": "Allocation",
+      "schema": "schemas/entities.json#/definitions/Allocation[]",
+      "protocol": "protocols/query-protocol.md#pattern-3"
+    },
+    {
+      "id": "allocation-by-destination",
+      "method": "GET",
+      "path": "/structs/allocation_by_destination/{destinationId}",
+      "category": "query",
+      "entity": "Allocation",
+      "schema": "schemas/entities.json#/definitions/Allocation[]",
+      "protocol": "protocols/query-protocol.md#pattern-3"
+    },
+    {
+      "id": "address-by-address",
+      "method": "GET",
+      "path": "/structs/address/{address}",
+      "category": "query",
+      "entity": "Address",
+      "schema": "schemas/entities.json#/definitions/Address",
+      "protocol": "protocols/query-protocol.md#pattern-1"
+    },
+    {
+      "id": "address-list",
+      "method": "GET",
+      "path": "/structs/address",
+      "category": "query",
+      "entity": "Address",
+      "pagination": true,
+      "schema": "schemas/entities.json#/definitions/Address[]",
+      "protocol": "protocols/query-protocol.md#pattern-2"
+    },
+    {
+      "id": "address-by-player",
+      "method": "GET",
+      "path": "/structs/address_by_player/{playerId}",
+      "category": "query",
+      "entity": "Address",
+      "schema": "schemas/entities.json#/definitions/Address[]",
+      "protocol": "protocols/query-protocol.md#pattern-3"
+    },
+    {
+      "id": "permission-by-id",
+      "method": "GET",
+      "path": "/structs/permission/{permissionId}",
+      "category": "query",
+      "entity": "Permission",
+      "schema": "schemas/entities.json#/definitions/Permission",
+      "protocol": "protocols/query-protocol.md#pattern-1"
+    },
+    {
+      "id": "permission-list",
+      "method": "GET",
+      "path": "/structs/permission",
+      "category": "query",
+      "entity": "Permission",
+      "pagination": true,
+      "schema": "schemas/entities.json#/definitions/Permission[]",
+      "protocol": "protocols/query-protocol.md#pattern-2"
+    },
+    {
+      "id": "permission-by-object",
+      "method": "GET",
+      "path": "/structs/permission/object/{objectId}",
+      "category": "query",
+      "entity": "Permission",
+      "schema": "schemas/entities.json#/definitions/Permission[]",
+      "protocol": "protocols/query-protocol.md#pattern-3"
+    },
+    {
+      "id": "permission-by-player",
+      "method": "GET",
+      "path": "/structs/permission/player/{playerId}",
+      "category": "query",
+      "entity": "Permission",
+      "schema": "schemas/entities.json#/definitions/Permission[]",
+      "protocol": "protocols/query-protocol.md#pattern-3"
+    },
+    {
+      "id": "block-height",
+      "method": "GET",
+      "path": "/blockheight",
+      "category": "query",
+      "entity": "BlockHeight",
+      "schema": "schemas/game-state.json#/definitions/BlockHeight",
+      "protocol": "protocols/query-protocol.md#pattern-1"
+    },
+    {
+      "id": "params",
+      "method": "GET",
+      "path": "/structs/params",
+      "category": "query",
+      "entity": "Params",
+      "schema": "schemas/entities.json#/definitions/Params",
+      "protocol": "protocols/query-protocol.md#pattern-1"
+    },
+    {
+      "id": "submit-transaction",
+      "method": "POST",
+      "path": "/cosmos/tx/v1beta1/txs",
+      "category": "transaction",
+      "entity": "Transaction",
+      "schema": "schemas/actions.json",
+      "protocol": "protocols/action-protocol.md"
+    },
+    {
+      "id": "webapp-player-by-id",
+      "method": "GET",
+      "path": "/api/player/{player_id}",
+      "category": "webapp",
+      "entity": "Player",
+      "baseUrl": "http://localhost:8080",
+      "schema": "schemas/responses.json#/definitions/WebappPlayerResponse",
+      "protocol": "protocols/query-protocol.md#pattern-1"
+    },
+    {
+      "id": "webapp-player-ore-stats",
+      "method": "GET",
+      "path": "/api/player/{player_id}/ore/stats",
+      "category": "webapp",
+      "entity": "Player",
+      "baseUrl": "http://localhost:8080",
+      "schema": "schemas/responses.json#/definitions/OreStatsResponse",
+      "protocol": "protocols/query-protocol.md#pattern-1"
+    },
+    {
+      "id": "webapp-planet-by-id",
+      "method": "GET",
+      "path": "/api/planet/{planet_id}",
+      "category": "webapp",
+      "entity": "Planet",
+      "baseUrl": "http://localhost:8080",
+      "schema": "schemas/entities.json#/definitions/Planet",
+      "protocol": "protocols/query-protocol.md#pattern-1"
+    },
+    {
+      "id": "webapp-planet-shield-health",
+      "method": "GET",
+      "path": "/api/planet/{planet_id}/shield/health",
+      "category": "webapp",
+      "entity": "Planet",
+      "baseUrl": "http://localhost:8080",
+      "schema": "schemas/responses.json#/definitions/ShieldHealthResponse",
+      "protocol": "protocols/query-protocol.md#pattern-1"
+    },
+    {
+      "id": "webapp-guild-by-id",
+      "method": "GET",
+      "path": "/api/guild/{guild_id}",
+      "category": "webapp",
+      "entity": "Guild",
+      "baseUrl": "http://localhost:8080",
+      "schema": "schemas/entities.json#/definitions/Guild",
+      "protocol": "protocols/query-protocol.md#pattern-1"
+    },
+    {
+      "id": "webapp-guild-count",
+      "method": "GET",
+      "path": "/api/guild/count",
+      "category": "webapp",
+      "entity": "Guild",
+      "baseUrl": "http://localhost:8080",
+      "schema": "schemas/responses.json#/definitions/CountResponse",
+      "protocol": "protocols/query-protocol.md#pattern-1"
+    },
+    {
+      "id": "webapp-struct-by-id",
+      "method": "GET",
+      "path": "/api/struct/{struct_id}",
+      "category": "webapp",
+      "entity": "Struct",
+      "baseUrl": "http://localhost:8080",
+      "schema": "schemas/entities.json#/definitions/Struct",
+      "protocol": "protocols/query-protocol.md#pattern-1"
+    },
+    {
+      "id": "webapp-timestamp",
+      "method": "GET",
+      "path": "/api/timestamp",
+      "category": "webapp",
+      "entity": "Timestamp",
+      "baseUrl": "http://localhost:8080",
+      "schema": "schemas/responses.json#/definitions/TimestampResponse",
+      "protocol": "protocols/query-protocol.md#pattern-1"
+    },
+    {
+      "id": "cosmetic-mod-list",
+      "method": "GET",
+      "path": "/api/cosmetic-mods",
+      "category": "modding",
+      "entity": "CosmeticMod",
+      "baseUrl": "http://localhost:8080",
+      "schema": "schemas/responses.json#/definitions/CosmeticModListResponse",
+      "protocol": "protocols/cosmetic-mod-integration.md#pattern-1"
+    },
+    {
+      "id": "cosmetic-mod-get",
+      "method": "GET",
+      "path": "/api/cosmetic-mods/{modId}",
+      "category": "modding",
+      "entity": "CosmeticMod",
+      "baseUrl": "http://localhost:8080",
+      "schema": "schemas/responses.json#/definitions/CosmeticModResponse",
+      "protocol": "protocols/cosmetic-mod-integration.md#pattern-1"
+    },
+    {
+      "id": "cosmetic-mod-install",
+      "method": "POST",
+      "path": "/api/cosmetic-mods/install",
+      "category": "modding",
+      "entity": "CosmeticMod",
+      "baseUrl": "http://localhost:8080",
+      "schema": "schemas/responses.json#/definitions/CosmeticModInstallResponse",
+      "protocol": "protocols/cosmetic-mod-integration.md#pattern-3"
+    },
+    {
+      "id": "cosmetic-mod-validate",
+      "method": "POST",
+      "path": "/api/cosmetic-mods/validate",
+      "category": "modding",
+      "entity": "CosmeticMod",
+      "baseUrl": "http://localhost:8080",
+      "schema": "schemas/responses.json#/definitions/CosmeticModValidateResponse",
+      "protocol": "protocols/cosmetic-mod-integration.md#pattern-3"
+    },
+    {
+      "id": "cosmetic-struct-type",
+      "method": "GET",
+      "path": "/api/cosmetic/struct-type/{structTypeId}",
+      "category": "modding",
+      "entity": "StructType",
+      "baseUrl": "http://localhost:8080",
+      "schema": "schemas/responses.json#/definitions/StructTypeCosmeticResponse",
+      "protocol": "protocols/cosmetic-mod-integration.md#pattern-1"
+    },
+    {
+      "id": "struct-type-with-cosmetics",
+      "method": "GET",
+      "path": "/api/struct-type/{structTypeId}/full",
+      "category": "modding",
+      "entity": "StructType",
+      "baseUrl": "http://localhost:8080",
+      "schema": "schemas/responses.json#/definitions/StructTypeFullResponse",
+      "protocol": "protocols/cosmetic-mod-integration.md#pattern-1"
+    }
+  ],
+  "structs:categories": {
+    "query": "Read-only operations to query game state",
+    "transaction": "Write operations to perform actions",
+    "webapp": "Web Application API endpoints (PHP/Symfony)",
+    "modding": "Cosmetic mod management and integration endpoints"
+  },
+  "structs:patterns": {
+    "single": "Get single entity by ID",
+    "list": "List all entities (with pagination)",
+    "filtered": "Get entities filtered by relationship",
+    "transaction": "Submit transaction to perform action"
+  }
+}
+

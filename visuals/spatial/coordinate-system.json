@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "id": "coordinate-system",
+  "type": "coordinate-system",
+  "title": "Galactic Coordinate System",
+  "description": "Coordinate system definition for galactic space in Structs",
+  "coordinateSystem": {
+    "type": "cartesian",
+    "origin": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "units": "light-years",
+    "bounds": {
+      "min": {
+        "x": -1000,
+        "y": -1000,
+        "z": -1000
+      },
+      "max": {
+        "x": 1000,
+        "y": 1000,
+        "z": 1000
+      }
+    }
+  },
+  "positions": [],
+  "regions": [
+    {
+      "id": "galactic-core",
+      "type": "region",
+      "bounds": {
+        "min": {
+          "x": -100,
+          "y": -100,
+          "z": -100
+        },
+        "max": {
+          "x": 100,
+          "y": 100,
+          "z": 100
+        }
+      },
+      "metadata": {
+        "name": "Galactic Core",
+        "description": "Central region of the galaxy"
+      }
+    }
+  ],
+  "relatedSchemas": [
+    "schemas/entities.json#/definitions/Planet",
+    "schemas/entities.json#/definitions/Fleet"
+  ]
+}
+

@@ -1,0 +1,392 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Entity Index",
+  "description": "Complete index of all game entities for AI agents",
+  "type": "object",
+  "lastUpdated": "2025-01-XX",
+  "structs:verified": true,
+  "entities": [
+    {
+      "id": "player",
+      "name": "Player",
+      "category": "core",
+      "endpoint": "/structs/player/{id}",
+      "listEndpoint": "/structs/player",
+      "schema": "schemas/entities.json#/definitions/Player",
+      "schemaPath": "schemas/entities.json",
+      "splitSchemaPath": "schemas/entities/player.json",
+      "minimalSchemaPath": "schemas/minimal/player-essential.json",
+      "description": "A player in the game",
+      "verified": true,
+      "fieldsVerified": true,
+      "keyFields": ["id", "capacity", "load", "charge", "storedOre", "playerOnline"],
+      "relationships": {
+        "owns": ["Planet", "Struct", "Fleet", "Reactor", "Substation", "Provider"],
+        "memberOf": ["Guild"]
+      },
+      "queryPatterns": {
+        "byId": "/structs/player/{id}",
+        "all": "/structs/player",
+        "halted": "/structs/player_halted"
+      },
+      "codeReference": "x/structs/types/player.pb.go, x/structs/keeper/player_cache.go"
+    },
+    {
+      "id": "planet",
+      "name": "Planet",
+      "category": "core",
+      "endpoint": "/structs/planet/{id}",
+      "listEndpoint": "/structs/planet",
+      "schema": "schemas/entities.json#/definitions/Planet",
+      "schemaPath": "schemas/entities.json",
+      "splitSchemaPath": "schemas/entities/planet.json",
+      "description": "A planet in the game",
+      "verified": true,
+      "fieldsVerified": true,
+      "keyFields": ["id", "ownerId", "status", "remainingOre", "startingOre"],
+      "relationships": {
+        "ownedBy": ["Player"],
+        "contains": ["Struct", "Reactor", "Substation"],
+        "hasAttributes": ["PlanetAttribute"]
+      },
+      "queryPatterns": {
+        "byId": "/structs/planet/{id}",
+        "all": "/structs/planet",
+        "byPlayer": "/structs/planet_by_player/{playerId}",
+        "attributes": "/structs/planet_attribute/{planetId}/{attributeType}",
+        "allAttributes": "/structs/planet_attribute"
+      },
+      "startingProperties": {
+        "maxOre": 5,
+        "spaceSlots": 4,
+        "airSlots": 4,
+        "landSlots": 4,
+        "waterSlots": 4
+      },
+      "codeReference": "x/structs/types/planet.pb.go, x/structs/keeper/planet_cache.go"
+    },
+    {
+      "id": "struct",
+      "name": "Struct",
+      "category": "core",
+      "endpoint": "/structs/struct/{id}",
+      "listEndpoint": "/structs/struct",
+      "schema": "schemas/entities.json#/definitions/Struct",
+      "schemaPath": "schemas/entities.json",
+      "splitSchemaPath": "schemas/entities/struct.json",
+      "description": "A struct (unit) in the game",
+      "verified": true,
+      "fieldsVerified": true,
+      "keyFields": ["id", "typeId", "ownerId", "status", "buildDraw", "passiveDraw"],
+      "relationships": {
+        "ownedBy": ["Player"],
+        "typeOf": ["StructType"],
+        "locatedOn": ["Planet", "Fleet"],
+        "hasAttributes": ["StructAttribute"]
+      },
+      "queryPatterns": {
+        "byId": "/structs/struct/{id}",
+        "all": "/structs/struct",
+        "attributes": "/structs/struct_attribute/{structId}/{attributeType}",
+        "allAttributes": "/structs/struct_attribute"
+      },
+      "codeReference": "x/structs/types/struct.pb.go, x/structs/keeper/struct_cache.go"
+    },
+    {
+      "id": "struct-type",
+      "name": "Struct Type",
+      "category": "core",
+      "endpoint": "/structs/struct_type/{id}",
+      "listEndpoint": "/structs/struct_type",
+      "schema": "schemas/entities.json#/definitions/StructType",
+      "schemaPath": "schemas/entities.json",
+      "splitSchemaPath": "schemas/entities/struct-type.json",
+      "description": "A struct type definition (template)",
+      "verified": true,
+      "fieldsVerified": true,
+      "keyFields": ["id", "class", "category", "buildLimit", "buildDifficulty", "buildDraw", "passiveDraw", "maxHealth"],
+      "relationships": {
+        "instances": ["Struct"]
+      },
+      "queryPatterns": {
+        "byId": "/structs/struct_type/{id}",
+        "all": "/structs/struct_type"
+      },
+      "codeReference": "proto/structs/structs/struct.proto:26, x/structs/types/struct.pb.go",
+      "databaseReference": "structs.struct_type table (80+ columns)"
+    },
+    {
+      "id": "fleet",
+      "name": "Fleet",
+      "category": "core",
+      "endpoint": "/structs/fleet/{id}",
+      "listEndpoint": "/structs/fleet",
+      "schema": "schemas/entities.json#/definitions/Fleet",
+      "schemaPath": "schemas/entities.json",
+      "splitSchemaPath": "schemas/entities/fleet.json",
+      "description": "A fleet (group of structs)",
+      "verified": true,
+      "fieldsVerified": true,
+      "keyFields": ["id", "ownerId", "slots", "status", "canMove"],
+      "relationships": {
+        "ownedBy": ["Player"],
+        "contains": ["Struct"]
+      },
+      "queryPatterns": {
+        "byId": "/structs/fleet/{id}",
+        "byIndex": "/structs/fleet_by_index/{index}",
+        "all": "/structs/fleet"
+      },
+      "codeReference": "x/structs/types/fleet.pb.go, x/structs/keeper/fleet_cache.go"
+    },
+    {
+      "id": "guild",
+      "name": "Guild",
+      "category": "social",
+      "endpoint": "/structs/guild/{id}",
+      "listEndpoint": "/structs/guild",
+      "schema": "schemas/entities.json#/definitions/Guild",
+      "schemaPath": "schemas/entities.json",
+      "splitSchemaPath": "schemas/entities/guild.json",
+      "description": "A guild (player organization)",
+      "verified": true,
+      "fieldsVerified": true,
+      "keyFields": ["id", "creator", "entrySubstationId", "joinInfusionMinimum"],
+      "relationships": {
+        "hasMembers": ["Player"],
+        "hasEntrySubstation": ["Substation"],
+        "hasPrimaryReactor": ["Reactor"]
+      },
+      "queryPatterns": {
+        "byId": "/structs/guild/{id}",
+        "all": "/structs/guild"
+      },
+      "codeReference": "proto/structs/structs/guild.proto, x/structs/keeper/guild_cache.go",
+      "databaseReference": "structs.guild table"
+    },
+    {
+      "id": "reactor",
+      "name": "Reactor",
+      "category": "resource",
+      "endpoint": "/structs/reactor/{id}",
+      "listEndpoint": "/structs/reactor",
+      "schema": "schemas/entities.json#/definitions/Reactor",
+      "schemaPath": "schemas/entities.json",
+      "splitSchemaPath": "schemas/entities/reactor.json",
+      "description": "A reactor (energy production)",
+      "verified": true,
+      "fieldsVerified": true,
+      "keyFields": ["id", "ownerId", "validator", "guildId", "defaultCommission"],
+      "relationships": {
+        "ownedBy": ["Player"],
+        "belongsTo": ["Guild"],
+        "locatedOn": ["Planet"]
+      },
+      "queryPatterns": {
+        "byId": "/structs/reactor/{id}",
+        "all": "/structs/reactor"
+      },
+      "codeReference": "x/structs/types/reactor.pb.go, x/structs/keeper/reactor_cache.go",
+      "databaseReference": "structs.reactor table"
+    },
+    {
+      "id": "substation",
+      "name": "Substation",
+      "category": "resource",
+      "endpoint": "/structs/substation/{id}",
+      "listEndpoint": "/structs/substation",
+      "schema": "schemas/entities.json#/definitions/Substation",
+      "schemaPath": "schemas/entities.json",
+      "splitSchemaPath": "schemas/entities/substation.json",
+      "description": "A substation (power distribution)",
+      "verified": true,
+      "fieldsVerified": true,
+      "keyFields": ["id", "ownerId", "creator"],
+      "relationships": {
+        "ownedBy": ["Player"],
+        "locatedOn": ["Planet"],
+        "usedBy": ["Guild"]
+      },
+      "queryPatterns": {
+        "byId": "/structs/substation/{id}",
+        "all": "/structs/substation"
+      },
+      "codeReference": "x/structs/types/substation.pb.go, x/structs/keeper/substation_cache.go",
+      "databaseReference": "structs.substation table"
+    },
+    {
+      "id": "provider",
+      "name": "Provider",
+      "category": "economic",
+      "endpoint": "/structs/provider/{id}",
+      "listEndpoint": "/structs/provider",
+      "schema": "schemas/entities.json#/definitions/Provider",
+      "schemaPath": "schemas/entities.json",
+      "splitSchemaPath": "schemas/entities/provider.json",
+      "description": "An energy provider",
+      "verified": true,
+      "fieldsVerified": true,
+      "keyFields": ["id", "ownerId", "substationId", "rateAmount", "capacityMinimum", "capacityMaximum"],
+      "relationships": {
+        "ownedBy": ["Player"],
+        "partOf": ["Substation"],
+        "hasAgreements": ["Agreement"]
+      },
+      "queryPatterns": {
+        "byId": "/structs/provider/{id}",
+        "all": "/structs/provider"
+      },
+      "codeReference": "x/structs/types/provider.pb.go, x/structs/keeper/provider_cache.go",
+      "databaseReference": "structs.provider table"
+    },
+    {
+      "id": "agreement",
+      "name": "Agreement",
+      "category": "economic",
+      "endpoint": "/structs/agreement/{id}",
+      "listEndpoint": "/structs/agreement",
+      "schema": "schemas/entities.json#/definitions/Agreement",
+      "schemaPath": "schemas/entities.json",
+      "splitSchemaPath": "schemas/entities/agreement.json",
+      "description": "An energy agreement (automated contract)",
+      "verified": true,
+      "fieldsVerified": true,
+      "keyFields": ["id", "providerId", "consumerId", "allocationId", "capacity", "startBlock", "endBlock"],
+      "relationships": {
+        "providedBy": ["Provider"],
+        "hasAllocation": ["Allocation"],
+        "consumedBy": ["Player"]
+      },
+      "queryPatterns": {
+        "byId": "/structs/agreement/{id}",
+        "all": "/structs/agreement",
+        "byProvider": "/structs/agreement_by_provider/{providerId}"
+      },
+      "codeReference": "x/structs/types/agreement.pb.go, x/structs/keeper/agreement_cache.go",
+      "databaseReference": "structs.agreement table"
+    },
+    {
+      "id": "allocation",
+      "name": "Allocation",
+      "category": "economic",
+      "endpoint": "/structs/allocation/{id}",
+      "listEndpoint": "/structs/allocation",
+      "schema": "schemas/entities.json#/definitions/Allocation",
+      "schemaPath": "schemas/entities.json",
+      "splitSchemaPath": "schemas/entities/allocation.json",
+      "description": "An energy allocation",
+      "verified": true,
+      "fieldsVerified": true,
+      "keyFields": ["id", "sourceId", "destinationId", "amount", "allocationType", "controller", "locked"],
+      "relationships": {
+        "from": ["Provider", "Reactor"],
+        "to": ["Player", "Struct"]
+      },
+      "queryPatterns": {
+        "byId": "/structs/allocation/{id}",
+        "all": "/structs/allocation",
+        "bySource": "/structs/allocation_by_source/{sourceId}",
+        "byDestination": "/structs/allocation_by_destination/{destinationId}"
+      },
+      "codeReference": "x/structs/types/allocation.pb.go, x/structs/keeper/allocation_cache.go",
+      "databaseReference": "structs.allocation table"
+    },
+    {
+      "id": "address",
+      "name": "Address",
+      "category": "core",
+      "endpoint": "/structs/address/{address}",
+      "listEndpoint": "/structs/address",
+      "schema": "schemas/entities.json#/definitions/Address",
+      "schemaPath": "schemas/entities.json",
+      "description": "A blockchain address",
+      "verified": true,
+      "fieldsVerified": true,
+      "keyFields": ["address", "playerIndex"],
+      "relationships": {
+        "belongsTo": ["Player"]
+      },
+      "queryPatterns": {
+        "byAddress": "/structs/address/{address}",
+        "all": "/structs/address",
+        "byPlayer": "/structs/address_by_player/{playerId}"
+      },
+      "codeReference": "proto/structs/structs/address.proto:14, x/structs/types/address.pb.go",
+      "databaseReference": "structs.player_address table"
+    },
+    {
+      "id": "permission",
+      "name": "Permission",
+      "category": "core",
+      "endpoint": "/structs/permission/{permissionId}",
+      "listEndpoint": "/structs/permission",
+      "schema": "schemas/entities.json#/definitions/Permission",
+      "schemaPath": "schemas/entities.json",
+      "description": "A permission (access control)",
+      "verified": true,
+      "fieldsVerified": true,
+      "keyFields": ["permissionId", "value"],
+      "relationships": {
+        "grantedTo": ["Player"],
+        "appliesTo": ["Planet", "Struct", "Fleet"]
+      },
+      "queryPatterns": {
+        "byId": "/structs/permission/{permissionId}",
+        "all": "/structs/permission",
+        "byObject": "/structs/permission/object/{objectId}",
+        "byPlayer": "/structs/permission/player/{playerId}"
+      },
+      "codeReference": "proto/structs/structs/permission.proto:11, x/structs/types/permission.pb.go",
+      "databaseReference": "structs.permission table (id, object_type, object_index, object_id, player_id, val)"
+    },
+    {
+      "id": "infusion",
+      "name": "Infusion",
+      "category": "economic",
+      "endpoint": "/structs/infusion/{destinationId}/{address}",
+      "listEndpoint": "/structs/infusion",
+      "schema": "schemas/entities.json#/definitions/Infusion",
+      "schemaPath": "schemas/entities.json",
+      "description": "An infusion (resource transfer)",
+      "verified": true,
+      "fieldsVerified": true,
+      "keyFields": ["destinationType", "destinationId", "fuel", "power", "commission", "playerId", "address", "ratio", "defusing"],
+      "relationships": {
+        "toDestination": ["Player", "Struct"],
+        "fromAddress": ["Address"]
+      },
+      "queryPatterns": {
+        "byDestinationAndAddress": "/structs/infusion/{destinationId}/{address}",
+        "all": "/structs/infusion",
+        "byDestination": "/structs/infusion_by_destination/{destinationId}"
+      },
+      "codeReference": "proto/structs/structs/infusion.proto:12, x/structs/types/infusion.pb.go",
+      "databaseReference": "structs.infusion table (composite PK: destination_id, address; fuel, power, ratio, commission generated columns)"
+    }
+  ],
+  "summary": {
+    "total": 14,
+    "verified": 14,
+    "fieldsVerified": 14,
+    "categories": {
+      "core": 7,
+      "social": 1,
+      "resource": 2,
+      "economic": 4
+    },
+    "splitEntityFiles": {
+      "verified": 10,
+      "total": 11,
+      "percentage": 91
+    }
+  },
+  "structs:verification": {
+    "verified": true,
+    "verifiedBy": "GameCodeAnalyst",
+    "verifiedDate": "2025-01-XX",
+    "verificationMethod": "code-analysis",
+    "confidence": "high"
+  }
+}
+

@@ -1,0 +1,125 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Structs Data Format Specifications",
+  "description": "Format specifications for all data types used in Structs APIs and schemas",
+  "type": "object",
+  "formats": {
+    "entity-id": {
+      "name": "Entity ID",
+      "description": "Object identifier in format 'type-index' where type is object type code and index is 1-based object index",
+      "pattern": "^[0-9]+-[0-9]+$",
+      "format": "type-index",
+      "examples": [
+        "0-1",
+        "1-11",
+        "2-1",
+        "4-3"
+      ],
+      "objectTypes": {
+        "0": {
+          "name": "Guild",
+          "description": "Guild identifier",
+          "example": "0-1"
+        },
+        "1": {
+          "name": "Player",
+          "description": "Player identifier",
+          "example": "1-11"
+        },
+        "2": {
+          "name": "Planet",
+          "description": "Planet identifier",
+          "example": "2-1"
+        },
+        "3": {
+          "name": "Reactor",
+          "description": "Reactor identifier",
+          "example": "3-1"
+        },
+        "4": {
+          "name": "Substation",
+          "description": "Substation identifier",
+          "example": "4-3"
+        },
+        "5": {
+          "name": "Struct",
+          "description": "Struct identifier",
+          "example": "5-42"
+        },
+        "6": {
+          "name": "Allocation",
+          "description": "Allocation identifier",
+          "example": "6-1"
+        },
+        "7": {
+          "name": "Infusion",
+          "description": "Infusion identifier",
+          "example": "7-1"
+        },
+        "8": {
+          "name": "Address",
+          "description": "Address identifier",
+          "example": "8-1"
+        },
+        "9": {
+          "name": "Fleet",
+          "description": "Fleet identifier",
+          "example": "9-11"
+        },
+        "10": {
+          "name": "Provider",
+          "description": "Provider identifier",
+          "example": "10-1"
+        },
+        "11": {
+          "name": "Agreement",
+          "description": "Agreement identifier",
+          "example": "11-1"
+        }
+      }
+    },
+    "struct-type-id": {
+      "name": "Struct Type ID",
+      "description": "Struct type identifier (exception: uses regular integer, not entity-id format)",
+      "type": "integer",
+      "format": "integer",
+      "examples": [1, 2, 3],
+      "note": "Struct types use regular integer IDs, not the entity-id format"
+    },
+    "blockchain-address": {
+      "name": "Blockchain Address",
+      "description": "Cosmos blockchain address",
+      "pattern": "^structs1[a-z0-9]{38}$",
+      "format": "bech32",
+      "examples": [
+        "structs1nffawa6ncl73d8hdcfh74f2sm5en4k8uqyupj0"
+      ]
+    },
+    "micrograms": {
+      "name": "Micrograms",
+      "description": "Alpha Matter amount in micrograms (μAlpha)",
+      "type": "string",
+      "format": "integer-string",
+      "pattern": "^[0-9]+$",
+      "examples": ["1000000"],
+      "note": "1 gram = 1,000,000 micrograms"
+    },
+    "watts": {
+      "name": "Watts",
+      "description": "Energy amount in kilowatts (kW)",
+      "type": "string",
+      "format": "integer-string",
+      "pattern": "^[0-9]+$",
+      "examples": ["1000", "500000"]
+    }
+  },
+  "usage": {
+    "entity-id": "Use for all entity identifiers except struct_types",
+    "struct-type-id": "Use only for struct_type identifiers",
+    "blockchain-address": "Use for Cosmos addresses",
+    "micrograms": "Use for Alpha Matter amounts in API responses",
+    "watts": "Use for energy amounts in API responses"
+  }
+}
+

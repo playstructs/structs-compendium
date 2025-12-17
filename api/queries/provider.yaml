@@ -1,0 +1,34 @@
+version: "1.0.0"
+lastUpdated: "2025-01-XX"
+baseUrl: "http://localhost:1317"
+basePath: "/structs"
+category: "query"
+entity: "Provider"
+
+endpoints:
+  - id: "provider-by-id"
+    method: "GET"
+    path: "/structs/provider/{id}"
+    description: "Get provider by ID"
+    category: "query"
+    entity: "Provider"
+    parameters:
+      - name: "id"
+        type: "string"
+        required: true
+        format: "provider-id"
+        description: "Provider identifier"
+    response:
+      schema: "schemas/entities/provider.json"
+      contentType: "application/json"
+  
+  - id: "provider-list"
+    method: "GET"
+    path: "/structs/provider"
+    description: "List all providers"
+    category: "query"
+    entity: "Provider"
+    pagination: true
+    response:
+      schema: "schemas/entities/provider.json[]"
+      contentType: "application/json"

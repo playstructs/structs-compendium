@@ -1,0 +1,205 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Cosmetic Skin Schema",
+  "description": "Schema for cosmetic skins - specific struct type cosmetics",
+  "type": "object",
+  "structs:category": "modding",
+  "structs:scope": "guild-customization",
+  "properties": {
+    "skinHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "SHA-256 hash of the skin manifest (hexadecimal, 64 characters). Generated from the skin manifest content to ensure uniqueness without central authority."
+    },
+    "class": {
+      "type": "string",
+      "description": "Struct Type class name this skin is for (must match the 'class' field from struct_type table/on-chain). Examples: 'Command Ship', 'Miner', 'Reactor', 'Fleet'"
+    },
+    "name": {
+      "type": "object",
+      "description": "Skin name in multiple languages",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version (e.g., '1.0.0')"
+    },
+    "author": {
+      "type": "string",
+      "description": "Skin author/guild name"
+    },
+    "setHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Parent set hash (optional, for skins that are part of a set). Must match the setHash of the containing set."
+    },
+    "description": {
+      "type": "object",
+      "description": "Skin description in multiple languages",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "lore": {
+      "type": "object",
+      "description": "Lore/backstory text in multiple languages",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "weapons": {
+      "type": "array",
+      "description": "Weapon cosmetic overrides",
+      "items": {
+        "$ref": "#/definitions/WeaponCosmetic"
+      }
+    },
+    "abilities": {
+      "type": "array",
+      "description": "Ability cosmetic overrides",
+      "items": {
+        "$ref": "#/definitions/AbilityCosmetic"
+      }
+    },
+    "animations": {
+      "type": "object",
+      "description": "Animation file paths (Lottie JSON files)",
+      "properties": {
+        "idle": {
+          "type": "string",
+          "description": "Path to idle animation (relative to animations/ directory)"
+        },
+        "active": {
+          "type": "string",
+          "description": "Path to active animation"
+        },
+        "building": {
+          "type": "string",
+          "description": "Path to building animation"
+        },
+        "attacking": {
+          "type": "string",
+          "description": "Path to attack animation"
+        },
+        "defending": {
+          "type": "string",
+          "description": "Path to defense animation"
+        },
+        "custom": {
+          "type": "object",
+          "description": "Custom animation mappings",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "icon": {
+      "type": "string",
+      "description": "Path to icon file (relative to icons/ directory)"
+    },
+    "graphics": {
+      "type": "object",
+      "description": "Additional graphics files",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Skin creation timestamp (ISO 8601)"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Skin last update timestamp (ISO 8601)"
+    }
+  },
+  "required": ["skinHash", "class", "version"],
+  "definitions": {
+    "WeaponCosmetic": {
+      "type": "object",
+      "description": "Cosmetic override for a weapon",
+      "properties": {
+        "weaponType": {
+          "type": "string",
+          "enum": ["primary", "secondary"],
+          "description": "Primary or secondary weapon"
+        },
+        "names": {
+          "type": "object",
+          "description": "Weapon names in multiple languages",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "object",
+          "description": "Weapon description in multiple languages",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "animation": {
+          "type": "string",
+          "description": "Path to weapon animation (Lottie JSON)"
+        },
+        "icon": {
+          "type": "string",
+          "description": "Path to weapon icon"
+        }
+      },
+      "required": ["weaponType"]
+    },
+    "AbilityCosmetic": {
+      "type": "object",
+      "description": "Cosmetic override for an ability",
+      "properties": {
+        "abilityId": {
+          "type": "string",
+          "description": "Ability identifier (must match game ability)"
+        },
+        "names": {
+          "type": "object",
+          "description": "Ability names in multiple languages",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "object",
+          "description": "Ability description in multiple languages",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "animation": {
+          "type": "string",
+          "description": "Path to ability animation (Lottie JSON)"
+        },
+        "icon": {
+          "type": "string",
+          "description": "Path to ability icon"
+        }
+      },
+      "required": ["abilityId"]
+    }
+  },
+  "structs:notes": [
+    "A skin is a specific struct type cosmetic",
+    "Skin identifiers use SHA-256 hashes (not IDs) to ensure uniqueness without central authority",
+    "skinHash is generated from the skin manifest content (excluding the hash field itself)",
+    "Skins link to Struct Types using the 'class' field (stored on-chain and in database)",
+    "The 'class' field must match exactly the class name from struct_type table",
+    "Skins can be part of a set or standalone",
+    "Skins override default cosmetics for their struct type",
+    "Animation files must be valid Lottie JSON format",
+    "Icon files should be PNG or SVG format"
+  ]
+}
+

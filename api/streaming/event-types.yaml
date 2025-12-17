@@ -1,0 +1,137 @@
+version: "1.0.0"
+lastUpdated: "2025-01-XX"
+description: "Complete catalog of GRASS event types and categories"
+
+eventCategories:
+  consensus:
+    - name: "block"
+      description: "Block updates"
+      subjectPattern: "structs.block.*"
+      schema: "event-schemas.json#/definitions/BlockEvent"
+  
+  guild:
+    - name: "guild_consensus"
+      description: "Guild consensus data updates"
+      subjectPattern: "structs.guild.*"
+      schema: "event-schemas.json#/definitions/GuildConsensusEvent"
+    
+    - name: "guild_meta"
+      description: "Guild metadata updates"
+      subjectPattern: "structs.guild.*"
+      schema: "event-schemas.json#/definitions/GuildMetaEvent"
+    
+    - name: "guild_membership"
+      description: "Guild membership changes"
+      subjectPattern: "structs.guild.*"
+      schema: "event-schemas.json#/definitions/GuildMembershipEvent"
+  
+  planet:
+    - name: "raid_status"
+      description: "Raid status changes"
+      subjectPattern: "structs.planet.*"
+      schema: "event-schemas.json#/definitions/PlanetRaidStatusEvent"
+    
+    - name: "fleet_arrive"
+      description: "Fleet arrival"
+      subjectPattern: "structs.fleet.*"
+      schema: "event-schemas.json#/definitions/FleetArriveEvent"
+    
+    - name: "fleet_advance"
+      description: "Fleet advancement"
+      subjectPattern: "structs.fleet.*"
+    
+    - name: "fleet_depart"
+      description: "Fleet departure"
+      subjectPattern: "structs.fleet.*"
+  
+  struct:
+    - name: "struct_attack"
+      description: "Struct attack events"
+      subjectPattern: "structs.struct.*"
+    
+    - name: "struct_defense_remove"
+      description: "Defense structure removed"
+      subjectPattern: "structs.struct.*"
+    
+    - name: "struct_defense_add"
+      description: "Defense structure added"
+      subjectPattern: "structs.struct.*"
+    
+    - name: "struct_status"
+      description: "Struct status changes"
+      subjectPattern: "structs.struct.*"
+      schema: "event-schemas.json#/definitions/StructStatusEvent"
+    
+    - name: "struct_move"
+      description: "Struct movement"
+      subjectPattern: "structs.struct.*"
+    
+    - name: "struct_block_build_start"
+      description: "Build operation started"
+      subjectPattern: "structs.struct.*"
+    
+    - name: "struct_block_ore_mine_start"
+      description: "Mining operation started"
+      subjectPattern: "structs.struct.*"
+    
+    - name: "struct_block_ore_refine_start"
+      description: "Refining operation started"
+      subjectPattern: "structs.struct.*"
+  
+  player:
+    - name: "player_consensus"
+      description: "Player consensus data updates"
+      subjectPattern: "structs.player.*"
+      schema: "event-schemas.json#/definitions/PlayerConsensusEvent"
+    
+    - name: "player_meta"
+      description: "Player metadata updates"
+      subjectPattern: "structs.player.*"
+      schema: "event-schemas.json#/definitions/PlayerMetaEvent"
+  
+  address:
+    - name: "address_register"
+      description: "Address registration events"
+      subjectPattern: "structs.address.register.*"
+
+subjectPatterns:
+  player:
+    pattern: "structs.player.*"
+    wildcard: "structs.player.*"
+    specific: "structs.player.{guild_id}.{player_id}"
+    example: "structs.player.0-1.1-11"
+  
+  guild:
+    pattern: "structs.guild.*"
+    wildcard: "structs.guild.*"
+    specific: "structs.guild.{guild_id}"
+    example: "structs.guild.0-1"
+  
+  planet:
+    pattern: "structs.planet.*"
+    wildcard: "structs.planet.*"
+    specific: "structs.planet.{planet_id}"
+    example: "structs.planet.3-1"
+  
+  struct:
+    pattern: "structs.struct.*"
+    wildcard: "structs.struct.*"
+    specific: "structs.struct.{struct_id}"
+    example: "structs.struct.5-1"
+  
+  fleet:
+    pattern: "structs.fleet.*"
+    wildcard: "structs.fleet.*"
+    specific: "structs.fleet.{fleet_id}"
+    example: "structs.fleet.7-1"
+  
+  address:
+    pattern: "structs.address.register.*"
+    wildcard: "structs.address.register.*"
+    specific: "structs.address.register.{code}"
+    example: "structs.address.register.ABC123"
+  
+  global:
+    pattern: "structs.global"
+    example: "structs.global"
+

@@ -1,0 +1,286 @@
+version: "1.0.0"
+lastUpdated: "2025-01-XX"
+description: "Rate limiting information for API endpoints"
+
+note: "Rate limits may vary by deployment and are subject to change. Always check response headers for current limits."
+
+# Rate Limit Headers
+headers:
+  limit: "X-RateLimit-Limit"
+  description: "Maximum number of requests allowed in the time window"
+  
+  remaining: "X-RateLimit-Remaining"
+  description: "Number of requests remaining in the current time window"
+  
+  reset: "X-RateLimit-Reset"
+  description: "Unix timestamp when the rate limit window resets"
+  
+  retryAfter: "Retry-After"
+  description: "Number of seconds to wait before retrying (when rate limit exceeded)"
+
+# Default Rate Limits (if not specified per endpoint)
+defaults:
+  consensusNetwork:
+    requestsPerMinute: 60
+    requestsPerHour: 3600
+    window: "1 minute"
+    note: "Default limits for Consensus Network API endpoints"
+  
+  webApplication:
+    requestsPerMinute: 100
+    requestsPerHour: 6000
+    window: "1 minute"
+    note: "Default limits for Web Application API endpoints"
+  
+  rpc:
+    requestsPerMinute: 30
+    requestsPerHour: 1800
+    window: "1 minute"
+    note: "Default limits for RPC endpoints"
+
+# Endpoint-Specific Rate Limits
+endpoints:
+  # Consensus Network API
+  - endpoint: "player-by-id"
+    path: "/structs/player/{id}"
+    method: "GET"
+    limits:
+      requestsPerMinute: 60
+      requestsPerHour: 3600
+      window: "1 minute"
+    note: "Standard query endpoint limit"
+  
+  - endpoint: "player-list"
+    path: "/structs/player"
+    method: "GET"
+    limits:
+      requestsPerMinute: 30
+      requestsPerHour: 1800
+      window: "1 minute"
+    note: "List endpoints may have lower limits due to pagination overhead"
+  
+  - endpoint: "submit-transaction"
+    path: "/cosmos/tx/v1beta1/txs"
+    method: "POST"
+    limits:
+      requestsPerMinute: 10
+      requestsPerHour: 600
+      window: "1 minute"
+    note: "Transaction submission has stricter limits"
+  
+  # Web Application API
+  - endpoint: "webapp-player-by-id"
+    path: "/api/player/{player_id}"
+    method: "GET"
+    limits:
+      requestsPerMinute: 100
+      requestsPerHour: 6000
+      window: "1 minute"
+    note: "Standard webapp query endpoint"
+  
+  - endpoint: "webapp-player-username-update"
+    path: "/api/player/username"
+    method: "PUT"
+    limits:
+      requestsPerMinute: 10
+      requestsPerHour: 100
+      window: "1 minute"
+    note: "Write operations have stricter limits"
+  
+  - endpoint: "webapp-guild-directory"
+    path: "/api/guild/directory"
+    method: "GET"
+    limits:
+      requestsPerMinute: 30
+      requestsPerHour: 1800
+      window: "1 minute"
+    note: "Directory/list endpoints may have lower limits"
+  
+  # RPC Endpoints
+  - endpoint: "rpc-status"
+    path: "/status"
+    method: "GET"
+    limits:
+      requestsPerMinute: 30
+      requestsPerHour: 1800
+      window: "1 minute"
+    note: "RPC endpoints have lower default limits"
+
+# Rate Limit Error Response
+errorResponse:
+  statusCode: 429
+  headers:
+    Content-Type: "application/json"
+    Retry-After: "60"
+    X-RateLimit-Limit: "100"
+    X-RateLimit-Remaining: "0"
+    X-RateLimit-Reset: "1704067260"
+  body:
+    schema: "schemas/responses.json#/definitions/RateLimitErrorResponse"
+    example:
+      error: "Rate limit exceeded"
+      code: 429
+      retry_after: 60
+      limit: 100
+      remaining: 0
+      reset_at: "2025-01-01T00:01:00Z"
+
+# Best Practices
+bestPractices:
+  - name: "Monitor Rate Limit Headers"
+    description: "Always check X-RateLimit-* headers in responses"
+    example: |
+      {
+        "X-RateLimit-Limit": "100",
+        "X-RateLimit-Remaining": "95",
+        "X-RateLimit-Reset": "1704067260"
+      }
+  
+  - name: "Implement Request Throttling"
+    description: "Throttle requests to stay within limits"
+    recommendation: "Use a token bucket or sliding window algorithm"
+  
+  - name: "Respect Retry-After Header"
+    description: "When receiving 429, wait for Retry-After seconds"
+    example: |
+      if (response.status === 429) {
+        const retryAfter = parseInt(response.headers['Retry-After']);
+        await sleep(retryAfter * 1000);
+        // Retry request
+      }
+  
+  - name: "Use Exponential Backoff"
+    description: "For rate limit errors, use exponential backoff"
+    example: |
+      {
+        "initialDelay": 1000,
+        "maxDelay": 60000,
+        "backoffMultiplier": 2,
+        "maxRetries": 3
+      }
+  
+  - name: "Cache Responses"
+    description: "Cache responses when possible to reduce API calls"
+    recommendation: "Cache GET requests with appropriate TTL"
+  
+  - name: "Batch Requests"
+    description: "Batch multiple operations when possible"
+    note: "Not all endpoints support batching"
+  
+  - name: "Prioritize Critical Requests"
+    description: "Prioritize critical operations over non-critical ones"
+    example: "Prioritize transaction submission over status queries"
+
+# Rate Limit Strategies
+strategies:
+  tokenBucket:
+    description: "Token bucket algorithm for rate limiting"
+    implementation: |
+      {
+        "tokens": 100,
+        "refillRate": 100,
+        "refillInterval": 60000,
+        "maxTokens": 100
+      }
+  
+  slidingWindow:
+    description: "Sliding window algorithm for rate limiting"
+    implementation: |
+      {
+        "windowSize": 60000,
+        "maxRequests": 100,
+        "trackRequests": true
+      }
+  
+  fixedWindow:
+    description: "Fixed window algorithm for rate limiting"
+    implementation: |
+      {
+        "windowSize": 60000,
+        "maxRequests": 100,
+        "resetAt": "top of minute"
+      }
+
+# Handling Rate Limits
+handling:
+  whenExceeded:
+    - step: "Check Retry-After header"
+      action: "Read Retry-After value from response header"
+    
+    - step: "Wait for retry window"
+      action: "Wait for Retry-After seconds before retrying"
+    
+    - step: "Implement backoff"
+      action: "Use exponential backoff if Retry-After not provided"
+    
+    - step: "Reduce request rate"
+      action: "Reduce overall request frequency"
+    
+    - step: "Cache responses"
+      action: "Increase caching to reduce API calls"
+  
+  prevention:
+    - "Monitor rate limit headers in all responses"
+    - "Implement client-side rate limiting"
+    - "Use request queuing for high-volume operations"
+    - "Cache responses aggressively"
+    - "Batch operations when possible"
+    - "Prioritize critical requests"
+
+# Rate Limit Examples
+examples:
+  - name: "Check Rate Limit Headers"
+    description: "Monitor rate limit status from response headers"
+    code: |
+      const response = await fetch('/api/player/1-11');
+      const limit = response.headers.get('X-RateLimit-Limit');
+      const remaining = response.headers.get('X-RateLimit-Remaining');
+      const reset = response.headers.get('X-RateLimit-Reset');
+      
+      console.log(`Limit: ${limit}, Remaining: ${remaining}, Reset: ${new Date(reset * 1000)}`);
+  
+  - name: "Handle Rate Limit Error"
+    description: "Handle 429 error with retry logic"
+    code: |
+      async function makeRequestWithRetry(url, maxRetries = 3) {
+        for (let i = 0; i < maxRetries; i++) {
+          const response = await fetch(url);
+          
+          if (response.status === 429) {
+            const retryAfter = parseInt(response.headers.get('Retry-After') || '60');
+            console.log(`Rate limited. Waiting ${retryAfter} seconds...`);
+            await sleep(retryAfter * 1000);
+            continue;
+          }
+          
+          return response;
+        }
+        throw new Error('Max retries exceeded');
+      }
+  
+  - name: "Implement Request Throttling"
+    description: "Throttle requests to stay within limits"
+    code: |
+      class RateLimiter {
+        constructor(requestsPerMinute) {
+          this.requestsPerMinute = requestsPerMinute;
+          this.requests = [];
+        }
+        
+        async waitIfNeeded() {
+          const now = Date.now();
+          const oneMinuteAgo = now - 60000;
+          
+          // Remove requests older than 1 minute
+          this.requests = this.requests.filter(time => time > oneMinuteAgo);
+          
+          if (this.requests.length >= this.requestsPerMinute) {
+            const oldestRequest = this.requests[0];
+            const waitTime = 60000 - (now - oldestRequest);
+            await sleep(waitTime);
+          }
+          
+          this.requests.push(now);
+        }
+      }
+

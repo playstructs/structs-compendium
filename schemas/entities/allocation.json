@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Allocation Entity Schema",
+  "description": "Allocation entity definition - extracted from game-state.json for context window optimization. See schemas/formats.json for format specifications.",
+  "type": "object",
+  "structs:entity": "Allocation",
+  "structs:endpoint": "/structs/allocation/{id}",
+  "structs:category": "economic",
+  "properties": {
+    "id": {
+      "type": "string",
+      "structs:format": "entity-id",
+      "pattern": "^6-[0-9]+$",
+      "description": "Unique allocation identifier in format 'type-index' (e.g., '6-1' for allocation type 6, index 1). Type 6 = Allocation."
+    },
+    "sourceId": {
+      "type": "string",
+      "description": "Source ID (reactor, provider, etc.)"
+    },
+    "destinationId": {
+      "type": "string",
+      "description": "Destination ID (player, struct, etc.)"
+    },
+    "amount": {
+      "type": "string",
+      "description": "Allocation amount (string representation of integer)"
+    },
+    "gridAttributes": {
+      "type": "object",
+      "description": "Grid position and attributes",
+      "additionalProperties": true
+    }
+  },
+  "required": ["id", "sourceId", "destinationId", "amount"],
+  "structs:relationships": {
+    "source": {
+      "reactor": "schemas/entities/reactor.json",
+      "provider": "schemas/entities/provider.json"
+    },
+    "destination": {
+      "player": "schemas/entities/player.json",
+      "struct": "schemas/entities/struct.json"
+    }
+  },
+  "structs:verification": {
+    "verified": true,
+    "verifiedBy": "GameCodeAnalyst",
+    "verifiedDate": "2025-01-XX",
+    "verificationMethod": "code-analysis",
+    "confidence": "high",
+    "note": "API response schema. Missing fields from database (allocationType, controller, locked) - these may be in gridAttributes or separate queries. For code-based field definitions, see schemas/entities.json#/definitions/Allocation",
+    "codeReference": "x/structs/types/allocation.pb.go, x/structs/keeper/allocation_cache.go",
+    "databaseReference": "structs.allocation table (columns: id, allocation_type, source_id, destination_id, controller, locked)",
+    "verifiedFields": ["id", "sourceId", "destinationId", "amount"],
+    "missingFields": ["allocationType", "controller", "locked"]
+  }
+}
+

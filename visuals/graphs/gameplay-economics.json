@@ -1,0 +1,287 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "id": "gameplay-economics",
+  "type": "relationship",
+  "title": "Gameplay ↔ Economics Relationships",
+  "description": "Complete relationship graph showing how gameplay mechanics connect to economic systems",
+  "category": "system",
+  "entities": [
+    {
+      "id": "player-actions",
+      "label": "Player Actions",
+      "entityType": "GameplayMechanic",
+      "schemaReference": "schemas/actions.json",
+      "metadata": {
+        "category": "gameplay",
+        "examples": ["explore", "mine", "build", "attack", "expand"]
+      }
+    },
+    {
+      "id": "resource-management",
+      "label": "Resource Management",
+      "entityType": "GameplayMechanic",
+      "schemaReference": "schemas/gameplay.json#/definitions/ResourceManagement",
+      "metadata": {
+        "category": "gameplay",
+        "resources": ["Alpha Matter", "Watts", "Ore"]
+      }
+    },
+    {
+      "id": "strategic-decisions",
+      "label": "Strategic Decisions",
+      "entityType": "GameplayMechanic",
+      "schemaReference": "schemas/gameplay.json",
+      "metadata": {
+        "category": "gameplay",
+        "examples": ["what to build", "when to expand", "when to trade"]
+      }
+    },
+    {
+      "id": "5x-framework",
+      "label": "5X Framework",
+      "entityType": "GameplayMechanic",
+      "schemaReference": "schemas/gameplay.json#/definitions/5XFramework",
+      "metadata": {
+        "category": "gameplay",
+        "elements": ["Explore", "Extract", "Expand", "Exterminate", "Exchange"]
+      }
+    },
+    {
+      "id": "planet-system",
+      "label": "Planet System",
+      "entityType": "GameplayMechanic",
+      "schemaReference": "schemas/entities.json#/definitions/Planet",
+      "metadata": {
+        "category": "gameplay",
+        "features": ["territory", "slots", "ore deposits"]
+      }
+    },
+    {
+      "id": "market-prices",
+      "label": "Market Prices",
+      "entityType": "EconomicSystem",
+      "schemaReference": "schemas/markets.json",
+      "metadata": {
+        "category": "economics",
+        "drivers": ["supply", "demand"]
+      }
+    },
+    {
+      "id": "conversion-rates",
+      "label": "Conversion Rates",
+      "entityType": "EconomicSystem",
+      "schemaReference": "schemas/gameplay.json#/definitions/ResourceConversion",
+      "metadata": {
+        "category": "economics",
+        "methods": ["reactor", "fieldGenerator", "continentalPowerPlant", "worldEngine"]
+      }
+    },
+    {
+      "id": "cost-analysis",
+      "label": "Cost Analysis",
+      "entityType": "EconomicSystem",
+      "schemaReference": "schemas/economics.json",
+      "metadata": {
+        "category": "economics",
+        "examples": ["build vs buy", "opportunity cost", "resource optimization"]
+      }
+    },
+    {
+      "id": "trading-systems",
+      "label": "Trading Systems",
+      "entityType": "EconomicSystem",
+      "schemaReference": "schemas/trading.json",
+      "metadata": {
+        "category": "economics",
+        "features": ["buy", "sell", "market orders"]
+      }
+    },
+    {
+      "id": "economic-strategy",
+      "label": "Economic Strategy",
+      "entityType": "EconomicSystem",
+      "schemaReference": "schemas/economics.json",
+      "metadata": {
+        "category": "economics",
+        "examples": ["optimization", "economic warfare", "resource allocation"]
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "id": "r1",
+      "from": "player-actions",
+      "to": "market-prices",
+      "type": "affects",
+      "label": "affects",
+      "direction": "directed",
+      "cardinality": "many-to-many",
+      "metadata": {
+        "description": "Player actions (mining, trading) affect market supply and demand, which affects prices"
+      }
+    },
+    {
+      "id": "r2",
+      "from": "market-prices",
+      "to": "player-actions",
+      "type": "influences",
+      "label": "influences",
+      "direction": "directed",
+      "cardinality": "many-to-many",
+      "metadata": {
+        "description": "Market prices influence player decisions about what actions to take"
+      }
+    },
+    {
+      "id": "r3",
+      "from": "resource-management",
+      "to": "conversion-rates",
+      "type": "uses",
+      "label": "uses",
+      "direction": "directed",
+      "cardinality": "many-to-many",
+      "metadata": {
+        "description": "Resource management uses conversion rates to optimize Alpha Matter → Watts conversion"
+      }
+    },
+    {
+      "id": "r4",
+      "from": "conversion-rates",
+      "to": "resource-management",
+      "type": "enables",
+      "label": "enables",
+      "direction": "directed",
+      "cardinality": "many-to-many",
+      "metadata": {
+        "description": "Conversion rates enable resource management strategies (safe vs efficient)"
+      }
+    },
+    {
+      "id": "r5",
+      "from": "strategic-decisions",
+      "to": "cost-analysis",
+      "type": "requires",
+      "label": "requires",
+      "direction": "directed",
+      "cardinality": "many-to-many",
+      "metadata": {
+        "description": "Strategic decisions require cost analysis to evaluate options"
+      }
+    },
+    {
+      "id": "r6",
+      "from": "cost-analysis",
+      "to": "strategic-decisions",
+      "type": "informs",
+      "label": "informs",
+      "direction": "directed",
+      "cardinality": "many-to-many",
+      "metadata": {
+        "description": "Cost analysis informs strategic decisions (build vs buy, when to expand)"
+      }
+    },
+    {
+      "id": "r7",
+      "from": "5x-framework",
+      "to": "economic-strategy",
+      "type": "drives",
+      "label": "drives",
+      "direction": "directed",
+      "cardinality": "one-to-many",
+      "metadata": {
+        "description": "5X Framework (Explore, Extract, Expand, Exterminate, Exchange) drives economic strategy decisions"
+      }
+    },
+    {
+      "id": "r8",
+      "from": "economic-strategy",
+      "to": "5x-framework",
+      "type": "optimizes",
+      "label": "optimizes",
+      "direction": "directed",
+      "cardinality": "many-to-one",
+      "metadata": {
+        "description": "Economic strategy optimizes 5X Framework execution"
+      }
+    },
+    {
+      "id": "r9",
+      "from": "planet-system",
+      "to": "trading-systems",
+      "type": "creates",
+      "label": "creates opportunities",
+      "direction": "directed",
+      "cardinality": "one-to-many",
+      "metadata": {
+        "description": "Planet system creates economic opportunities (better planets = better income)"
+      }
+    },
+    {
+      "id": "r10",
+      "from": "trading-systems",
+      "to": "planet-system",
+      "type": "enables",
+      "label": "enables",
+      "direction": "directed",
+      "cardinality": "many-to-one",
+      "metadata": {
+        "description": "Trading systems enable planet expansion and resource acquisition"
+      }
+    },
+    {
+      "id": "r11",
+      "from": "resource-management",
+      "to": "economic-strategy",
+      "type": "is",
+      "label": "is",
+      "direction": "directed",
+      "cardinality": "one-to-one",
+      "metadata": {
+        "description": "Resource management is economics in action - optimizing resources = optimizing economics"
+      }
+    },
+    {
+      "id": "r12",
+      "from": "player-actions",
+      "to": "trading-systems",
+      "type": "uses",
+      "label": "uses",
+      "direction": "directed",
+      "cardinality": "many-to-many",
+      "metadata": {
+        "description": "Player actions use trading systems to buy/sell resources"
+      }
+    },
+    {
+      "id": "r13",
+      "from": "trading-systems",
+      "to": "player-actions",
+      "type": "enables",
+      "label": "enables",
+      "direction": "directed",
+      "cardinality": "many-to-many",
+      "metadata": {
+        "description": "Trading systems enable player actions by providing resource access"
+      }
+    }
+  ],
+  "relatedSchemas": [
+    "schemas/gameplay.json",
+    "schemas/economics.json",
+    "schemas/markets.json",
+    "schemas/trading.json",
+    "schemas/actions.json"
+  ],
+  "relatedEndpoints": [
+    "/structs/player/{id}",
+    "/structs/planet/{id}",
+    "/structs/market",
+    "/structs/trade"
+  ],
+  "relatedDiagrams": [
+    "visuals/graphs/resource-flow.json",
+    "visuals/graphs/entity-relationships.json"
+  ]
+}
+

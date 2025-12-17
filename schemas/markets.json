@@ -1,0 +1,511 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Structs Market Data Structures",
+  "description": "Complete catalog of market data structures for AI agents. See schemas/formats.json for format specifications.",
+  "type": "object",
+  "structs:category": "economic",
+  "markets": {
+    "MarketPrice": {
+      "id": "market-price",
+      "name": "Market Price",
+      "category": "economic",
+      "description": "Current market price for a resource",
+      "properties": {
+        "resource": {
+          "type": "string",
+          "enum": ["AlphaMatter", "Energy", "GuildToken"],
+          "description": "Resource type being priced"
+        },
+        "price": {
+          "type": "number",
+          "description": "Current market price",
+          "minimum": 0
+        },
+        "unit": {
+          "type": "string",
+          "description": "Price unit (e.g., 'grams per kW', 'kW per gram')"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When this price was recorded"
+        },
+        "source": {
+          "type": "string",
+          "description": "Source of price data (marketplace, agreement, etc.)"
+        },
+        "volume": {
+          "type": "number",
+          "description": "Trading volume for this price",
+          "minimum": 0
+        }
+      }
+    },
+    "MarketData": {
+      "id": "market-data",
+      "name": "Market Data",
+      "category": "economic",
+      "description": "Complete market data snapshot",
+      "properties": {
+        "resource": {
+          "type": "string",
+          "enum": ["AlphaMatter", "Energy", "GuildToken"],
+          "description": "Resource type"
+        },
+        "currentPrice": {
+          "$ref": "#/markets/MarketPrice",
+          "description": "Current market price"
+        },
+        "high24h": {
+          "type": "number",
+          "description": "24-hour high price",
+          "minimum": 0
+        },
+        "low24h": {
+          "type": "number",
+          "description": "24-hour low price",
+          "minimum": 0
+        },
+        "volume24h": {
+          "type": "number",
+          "description": "24-hour trading volume",
+          "minimum": 0
+        },
+        "supply": {
+          "type": "number",
+          "description": "Current market supply",
+          "minimum": 0
+        },
+        "demand": {
+          "type": "number",
+          "description": "Current market demand",
+          "minimum": 0
+        },
+        "volatility": {
+          "type": "number",
+          "description": "Price volatility indicator",
+          "minimum": 0
+        },
+        "trend": {
+          "type": "string",
+          "enum": ["rising", "falling", "stable"],
+          "description": "Price trend direction"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When this data was recorded"
+        }
+      }
+    },
+    "TradingHistory": {
+      "id": "trading-history",
+      "name": "Trading History",
+      "category": "economic",
+      "description": "Historical trading data",
+      "properties": {
+        "resource": {
+          "type": "string",
+          "enum": ["AlphaMatter", "Energy", "GuildToken"],
+          "description": "Resource type"
+        },
+        "trades": {
+          "type": "array",
+          "items": {
+            "$ref": "#/markets/Trade"
+          },
+          "description": "List of trades"
+        },
+        "period": {
+          "type": "string",
+          "enum": ["1h", "24h", "7d", "30d", "all"],
+          "description": "Time period for history"
+        }
+      }
+    },
+    "Trade": {
+      "id": "trade",
+      "name": "Trade",
+      "category": "economic",
+      "description": "Individual trade record",
+      "properties": {
+        "id": {
+          "type": "string",
+          "structs:format": "trade-id",
+          "description": "Unique trade identifier"
+        },
+        "resource": {
+          "type": "string",
+          "enum": ["AlphaMatter", "Energy", "GuildToken"],
+          "description": "Resource type traded"
+        },
+        "quantity": {
+          "type": "number",
+          "description": "Quantity traded",
+          "minimum": 0
+        },
+        "price": {
+          "type": "number",
+          "description": "Price per unit",
+          "minimum": 0
+        },
+        "total": {
+          "type": "number",
+          "description": "Total trade value",
+          "minimum": 0
+        },
+        "buyer": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "description": "Buyer player ID. Format: 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        },
+        "seller": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "description": "Seller player ID. Format: 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When trade occurred"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["marketplace", "agreement", "direct"],
+          "description": "Trade type"
+        }
+      }
+    },
+    "MarketOrder": {
+      "id": "market-order",
+      "name": "Market Order",
+      "category": "economic",
+      "description": "Market buy or sell order",
+      "properties": {
+        "id": {
+          "type": "string",
+          "structs:format": "order-id",
+          "description": "Unique order identifier"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["buy", "sell"],
+          "description": "Order type"
+        },
+        "resource": {
+          "type": "string",
+          "enum": ["AlphaMatter", "Energy", "GuildToken"],
+          "description": "Resource type"
+        },
+        "quantity": {
+          "type": "number",
+          "description": "Order quantity",
+          "minimum": 0
+        },
+        "price": {
+          "type": "number",
+          "description": "Order price per unit",
+          "minimum": 0
+        },
+        "status": {
+          "type": "string",
+          "enum": ["open", "filled", "cancelled", "partial"],
+          "description": "Order status"
+        },
+        "player": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "description": "Player who placed order. Format: 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When order was created"
+        },
+        "filled": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When order was filled (if filled)"
+        }
+      }
+    },
+    "GuildTokenMarketData": {
+      "id": "guild-token-market-data",
+      "name": "Guild Token Market Data",
+      "category": "economic",
+      "description": "Market data specific to guild tokens",
+      "properties": {
+        "guildId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^0-[0-9]+$",
+          "description": "Guild identifier. Format: 'type-index' (e.g., '0-1' for guild type 0, index 1). Type 0 = Guild."
+        },
+        "tokenSymbol": {
+          "type": "string",
+          "description": "Guild token symbol"
+        },
+        "currentPrice": {
+          "type": "number",
+          "description": "Current token price in Alpha Matter",
+          "minimum": 0
+        },
+        "marketCap": {
+          "type": "number",
+          "description": "Market capitalization (tokens in circulation × price)",
+          "minimum": 0
+        },
+        "tokensInCirculation": {
+          "type": "number",
+          "description": "Tokens currently in circulation",
+          "minimum": 0
+        },
+        "collateral": {
+          "type": "number",
+          "description": "Locked Alpha Matter collateral",
+          "minimum": 0
+        },
+        "collateralRatio": {
+          "type": "number",
+          "description": "Collateral ratio (collateral / tokens in circulation)",
+          "minimum": 0
+        },
+        "volume24h": {
+          "type": "number",
+          "description": "24-hour trading volume",
+          "minimum": 0
+        },
+        "volatility": {
+          "type": "number",
+          "description": "Price volatility",
+          "minimum": 0
+        },
+        "trustRating": {
+          "type": "string",
+          "enum": ["high", "medium", "low", "unknown"],
+          "description": "Trust rating based on guild reputation"
+        },
+        "warning": {
+          "type": "string",
+          "description": "Warning about trust-based nature (no technical safeguards)"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When this data was recorded"
+        }
+      }
+    },
+    "EnergyMarketData": {
+      "id": "energy-market-data",
+      "name": "Energy Market Data",
+      "category": "economic",
+      "description": "Market data specific to energy trading",
+      "properties": {
+        "currentPrice": {
+          "type": "number",
+          "description": "Current energy price (Alpha Matter per kW)",
+          "minimum": 0
+        },
+        "supply": {
+          "type": "number",
+          "description": "Available energy supply (kW)",
+          "minimum": 0
+        },
+        "demand": {
+          "type": "number",
+          "description": "Energy demand (kW)",
+          "minimum": 0
+        },
+        "agreements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/markets/EnergyAgreementMarketData"
+          },
+          "description": "Available energy agreements"
+        },
+        "providers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "structs:format": "entity-id",
+          "pattern": "^10-[0-9]+$",
+          "description": "Provider identifier in format 'type-index' (e.g., '10-1' for provider type 10, index 1). Type 10 = Provider."
+          },
+          "description": "Active energy providers"
+        },
+        "ephemeral": {
+          "type": "boolean",
+          "description": "Energy is ephemeral (must be consumed immediately)",
+          "default": true
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When this data was recorded"
+        }
+      }
+    },
+    "EnergyAgreementMarketData": {
+      "id": "energy-agreement-market-data",
+      "name": "Energy Agreement Market Data",
+      "category": "economic",
+      "description": "Market data for energy agreements",
+      "properties": {
+        "agreementId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^11-[0-9]+$",
+          "description": "Agreement identifier. Format: 'type-index' (e.g., '11-1' for agreement type 11, index 1). Type 11 = Agreement."
+        },
+        "providerId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^10-[0-9]+$",
+          "description": "Provider identifier. Format: 'type-index' (e.g., '10-1' for provider type 10, index 1). Type 10 = Provider."
+        },
+        "rate": {
+          "type": "number",
+          "description": "Energy rate (kW per unit)",
+          "minimum": 0
+        },
+        "price": {
+          "type": "number",
+          "description": "Price per unit",
+          "minimum": 0
+        },
+        "available": {
+          "type": "number",
+          "description": "Available energy (kW)",
+          "minimum": 0
+        },
+        "penaltyProtection": {
+          "type": "boolean",
+          "description": "Whether penalty protection is enabled",
+          "default": true
+        },
+        "automatic": {
+          "type": "boolean",
+          "description": "Whether agreement is automatic/on-chain",
+          "default": true
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "inactive", "full"],
+          "description": "Agreement status"
+        }
+      }
+    }
+  },
+  "marketOperations": {
+    "queryMarketPrice": {
+      "description": "Query current market price for a resource",
+      "resource": {
+        "type": "string",
+        "enum": ["AlphaMatter", "Energy", "GuildToken"]
+      },
+      "response": {
+        "$ref": "#/markets/MarketPrice"
+      }
+    },
+    "queryMarketData": {
+      "description": "Query complete market data for a resource",
+      "resource": {
+        "type": "string",
+        "enum": ["AlphaMatter", "Energy", "GuildToken"]
+      },
+      "response": {
+        "$ref": "#/markets/MarketData"
+      }
+    },
+    "queryTradingHistory": {
+      "description": "Query trading history for a resource",
+      "resource": {
+        "type": "string",
+        "enum": ["AlphaMatter", "Energy", "GuildToken"]
+      },
+      "period": {
+        "type": "string",
+        "enum": ["1h", "24h", "7d", "30d", "all"]
+      },
+      "response": {
+        "$ref": "#/markets/TradingHistory"
+      }
+    },
+    "placeOrder": {
+      "description": "Place a market order",
+      "request": {
+        "$ref": "#/markets/MarketOrder"
+      },
+      "response": {
+        "orderId": {
+          "type": "string",
+          "structs:format": "order-id"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["placed", "filled", "rejected"]
+        }
+      }
+    },
+    "queryGuildTokenMarket": {
+      "description": "Query guild token market data",
+      "guildId": {
+        "type": "string",
+        "structs:format": "entity-id",
+        "pattern": "^0-[0-9]+$",
+        "description": "Guild identifier in format 'type-index' (e.g., '0-1' for guild type 0, index 1). Type 0 = Guild."
+      },
+      "response": {
+        "$ref": "#/markets/GuildTokenMarketData"
+      }
+    },
+    "queryEnergyMarket": {
+      "description": "Query energy market data",
+      "response": {
+        "$ref": "#/markets/EnergyMarketData"
+      }
+    }
+  },
+  "marketPatterns": {
+    "priceDiscovery": {
+      "description": "How market prices are determined",
+      "factors": [
+        "Supply and demand",
+        "Guild activities",
+        "Combat outcomes",
+        "Resource discoveries",
+        "Player-driven trading"
+      ],
+      "note": "Prices are player-driven. Exact formula depends on market implementation."
+    },
+    "volatility": {
+      "description": "Market volatility patterns",
+      "factors": [
+        "Supply changes",
+        "Demand changes",
+        "Market events",
+        "Guild activities"
+      ]
+    },
+    "tradingStrategies": {
+      "description": "Common trading strategies",
+      "strategies": [
+        "Buy low, sell high",
+        "Market timing",
+        "Arbitrage opportunities",
+        "Guild coordination"
+      ]
+    }
+  },
+  "verified": {
+    "date": "2025-01-XX",
+    "source": "documentation",
+    "notes": "Market data structures based on economic documentation. Some market mechanics may need code verification."
+  }
+}
+

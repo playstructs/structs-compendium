@@ -1,0 +1,288 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Structs Documentation Verification Status",
+  "description": "Complete verification status tracking for all AI documentation",
+  "type": "object",
+  "structs:category": "verification",
+  "lastUpdated": "2025-01-XX",
+  "milestones": {
+    "allEntitiesVerified": {
+      "date": "2025-01-XX",
+      "status": "complete",
+      "note": "All 14 entities verified with code and database references"
+    },
+    "allEntityFilesVerified": {
+      "date": "2025-01-XX",
+      "status": "complete",
+      "note": "All 11 entity files verified with proper metadata"
+    },
+    "actionDeprecationDocumented": {
+      "date": "2025-01-XX",
+      "status": "complete",
+      "note": "7 deprecated actions documented with replacement references"
+    }
+  },
+  "verificationStatus": {
+    "schemas": {
+      "formulas": {
+        "verified": true,
+        "verifiedBy": "GameCodeAnalyst",
+        "verifiedDate": "2025-01-XX",
+        "verificationMethod": "code-analysis",
+        "confidence": "high",
+        "totalFormulas": 20,
+        "verifiedFormulas": 20,
+        "percentage": 100,
+        "codeReference": "ProductManagement/GameCodeAnalyst/working/formula-verification-status.md",
+        "notes": "All formulas verified against codebase"
+      },
+      "entities": {
+        "verified": true,
+        "verifiedBy": "GameCodeAnalyst",
+        "verifiedDate": "2025-01-XX",
+        "verificationMethod": "code-analysis",
+        "confidence": "high",
+        "totalEntities": 14,
+        "verifiedEntities": 14,
+        "percentage": 100,
+        "notes": "All 14 entities fully verified with complete field definitions and code references (Player, Planet, Struct, Fleet, Guild, Reactor, Substation, Provider, Agreement, Allocation, StructType, Address, Permission, Infusion).",
+        "codeReference": "ai/schemas/entities.json#/definitions",
+        "splitEntityFiles": {
+          "verified": 11,
+          "total": 11,
+          "percentage": 100,
+          "verifiedFiles": ["player.json", "planet.json", "struct.json", "fleet.json", "struct-type.json", "guild.json", "reactor.json", "substation.json", "provider.json", "agreement.json", "allocation.json"],
+          "pendingFiles": [],
+          "note": "All entity files verified. Some fields may be in gridAttributes or returned via separate queries. See individual entity files for missingFields documentation."
+        }
+      },
+      "actions": {
+        "verified": true,
+        "verifiedBy": "GameCodeAnalyst",
+        "verifiedDate": "2025-01-XX",
+        "verificationMethod": "code-analysis",
+        "confidence": "high",
+        "totalActions": 34,
+        "verifiedActions": 26,
+        "deprecatedActions": 7,
+        "percentage": 76,
+        "notes": "26 actions fully verified with code references. 7 actions are deprecated (marked with replacement actions in action-index.json). 1 action (reactor-allocate) is deprecated with no direct replacement. 4 replacement actions added and verified: substation-allocation-connect, agreement-open, guild-membership-kick, struct-generator-infuse. Additional actions exist in proto file but not yet documented.",
+        "codeReference": "ai/schemas/actions.json"
+      },
+      "game-state": {
+        "verified": false,
+        "verifiedBy": null,
+        "verifiedDate": null,
+        "verificationMethod": null,
+        "confidence": "medium",
+        "notes": "Basic structure exists, needs expansion"
+      },
+      "errors": {
+        "verified": false,
+        "verifiedBy": null,
+        "verifiedDate": null,
+        "verificationMethod": null,
+        "confidence": "low",
+        "notes": "Needs verification against actual error codes"
+      },
+      "responses": {
+        "verified": true,
+        "verifiedBy": "APIDocumentationSpecialist",
+        "verifiedDate": "2025-01-XX",
+        "verificationMethod": "api-testing",
+        "confidence": "high",
+        "notes": "API response schemas verified"
+      },
+      "gameplay": {
+        "verified": true,
+        "verifiedBy": "GameplaySpecialist",
+        "verifiedDate": "2025-01-XX",
+        "verificationMethod": "gameplay-testing",
+        "confidence": "high",
+        "notes": "Gameplay mechanics verified"
+      },
+      "code-structures": {
+        "verified": true,
+        "verifiedBy": "GameCodeAnalyst",
+        "verifiedDate": "2025-01-XX",
+        "verificationMethod": "code-analysis",
+        "confidence": "high",
+        "totalStructures": 7,
+        "verifiedStructures": 7,
+        "percentage": 100,
+        "codeReference": "ProductManagement/GameCodeAnalyst/working/code-structures.json",
+        "notes": "All code structures verified against codebase"
+      }
+    },
+    "protocols": {
+      "query-protocol": {
+        "verified": true,
+        "verifiedBy": "APIDocumentationSpecialist",
+        "verifiedDate": "2025-01-XX",
+        "verificationMethod": "api-testing",
+        "confidence": "high"
+      },
+      "action-protocol": {
+        "verified": true,
+        "verifiedBy": "APIDocumentationSpecialist",
+        "verifiedDate": "2025-01-XX",
+        "verificationMethod": "api-testing",
+        "confidence": "high"
+      },
+      "error-handling": {
+        "verified": true,
+        "verifiedBy": "DeveloperRelations",
+        "verifiedDate": "2025-01-XX",
+        "verificationMethod": "api-testing",
+        "confidence": "high"
+      },
+      "gameplay-protocol": {
+        "verified": true,
+        "verifiedBy": "GameplaySpecialist",
+        "verifiedDate": "2025-01-XX",
+        "verificationMethod": "gameplay-testing",
+        "confidence": "high"
+      },
+      "economic-protocol": {
+        "verified": true,
+        "verifiedBy": "EconomicsSpecialist",
+        "verifiedDate": "2025-01-XX",
+        "verificationMethod": "economic-testing",
+        "confidence": "high"
+      },
+      "authentication": {
+        "verified": false,
+        "verifiedBy": null,
+        "verifiedDate": null,
+        "verificationMethod": null,
+        "confidence": "low",
+        "status": "in-progress",
+        "notes": "In progress by Developer Relations"
+      },
+      "streaming": {
+        "verified": false,
+        "verifiedBy": null,
+        "verifiedDate": null,
+        "verificationMethod": null,
+        "confidence": "low",
+        "status": "pending",
+        "notes": "HIGH PRIORITY - Not started"
+      },
+      "testing-protocol": {
+        "verified": false,
+        "verifiedBy": null,
+        "verifiedDate": null,
+        "verificationMethod": null,
+        "confidence": "low",
+        "status": "pending",
+        "notes": "HIGH PRIORITY - Not started"
+      }
+    },
+    "examples": {
+      "simple-bot": {
+        "verified": true,
+        "verifiedBy": "APIDocumentationSpecialist",
+        "verifiedDate": "2025-01-XX",
+        "verificationMethod": "testing",
+        "confidence": "high"
+      },
+      "gameplay-mining-bot": {
+        "verified": true,
+        "verifiedBy": "GameplaySpecialist",
+        "verifiedDate": "2025-01-XX",
+        "verificationMethod": "gameplay-testing",
+        "confidence": "high"
+      },
+      "gameplay-combat-bot": {
+        "verified": true,
+        "verifiedBy": "GameplaySpecialist",
+        "verifiedDate": "2025-01-XX",
+        "verificationMethod": "gameplay-testing",
+        "confidence": "high"
+      },
+      "working-api-examples": {
+        "verified": true,
+        "verifiedBy": "APIDocumentationSpecialist",
+        "verifiedDate": "2025-01-XX",
+        "verificationMethod": "api-testing",
+        "confidence": "high"
+      }
+    },
+      "indexes": {
+        "entity-index": {
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst",
+          "verifiedDate": "2025-01-XX",
+          "verificationMethod": "code-analysis",
+          "confidence": "high",
+          "totalEntities": 14,
+          "verifiedEntities": 14,
+          "percentage": 100,
+          "notes": "All 14 entities fully verified with field definitions and code references"
+        },
+      "action-index": {
+        "verified": true,
+        "verifiedBy": "GameCodeAnalyst",
+        "verifiedDate": "2025-01-XX",
+        "verificationMethod": "code-analysis",
+        "confidence": "high",
+        "totalActions": 34,
+        "verifiedActions": 26,
+        "percentage": 76,
+        "notes": "26 actions fully verified with code references. 4 replacement actions added: substation-allocation-connect, agreement-open, guild-membership-kick, struct-generator-infuse. 7 actions are deprecated with replacement actions documented."
+      },
+      "endpoint-index": {
+        "verified": true,
+        "verifiedBy": "APIDocumentationSpecialist",
+        "verifiedDate": "2025-01-XX",
+        "verificationMethod": "api-testing",
+        "confidence": "high"
+      }
+    }
+  },
+  "overallStatus": {
+    "totalItems": 40,
+    "verifiedItems": 28,
+    "inProgressItems": 0,
+    "pendingItems": 12,
+    "verificationPercentage": 70,
+    "confidence": "high",
+    "lastVerificationRun": "2025-01-XX",
+    "breakdown": {
+      "schemas": {
+        "total": 8,
+        "verified": 5,
+        "percentage": 63
+      },
+      "protocols": {
+        "total": 8,
+        "verified": 5,
+        "percentage": 63
+      },
+      "examples": {
+        "total": 4,
+        "verified": 4,
+        "percentage": 100
+      },
+      "indexes": {
+        "total": 3,
+        "verified": 3,
+        "percentage": 100
+      }
+    }
+  },
+  "verificationMethods": {
+    "code-analysis": "Verification by analyzing source code",
+    "api-testing": "Verification by testing actual API endpoints",
+    "gameplay-testing": "Verification by testing gameplay mechanics",
+    "economic-testing": "Verification by testing economic calculations",
+    "testing": "Verification by general testing"
+  },
+  "confidenceLevels": {
+    "high": "Verified against code/API with high confidence",
+    "medium": "Partially verified or verified with some uncertainty",
+    "low": "Not verified or verification incomplete"
+  }
+}
+

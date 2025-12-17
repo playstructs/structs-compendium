@@ -1,0 +1,205 @@
+{
+  "version": "1.0.0",
+  "id": "energy-production",
+  "name": "Energy Production Task",
+  "description": "Complete workflow for producing energy from Alpha Matter using Reactors or Generators",
+  "category": "economic",
+  "priority": "high",
+  "estimatedTime": "5-10 minutes",
+  "prerequisites": {
+    "playerOnline": true,
+    "hasAlphaMatter": true,
+    "alphaMatterAmount": {
+      "minimum": 1,
+      "unit": "grams",
+      "description": "At least 1 gram Alpha Matter needed"
+    }
+  },
+  "decisionPoint": {
+    "name": "Reactor vs Generator",
+    "description": "Choose between safe Reactor (1 kW/g) or risky Generator (2, 5, or 10 kW/g)",
+    "options": {
+      "reactor": {
+        "rate": 1,
+        "formula": "Energy (kW) = Alpha Matter (grams) × 1",
+        "risk": "low",
+        "bestFor": ["beginners", "reliable operations", "network stability"],
+        "recommendation": "Choose Reactor if you need reliability and safety"
+      },
+      "fieldGenerator": {
+        "rate": 2,
+        "formula": "Energy (kW) = Alpha Matter (grams) × 2",
+        "risk": "high",
+        "bestFor": ["experienced players", "maximum efficiency", "acceptable risk"],
+        "recommendation": "Choose Field Generator if you can handle risk for 2x efficiency"
+      },
+      "continentalPowerPlant": {
+        "rate": 5,
+        "formula": "Energy (kW) = Alpha Matter (grams) × 5",
+        "risk": "high",
+        "bestFor": ["high-risk strategies", "maximum efficiency", "experienced players"],
+        "recommendation": "Choose Continental Power Plant for 5x efficiency (high risk)"
+      },
+      "worldEngine": {
+        "rate": 10,
+        "formula": "Energy (kW) = Alpha Matter (grams) × 10",
+        "risk": "high",
+        "bestFor": ["maximum risk/reward", "extreme efficiency", "experienced players"],
+        "recommendation": "Choose World Engine for 10x efficiency (very high risk)"
+      }
+    }
+  },
+  "steps": {
+    "reactor": [
+      {
+        "step": 1,
+        "name": "Build Reactor",
+        "description": "Build Reactor struct for energy production",
+        "action": "MsgStructBuild",
+        "requirements": {
+          "structType": "Reactor",
+          "location": "Planet"
+        },
+        "result": {
+          "reactorBuilt": true,
+          "canProduceEnergy": true
+        }
+      },
+      {
+        "step": 2,
+        "name": "Allocate Energy from Reactor",
+        "description": "Convert Alpha Matter to energy using Reactor",
+        "action": "MsgReactorAllocate",
+        "requirements": {
+          "reactorBuilt": true,
+          "hasAlphaMatter": true,
+          "sufficientAlphaMatter": true
+        },
+        "conversion": {
+          "input": "Alpha Matter (grams)",
+          "output": "Energy (kW)",
+          "rate": 1,
+          "formula": "Energy (kW) = Alpha Matter (grams) × 1"
+        },
+        "result": {
+          "energyProduced": "Energy amount (kW)",
+          "ephemeral": true,
+          "mustConsumeImmediately": true
+        }
+      }
+    ],
+    "generator": [
+      {
+        "step": 1,
+        "name": "Build Generator",
+        "description": "Build Generator struct (Field Generator, Continental Power Plant, or World Engine)",
+        "action": "MsgStructBuild",
+        "requirements": {
+          "structType": "FieldGenerator | ContinentalPowerPlant | WorldEngine",
+          "location": "Planet"
+        },
+        "result": {
+          "generatorBuilt": true,
+          "canProduceEnergy": true
+        }
+      },
+      {
+        "step": 2,
+        "name": "Allocate Energy from Generator",
+        "description": "Convert Alpha Matter to energy using Generator",
+        "action": "MsgGeneratorAllocate",
+        "requirements": {
+          "generatorBuilt": true,
+          "hasAlphaMatter": true,
+          "sufficientAlphaMatter": true
+        },
+        "conversion": {
+          "input": "Alpha Matter (grams)",
+          "output": "Energy (kW)",
+          "rate": "2, 5, or 10 (depends on generator type)",
+          "formula": "Energy (kW) = Alpha Matter (grams) × GeneratorRate"
+        },
+        "result": {
+          "energyProduced": "Energy amount (kW)",
+          "ephemeral": true,
+          "mustConsumeImmediately": true,
+          "risk": "high"
+        }
+      }
+    ]
+  },
+  "energyProperties": {
+    "ephemeral": true,
+    "description": "Energy must be consumed immediately upon production. Cannot be stored.",
+    "shared": true,
+    "description2": "Energy is shared across all Structs connected to the same power source."
+  },
+  "examples": {
+    "reactorExample": {
+      "input": "100 grams Alpha Matter",
+      "output": "100 kW Energy",
+      "formula": "100 × 1 = 100 kW"
+    },
+    "fieldGeneratorExample": {
+      "input": "100 grams Alpha Matter",
+      "output": "200 kW Energy",
+      "formula": "100 × 2 = 200 kW"
+    },
+    "continentalPowerPlantExample": {
+      "input": "100 grams Alpha Matter",
+      "output": "500 kW Energy",
+      "formula": "100 × 5 = 500 kW"
+    },
+    "worldEngineExample": {
+      "input": "100 grams Alpha Matter",
+      "output": "1000 kW Energy",
+      "formula": "100 × 10 = 1000 kW"
+    }
+  },
+  "bestPractices": {
+    "consumeImmediately": {
+      "priority": "critical",
+      "reason": "Energy is ephemeral and cannot be stored",
+      "action": "Have consumption ready before production"
+    },
+    "chooseReactorForSafety": {
+      "priority": "high",
+      "reason": "Reactors are safer (lower risk)",
+      "action": "Use Reactors when reliability is important"
+    },
+    "chooseGeneratorForEfficiency": {
+      "priority": "high",
+      "reason": "Generators are more efficient (2x, 5x, or 10x)",
+      "action": "Use Generators when you can handle risk for efficiency"
+    },
+    "planConsumption": {
+      "priority": "high",
+      "reason": "Energy must be consumed immediately",
+      "action": "Plan what you'll use energy for before producing it"
+    }
+  },
+  "commonErrors": {
+    "insufficientAlphaMatter": {
+      "code": "INSUFFICIENT_ALPHA_MATTER",
+      "description": "Not enough Alpha Matter for energy production",
+      "solution": "Mine more ore, refine to Alpha Matter, or trade for Alpha Matter"
+    },
+    "energyExpired": {
+      "code": "ENERGY_EXPIRED",
+      "description": "Energy was not consumed and expired (ephemeral)",
+      "solution": "Consume energy immediately upon production",
+      "prevention": "Have consumption ready before production"
+    },
+    "generatorFailure": {
+      "code": "GENERATOR_FAILURE",
+      "description": "Generator failed (higher risk than Reactor)",
+      "solution": "Use Reactor for reliability, or accept risk with Generator"
+    }
+  },
+  "nextSteps": {
+    "useEnergy": "Consume energy for operations (combat, building, expansion)",
+    "tradeEnergy": "Trade energy on marketplace if excess",
+    "establishAgreement": "Set up automated energy agreement for consistent supply"
+  }
+}
+

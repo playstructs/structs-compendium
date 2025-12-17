@@ -1,0 +1,141 @@
+{
+  "version": "1.0.0",
+  "id": "building",
+  "name": "Building Task",
+  "description": "Complete workflow for building structures on planets or in fleets",
+  "category": "gameplay",
+  "type": "task",
+  "difficulty": "beginner",
+  "prerequisites": [
+    "Command Ship built and online",
+    "Player online (sufficient power)",
+    "Fleet on station (for planet building)"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "action": "verify",
+      "description": "Verify all building requirements",
+      "checklist": [
+        {
+          "requirement": "playerOnline",
+          "check": "powerStatus.playerOnline == true",
+          "error": "Player must be online - check power capacity"
+        },
+        {
+          "requirement": "commandShipOnline",
+          "check": "commandShip.status == 'online'",
+          "error": "Command Ship must be online"
+        },
+        {
+          "requirement": "fleetOnStation",
+          "check": "fleetStatus == 'onStation'",
+          "condition": "locationType == 1",
+          "error": "Fleet must be on station for planet building"
+        },
+        {
+          "requirement": "sufficientPower",
+          "check": "availableCapacity >= (buildPower + passivePower)",
+          "error": "Insufficient power - need (buildPower + passivePower) Watts"
+        },
+        {
+          "requirement": "availableSlot",
+          "check": "planetSlots[slotType] > 0",
+          "condition": "locationType == 1",
+          "error": "No available slot on planet"
+        },
+        {
+          "requirement": "buildLimit",
+          "check": "currentCount < maxPerPlayer",
+          "condition": "structType has build limit",
+          "error": "Build limit exceeded"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "action": "select",
+      "description": "Select struct type and location",
+      "options": {
+        "structTypes": [
+          "Ore Extractor (500k power)",
+          "Ore Refinery (500k power)",
+          "Planetary Defense Cannon (600k power, limit 1)",
+          "Ore Bunker (200k power)",
+          "Field Generator (500k power)"
+        ],
+        "locationTypes": [
+          "Planet (locationType = 1)",
+          "Fleet (locationType = 2)"
+        ],
+        "slots": [
+          "Space",
+          "Air",
+          "Land",
+          "Water"
+        ]
+      }
+    },
+    {
+      "step": 3,
+      "action": "build",
+      "description": "Initiate build",
+      "requirements": {
+        "structType": "selected",
+        "locationType": "selected",
+        "locationId": "selected",
+        "slot": "selected (if planet)"
+      },
+      "result": {
+        "structId": "generated",
+        "status": "building",
+        "buildTime": "varies"
+      }
+    },
+    {
+      "step": 4,
+      "action": "wait",
+      "description": "Wait for build to complete",
+      "note": "Building takes real-time, may require proof-of-work"
+    },
+    {
+      "step": 5,
+      "action": "verify",
+      "description": "Verify build completed successfully",
+      "check": "struct.status == 'built'"
+    }
+  ],
+  "powerRequirements": {
+    "oreExtractor": {
+      "buildPower": 500000,
+      "passivePower": 500000,
+      "total": 1000000
+    },
+    "planetaryDefenseCannon": {
+      "buildPower": 600000,
+      "passivePower": 600000,
+      "total": 1200000,
+      "limit": 1
+    },
+    "oreBunker": {
+      "buildPower": 200000,
+      "passivePower": 200000,
+      "total": 400000
+    }
+  },
+  "commonErrors": {
+    "playerOffline": "Player must be online - check power capacity",
+    "fleetAway": "Fleet must be on station for planet building",
+    "commandShipOffline": "Command Ship must be online",
+    "noSlot": "No available slot on planet",
+    "insufficientPower": "Need (buildPower + passivePower) Watts",
+    "buildLimitExceeded": "Cannot build more of this struct type"
+  },
+  "tips": [
+    "Always verify requirements before building",
+    "Check power requirements (build + passive)",
+    "Planetary Defense Cannon limited to 1 per player",
+    "Command Ship can only be built in fleet",
+    "Economic structs need massive power (500k each)"
+  ]
+}

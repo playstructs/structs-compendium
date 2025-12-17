@@ -1,0 +1,108 @@
+{
+  "version": "1.0.0",
+  "id": "mine-refine-convert",
+  "name": "Mine, Refine, Convert Workflow",
+  "description": "Complete workflow for mining ore, refining to Alpha Matter, and converting to Watts",
+  "category": "gameplay",
+  "type": "workflow",
+  "steps": [
+    {
+      "step": 1,
+      "action": "monitor",
+      "description": "Monitor mining operation",
+      "request": {
+        "action": "queryMining",
+        "planetId": "2-1",
+        "extractorId": "extractor-1"
+      },
+      "response": {
+        "status": "mining",
+        "currentOre": 4,
+        "oreExtracted": 1,
+        "oreStored": 1,
+        "security": {
+          "needsRefinement": true,
+          "warning": "Ore can be stolen - refine immediately"
+        }
+      }
+    },
+    {
+      "step": 2,
+      "action": "refine",
+      "description": "Refine ore to Alpha Matter (SECURE)",
+      "priority": "immediate",
+      "request": {
+        "action": "refine",
+        "planetId": "2-1",
+        "oreAmount": 1
+      },
+      "response": {
+        "status": "refined",
+        "oreRefined": 1,
+        "alphaMatterGained": 1,
+        "security": {
+          "alphaMatterSecure": true,
+          "cannotBeStolen": true
+        }
+      },
+      "condition": {
+        "type": "check",
+        "property": "oreStored",
+        "operator": ">",
+        "value": 0
+      }
+    },
+    {
+      "step": 3,
+      "action": "evaluate",
+      "description": "Evaluate conversion needs",
+      "criteria": [
+        "Current Watts available",
+        "Power consumption needs",
+        "Reserve requirements (20-30%)"
+      ]
+    },
+    {
+      "step": 4,
+      "action": "convert",
+      "description": "Convert Alpha Matter to Watts",
+      "request": {
+        "action": "convertPower",
+        "method": "reactor",
+        "alphaMatterAmount": 1,
+        "maintainReserve": true
+      },
+      "response": {
+        "status": "converted",
+        "method": "reactor",
+        "alphaMatterUsed": 1,
+        "wattsGained": 1,
+        "rate": "1g:1kW"
+      },
+      "condition": {
+        "type": "check",
+        "property": "wattsNeeded",
+        "operator": ">",
+        "value": 0
+      }
+    },
+    {
+      "step": 5,
+      "action": "loop",
+      "description": "Continue mining loop",
+      "nextStep": 1
+    }
+  ],
+  "resourceFlow": {
+    "mining": "oreStored (stealable)",
+    "refinement": "alphaMatter (secure)",
+    "conversion": "watts (secure)"
+  },
+  "principles": [
+    "Refine ore immediately to secure resources",
+    "Maintain 20-30% Alpha Matter reserve",
+    "Convert when needed, not all at once",
+    "Monitor resource flow continuously"
+  ]
+}
+

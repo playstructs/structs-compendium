@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "structs:errorType": "404-not-found",
+  "description": "Resource not found error example",
+  "httpStatus": 404,
+  "scenarios": [
+    {
+      "scenario": "Player not found",
+      "endpoint": "webapp-player-by-id",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/player/1-999",
+        "headers": {
+          "Accept": "application/json"
+        }
+      },
+      "response": {
+        "status": 404,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "error": "Player not found",
+          "code": 404,
+          "details": [
+            "Player ID 1-999 does not exist"
+          ]
+        }
+      },
+      "handling": {
+        "action": "Verify resource ID and try again",
+        "retry": false,
+        "recovery": "Check if player_id is correct, or query player list to find valid IDs"
+      }
+    },
+    {
+      "scenario": "Planet not found",
+      "endpoint": "webapp-planet-by-id",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/planet/2-999",
+        "headers": {
+          "Accept": "application/json"
+        }
+      },
+      "response": {
+        "status": 404,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "error": "Planet not found",
+          "code": 404,
+          "details": [
+            "Planet ID 2-999 does not exist"
+          ]
+        }
+      },
+      "handling": {
+        "action": "Verify planet_id and try again",
+        "retry": false,
+        "recovery": "Check if planet_id is correct, or query planet list to find valid IDs"
+      }
+    },
+    {
+      "scenario": "Consensus Network - Object not found",
+      "endpoint": "player-by-id",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:1317/structs/player/1-999",
+        "headers": {
+          "Accept": "application/json"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "code": 2,
+          "message": "codespace structs code 1900: object not found",
+          "details": []
+        }
+      },
+      "handling": {
+        "action": "Verify resource ID and try again",
+        "retry": false,
+        "recovery": "Note: Consensus Network returns 200 with error code, not 404. Check response.code field."
+      }
+    }
+  ],
+  "schema": "schemas/responses.json#/definitions/ErrorResponse"
+}
+

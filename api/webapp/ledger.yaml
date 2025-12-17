@@ -1,0 +1,56 @@
+# Webapp Ledger API Endpoints
+
+**Version**: 1.0.0  
+**Category**: webapp  
+**Entity**: Ledger  
+**Base URL**: ${webappBaseUrl} (default: http://localhost:8080)
+
+---
+
+## Endpoints
+
+endpoints:
+  - id: "webapp-ledger-player-page"
+    method: "GET"
+    path: "/api/ledger/player/{player_id}/page/{page}"
+    description: "Get ledger page for player"
+    category: "webapp"
+    entity: "Ledger"
+    parameters:
+      - name: "player_id"
+        type: "string"
+        required: true
+        format: "player-id"
+      - name: "page"
+        type: "integer"
+        required: true
+        description: "Page number"
+
+  - id: "webapp-ledger-player-count"
+    method: "GET"
+    path: "/api/ledger/player/{player_id}/count"
+    description: "Get ledger count for player"
+    category: "webapp"
+    entity: "Ledger"
+    parameters:
+      - name: "player_id"
+        type: "string"
+        required: true
+        format: "player-id"
+
+  - id: "webapp-ledger-by-tx"
+    method: "GET"
+    path: "/api/ledger/{tx_id}"
+    description: "Get ledger entry by transaction ID"
+    category: "webapp"
+    entity: "Ledger"
+    parameters:
+      - name: "tx_id"
+        type: "string"
+        required: true
+        format: "transaction-hash"
+
+---
+
+*Last Updated: January 2025*
+

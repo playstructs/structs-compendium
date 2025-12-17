@@ -1,0 +1,85 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "structs:errorType": "500-server-error",
+  "description": "Server error example",
+  "httpStatus": 500,
+  "scenarios": [
+    {
+      "scenario": "Internal server error",
+      "endpoint": "any",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/player/1-11",
+        "headers": {
+          "Accept": "application/json"
+        }
+      },
+      "response": {
+        "status": 500,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "error": "Internal server error",
+          "code": 500,
+          "details": [
+            "An unexpected error occurred"
+          ],
+          "request_id": "req_1234567890"
+        }
+      },
+      "handling": {
+        "action": "Retry with exponential backoff",
+        "retry": true,
+        "retry_strategy": "exponential_backoff",
+        "initial_delay": 1000,
+        "max_delay": 60000,
+        "max_retries": 5,
+        "recovery": "If error persists, report issue with request_id"
+      }
+    },
+    {
+      "scenario": "Service unavailable",
+      "endpoint": "any",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/player/1-11",
+        "headers": {
+          "Accept": "application/json"
+        }
+      },
+      "response": {
+        "status": 503,
+        "headers": {
+          "Content-Type": "application/json",
+          "Retry-After": "30"
+        },
+        "body": {
+          "error": "Service unavailable",
+          "code": 503,
+          "details": [
+            "Service is temporarily unavailable"
+          ],
+          "retry_after": 30
+        }
+      },
+      "handling": {
+        "action": "Wait for retry_after seconds, then retry",
+        "retry": true,
+        "retry_after": "response.retry_after",
+        "max_retries": 10,
+        "recovery": "Service may be under maintenance or overloaded"
+      }
+    }
+  ],
+  "schema": "schemas/responses.json#/definitions/ErrorResponse",
+  "bestPractices": [
+    "Implement exponential backoff",
+    "Log request_id for debugging",
+    "Respect Retry-After header",
+    "Implement circuit breaker pattern",
+    "Monitor error rates"
+  ]
+}
+

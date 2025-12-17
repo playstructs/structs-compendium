@@ -1,0 +1,140 @@
+# Webapp Guild API Endpoints
+
+**Version**: 1.0.0  
+**Category**: webapp  
+**Entity**: Guild  
+**Base URL**: ${webappBaseUrl} (default: http://localhost:8080)
+
+---
+
+## Endpoints
+
+endpoints:
+  - id: "webapp-guild-this"
+    method: "GET"
+    path: "/api/guild/this"
+    description: "Get current user's guild"
+    category: "webapp"
+    entity: "Guild"
+    authentication: "required"
+
+  - id: "webapp-guild-name"
+    method: "GET"
+    path: "/api/guild/name"
+    description: "Get guild name"
+    category: "webapp"
+    entity: "Guild"
+
+  - id: "webapp-guild-by-id-name"
+    method: "GET"
+    path: "/api/guild/{guild_id}/name"
+    description: "Get guild name by ID"
+    category: "webapp"
+    entity: "Guild"
+    parameters:
+      - name: "guild_id"
+        type: "string"
+        required: true
+        format: "guild-id"
+
+  - id: "webapp-guild-members-count"
+    method: "GET"
+    path: "/api/guild/{guild_id}/members/count"
+    description: "Get guild member count"
+    category: "webapp"
+    entity: "Guild"
+    parameters:
+      - name: "guild_id"
+        type: "string"
+        required: true
+        format: "guild-id"
+
+  - id: "webapp-guild-count"
+    method: "GET"
+    path: "/api/guild/count"
+    description: "Get total guild count"
+    category: "webapp"
+    entity: "Guild"
+    baseUrl: "${webappBaseUrl}"
+    response:
+      schema: "schemas/responses.json#/definitions/CountResponse"
+      contentType: "application/json"
+    example:
+      request: "GET http://localhost:8080/api/guild/count"
+      response: |
+        {
+          "count": 42
+        }
+
+  - id: "webapp-guild-directory"
+    method: "GET"
+    path: "/api/guild/directory"
+    description: "Get guild directory"
+    category: "webapp"
+    entity: "Guild"
+
+  - id: "webapp-guild-by-id"
+    method: "GET"
+    path: "/api/guild/{guild_id}"
+    description: "Get guild by ID"
+    category: "webapp"
+    entity: "Guild"
+    baseUrl: "${webappBaseUrl}"
+    parameters:
+      - name: "guild_id"
+        type: "string"
+        required: true
+        format: "guild-id"
+        description: "Guild identifier"
+    response:
+      schema: "schemas/entities.json#/definitions/Guild"
+      contentType: "application/json"
+    example:
+      request: "GET http://localhost:8080/api/guild/2-1"
+      response: |
+        {
+          "id": "2-1",
+          "name": "GuildName",
+          "member_count": 10
+        }
+
+  - id: "webapp-guild-power-stats"
+    method: "GET"
+    path: "/api/guild/{guild_id}/power/stats"
+    description: "Get guild power statistics"
+    category: "webapp"
+    entity: "Guild"
+    parameters:
+      - name: "guild_id"
+        type: "string"
+        required: true
+        format: "guild-id"
+
+  - id: "webapp-guild-roster"
+    method: "GET"
+    path: "/api/guild/{guild_id}/roster"
+    description: "Get guild roster"
+    category: "webapp"
+    entity: "Guild"
+    parameters:
+      - name: "guild_id"
+        type: "string"
+        required: true
+        format: "guild-id"
+
+  - id: "webapp-guild-planet-complete-count"
+    method: "GET"
+    path: "/api/guild/{guild_id}/planet/complete/count"
+    description: "Get completed planet count for guild"
+    category: "webapp"
+    entity: "Guild"
+    parameters:
+      - name: "guild_id"
+        type: "string"
+        required: true
+        format: "guild-id"
+
+---
+
+*Last Updated: January 2025*
+

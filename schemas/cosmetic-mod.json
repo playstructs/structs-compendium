@@ -1,0 +1,256 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Cosmetic Mod Schema",
+  "description": "Schema for Struct Type cosmetic modding - allows guilds to customize appearance and lore without changing game capabilities",
+  "type": "object",
+  "structs:category": "modding",
+  "structs:scope": "guild-customization",
+  "properties": {
+    "manifest": {
+      "type": "object",
+      "description": "Mod metadata and information",
+      "properties": {
+        "modId": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$",
+          "description": "Unique mod identifier (e.g., 'guild-alpha-miner-v1')"
+        },
+        "name": {
+          "type": "object",
+          "description": "Mod name in multiple languages",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {
+            "en": "Unnamed Mod"
+          }
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Semantic version (e.g., '1.0.0')"
+        },
+        "author": {
+          "type": "string",
+          "description": "Mod author/guild name"
+        },
+        "guildId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^0-[0-9]+$",
+          "description": "Guild ID this mod is for (optional, for guild-specific mods)"
+        },
+        "description": {
+          "type": "object",
+          "description": "Mod description in multiple languages",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "compatibleGameVersion": {
+          "type": "string",
+          "description": "Game version compatibility (e.g., '1.0.0')"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Mod creation timestamp (ISO 8601)"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Mod last update timestamp (ISO 8601)"
+        }
+      },
+      "required": ["modId", "version", "author"]
+    },
+    "structTypes": {
+      "type": "array",
+      "description": "Cosmetic overrides for struct types",
+      "items": {
+        "$ref": "#/definitions/StructTypeCosmetic"
+      }
+    },
+    "localizations": {
+      "type": "object",
+      "description": "Localization data by language code",
+      "additionalProperties": {
+        "$ref": "#/definitions/Localization"
+      }
+    }
+  },
+  "required": ["manifest"],
+  "definitions": {
+    "StructTypeCosmetic": {
+      "type": "object",
+      "description": "Cosmetic overrides for a specific struct type",
+      "properties": {
+        "class": {
+          "type": "string",
+          "description": "Struct Type class name this cosmetic is for (must match the 'class' field from struct_type table/on-chain). Examples: 'Command Ship', 'Miner', 'Reactor', 'Fleet'. Case-sensitive."
+        },
+        "names": {
+          "type": "object",
+          "description": "Cosmetic names in multiple languages",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {
+            "en": ""
+          }
+        },
+        "lore": {
+          "type": "object",
+          "description": "Lore/description text in multiple languages",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "weapons": {
+          "type": "array",
+          "description": "Weapon cosmetic overrides",
+          "items": {
+            "$ref": "#/definitions/WeaponCosmetic"
+          }
+        },
+        "abilities": {
+          "type": "array",
+          "description": "Ability cosmetic overrides",
+          "items": {
+            "$ref": "#/definitions/AbilityCosmetic"
+          }
+        },
+        "animations": {
+          "type": "object",
+          "description": "Animation file paths (Lottie JSON files)",
+          "properties": {
+            "idle": {
+              "type": "string",
+              "description": "Path to idle animation (relative to animations/ directory)"
+            },
+            "active": {
+              "type": "string",
+              "description": "Path to active animation"
+            },
+            "building": {
+              "type": "string",
+              "description": "Path to building animation"
+            },
+            "attacking": {
+              "type": "string",
+              "description": "Path to attack animation"
+            },
+            "defending": {
+              "type": "string",
+              "description": "Path to defense animation"
+            },
+            "custom": {
+              "type": "object",
+              "description": "Custom animation mappings",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "icon": {
+          "type": "string",
+          "description": "Path to icon file (relative to icons/ directory)"
+        },
+        "graphics": {
+          "type": "object",
+          "description": "Additional graphics files",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["class"]
+    },
+    "WeaponCosmetic": {
+      "type": "object",
+      "description": "Cosmetic override for a weapon",
+      "properties": {
+        "weaponType": {
+          "type": "string",
+          "enum": ["primary", "secondary"],
+          "description": "Primary or secondary weapon"
+        },
+        "names": {
+          "type": "object",
+          "description": "Weapon names in multiple languages",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "object",
+          "description": "Weapon description in multiple languages",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "animation": {
+          "type": "string",
+          "description": "Path to weapon animation (Lottie JSON)"
+        },
+        "icon": {
+          "type": "string",
+          "description": "Path to weapon icon"
+        }
+      },
+      "required": ["weaponType"]
+    },
+    "AbilityCosmetic": {
+      "type": "object",
+      "description": "Cosmetic override for an ability",
+      "properties": {
+        "abilityId": {
+          "type": "string",
+          "description": "Ability identifier (must match game ability)"
+        },
+        "names": {
+          "type": "object",
+          "description": "Ability names in multiple languages",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "object",
+          "description": "Ability description in multiple languages",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "animation": {
+          "type": "string",
+          "description": "Path to ability animation (Lottie JSON)"
+        },
+        "icon": {
+          "type": "string",
+          "description": "Path to ability icon"
+        }
+      },
+      "required": ["abilityId"]
+    },
+    "Localization": {
+      "type": "object",
+      "description": "Localization data for a specific language",
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "structs:notes": [
+    "Mods only override cosmetic appearance and text - game capabilities remain unchanged",
+    "The 'class' field must match exactly the class name from struct_type table (on-chain). Examples: 'Command Ship', 'Miner', 'Reactor', 'Fleet'. Case-sensitive.",
+    "Animation files must be valid Lottie JSON format",
+    "Icon files should be PNG or SVG format",
+    "Localization keys should follow language codes (en, es, fr, etc.)",
+    "Mods are converted to Sets/Skins format during ingestion (Phase 2)",
+    "After ingestion, cosmetics use hash-based identification (setHash, skinHash)"
+  ]
+}
+

@@ -1,0 +1,221 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "GRASS Event Schemas",
+  "description": "Complete catalog of GRASS event payload schemas for AI agents",
+  "type": "object",
+  "definitions": {
+    "BaseEvent": {
+      "type": "object",
+      "description": "Base event structure for all GRASS events",
+      "properties": {
+        "subject": {
+          "type": "string",
+          "description": "NATS subject for this event",
+          "pattern": "^structs\\..+$"
+        },
+        "category": {
+          "type": "string",
+          "description": "Event category (see event-types.yaml)"
+        },
+        "id": {
+          "type": "string",
+          "description": "Entity identifier"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of update"
+        }
+      },
+      "required": ["subject", "category", "id", "updated_at"]
+    },
+    "PlayerConsensusEvent": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseEvent" },
+        {
+          "type": "object",
+          "properties": {
+            "category": {
+              "const": "player_consensus"
+            },
+            "data": {
+              "type": "object",
+              "description": "Player consensus data",
+              "properties": {
+                "id": { "type": "string" },
+                "guildId": { "type": "string" },
+                "primaryAddress": { "type": "string" }
+              }
+            }
+          },
+          "required": ["data"]
+        }
+      ]
+    },
+    "PlayerMetaEvent": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseEvent" },
+        {
+          "type": "object",
+          "properties": {
+            "category": {
+              "const": "player_meta"
+            },
+            "data": {
+              "type": "object",
+              "description": "Player metadata",
+              "properties": {
+                "id": { "type": "string" },
+                "username": { "type": "string" }
+              }
+            }
+          },
+          "required": ["data"]
+        }
+      ]
+    },
+    "GuildConsensusEvent": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseEvent" },
+        {
+          "type": "object",
+          "properties": {
+            "category": {
+              "const": "guild_consensus"
+            },
+            "data": {
+              "type": "object",
+              "description": "Guild consensus data"
+            }
+          },
+          "required": ["data"]
+        }
+      ]
+    },
+    "GuildMetaEvent": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseEvent" },
+        {
+          "type": "object",
+          "properties": {
+            "category": {
+              "const": "guild_meta"
+            },
+            "data": {
+              "type": "object",
+              "description": "Guild metadata",
+              "properties": {
+                "id": { "type": "string" },
+                "name": { "type": "string" }
+              }
+            }
+          },
+          "required": ["data"]
+        }
+      ]
+    },
+    "GuildMembershipEvent": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseEvent" },
+        {
+          "type": "object",
+          "properties": {
+            "category": {
+              "const": "guild_membership"
+            },
+            "data": {
+              "type": "object",
+              "description": "Guild membership change data"
+            }
+          },
+          "required": ["data"]
+        }
+      ]
+    },
+    "PlanetRaidStatusEvent": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseEvent" },
+        {
+          "type": "object",
+          "properties": {
+            "category": {
+              "const": "raid_status"
+            },
+            "data": {
+              "type": "object",
+              "description": "Raid status change data"
+            }
+          },
+          "required": ["data"]
+        }
+      ]
+    },
+    "FleetArriveEvent": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseEvent" },
+        {
+          "type": "object",
+          "properties": {
+            "category": {
+              "const": "fleet_arrive"
+            },
+            "data": {
+              "type": "object",
+              "description": "Fleet arrival data"
+            }
+          },
+          "required": ["data"]
+        }
+      ]
+    },
+    "StructStatusEvent": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseEvent" },
+        {
+          "type": "object",
+          "properties": {
+            "category": {
+              "const": "struct_status"
+            },
+            "data": {
+              "type": "object",
+              "description": "Struct status change data"
+            }
+          },
+          "required": ["data"]
+        }
+      ]
+    },
+    "BlockEvent": {
+      "allOf": [
+        { "$ref": "#/definitions/BaseEvent" },
+        {
+          "type": "object",
+          "properties": {
+            "category": {
+              "const": "block"
+            },
+            "data": {
+              "type": "object",
+              "description": "Block update data",
+              "properties": {
+                "height": { "type": "integer" },
+                "hash": { "type": "string" }
+              }
+            }
+          },
+          "required": ["data"]
+        }
+      ]
+    }
+  },
+  "structs:eventCategories": {
+    "consensus": ["block"],
+    "guild": ["guild_consensus", "guild_meta", "guild_membership"],
+    "planet": ["raid_status", "fleet_arrive", "fleet_advance", "fleet_depart"],
+    "struct": ["struct_attack", "struct_defense_remove", "struct_defense_add", "struct_status", "struct_move", "struct_block_build_start", "struct_block_ore_mine_start", "struct_block_ore_refine_start"],
+    "player": ["player_consensus", "player_meta"]
+  }
+}
+

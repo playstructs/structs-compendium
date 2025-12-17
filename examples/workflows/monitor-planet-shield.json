@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "structs:workflow": "monitor-planet-shield",
+  "description": "Monitor planet shield health and information",
+  "category": "monitoring",
+  "prerequisites": [
+    "planet_id"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "endpoint": "webapp-planet-by-id",
+      "method": "GET",
+      "url": "http://localhost:8080/api/planet/{planet_id}",
+      "description": "Get planet information",
+      "parameters": {
+        "planet_id": "3-1"
+      },
+      "extract": {
+        "planet_id": "response.id",
+        "owner_id": "response.owner_id"
+      }
+    },
+    {
+      "step": 2,
+      "endpoint": "webapp-planet-shield-health",
+      "method": "GET",
+      "url": "http://localhost:8080/api/planet/{planet_id}/shield/health",
+      "description": "Get planetary shield health",
+      "parameters": {
+        "planet_id": "{{step1.extract.planet_id}}"
+      },
+      "extract": {
+        "health": "response.health",
+        "max_health": "response.max_health"
+      }
+    },
+    {
+      "step": 3,
+      "endpoint": "webapp-planet-shield",
+      "method": "GET",
+      "url": "http://localhost:8080/api/planet/{planet_id}/shield",
+      "description": "Get planetary shield information",
+      "parameters": {
+        "planet_id": "{{step1.extract.planet_id}}"
+      },
+      "extract": {
+        "shield_info": "response.shield"
+      }
+    }
+  ],
+  "result": {
+    "planet": {
+      "id": "{{step1.extract.planet_id}}",
+      "owner_id": "{{step1.extract.owner_id}}",
+      "shield": {
+        "health": "{{step2.extract.health}}",
+        "max_health": "{{step2.extract.max_health}}",
+        "health_percentage": "{{step2.extract.health}} / {{step2.extract.max_health}} * 100",
+        "details": "{{step3.extract.shield_info}}"
+      }
+    }
+  },
+  "errorHandling": {
+    "step1": {
+      "404": "Planet not found - verify planet_id"
+    },
+    "step2": {
+      "404": "Planet not found or no shield data"
+    },
+    "step3": {
+      "404": "Planet not found or no shield data"
+    }
+  },
+  "notes": "This workflow demonstrates monitoring a planet's shield status. Steps 2 and 3 can be executed in parallel."
+}
+

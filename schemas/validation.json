@@ -1,0 +1,548 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Validation Rules and Patterns",
+  "description": "Validation rules, patterns, and validators for AI agents to validate API requests and responses. See schemas/formats.json for format specifications.",
+  "type": "object",
+  "structs:category": "validation",
+  "definitions": {
+    "ValidationRule": {
+      "type": "object",
+      "description": "A validation rule",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique rule identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Rule name"
+        },
+        "field": {
+          "type": "string",
+          "description": "Field to validate (dot notation)"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["required", "type", "format", "range", "pattern", "custom"],
+          "description": "Validation type"
+        },
+        "value": {
+          "description": "Validation value (depends on type)"
+        },
+        "message": {
+          "type": "string",
+          "description": "Error message if validation fails"
+        }
+      },
+      "required": ["id", "name", "type"]
+    },
+    "InputValidation": {
+      "type": "object",
+      "description": "Input validation rules",
+      "properties": {
+        "playerId": {
+          "type": "object",
+          "properties": {
+            "required": {
+              "type": "boolean",
+              "default": true
+            },
+            "type": {
+              "type": "string",
+              "enum": ["string", "number"],
+              "default": "string"
+            },
+            "pattern": {
+              "type": "string",
+              "description": "Regex pattern for player ID format"
+            }
+          }
+        },
+        "planetId": {
+          "type": "object",
+          "properties": {
+            "required": {
+              "type": "boolean",
+              "default": true
+            },
+            "type": {
+              "type": "string",
+              "enum": ["string"],
+              "default": "string"
+            },
+            "pattern": {
+              "type": "string",
+              "description": "Regex pattern for planet ID format (e.g., '\\d+-\\d+')"
+            }
+          }
+        },
+        "blockchainAddress": {
+          "type": "object",
+          "properties": {
+            "required": {
+              "type": "boolean",
+              "default": true
+            },
+            "type": {
+              "type": "string",
+              "enum": ["string"],
+              "default": "string"
+            },
+            "pattern": {
+              "type": "string",
+              "description": "Regex pattern for blockchain address (e.g., '^structs1[a-z0-9]{38}$')"
+            }
+          }
+        }
+      }
+    },
+    "ResponseValidation": {
+      "type": "object",
+      "description": "Response validation rules",
+      "properties": {
+        "statusCode": {
+          "type": "object",
+          "properties": {
+            "expected": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Expected status codes"
+            },
+            "retryable": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Retryable status codes (5xx)"
+            }
+          }
+        },
+        "requiredFields": {
+          "type": "object",
+          "description": "Required fields by endpoint",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "schemaValidation": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true
+            },
+            "strict": {
+              "type": "boolean",
+              "default": false,
+              "description": "Strict schema validation (reject unknown fields)"
+            }
+          }
+        }
+      }
+    },
+    "TransactionValidation": {
+      "type": "object",
+      "description": "Transaction validation rules",
+      "properties": {
+        "messageType": {
+          "type": "object",
+          "properties": {
+            "required": {
+              "type": "boolean",
+              "default": true
+            },
+            "pattern": {
+              "type": "string",
+              "description": "Message type pattern (e.g., '/structs.structs.Msg.*')"
+            }
+          }
+        },
+        "creator": {
+          "type": "object",
+          "properties": {
+            "required": {
+              "type": "boolean",
+              "default": true
+            },
+            "format": {
+              "type": "string",
+              "enum": ["blockchain-address"],
+              "default": "blockchain-address"
+            }
+          }
+        },
+        "gasLimit": {
+          "type": "object",
+          "properties": {
+            "min": {
+              "type": "integer",
+              "default": 200000
+            },
+            "max": {
+              "type": "integer",
+              "default": 10000000
+            }
+          }
+        }
+      }
+    },
+    "ValidationPattern": {
+      "type": "object",
+      "description": "A validation pattern",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Pattern identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Pattern name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Pattern description"
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ValidationRule"
+          },
+          "description": "Validation rules for this pattern"
+        }
+      },
+      "required": ["id", "name", "rules"]
+    }
+  },
+  "validationPatterns": {
+    "playerQuery": {
+      "id": "player-query",
+      "name": "Player Query Validation",
+      "description": "Validation for player query endpoints",
+      "rules": [
+        {
+          "id": "player-id-required",
+          "name": "Player ID Required",
+          "field": "id",
+          "type": "required",
+          "message": "Player ID is required"
+        },
+        {
+          "id": "player-id-format",
+          "name": "Player ID Format",
+          "field": "id",
+          "type": "pattern",
+          "value": "^1-[0-9]+$",
+          "message": "Player ID must be in format '1-X' where X is the player index (e.g., '1-11')"
+        }
+      ]
+    },
+    "planetQuery": {
+      "id": "planet-query",
+      "name": "Planet Query Validation",
+      "description": "Validation for planet query endpoints",
+      "rules": [
+        {
+          "id": "planet-id-required",
+          "name": "Planet ID Required",
+          "field": "id",
+          "type": "required",
+          "message": "Planet ID is required"
+        },
+        {
+          "id": "planet-id-format",
+          "name": "Planet ID Format",
+          "field": "id",
+          "type": "pattern",
+          "value": "^2-[0-9]+$",
+          "message": "Planet ID must be in format '2-X' where X is the planet index (e.g., '2-1')"
+        }
+      ]
+    },
+    "transaction": {
+      "id": "transaction",
+      "name": "Transaction Validation",
+      "description": "Validation for transaction submission",
+      "rules": [
+        {
+          "id": "message-type-required",
+          "name": "Message Type Required",
+          "field": "body.messages[].@type",
+          "type": "required",
+          "message": "Message type is required"
+        },
+        {
+          "id": "creator-required",
+          "name": "Creator Required",
+          "field": "body.messages[].creator",
+          "type": "required",
+          "message": "Creator address is required"
+        },
+        {
+          "id": "creator-format",
+          "name": "Creator Format",
+          "field": "body.messages[].creator",
+          "type": "format",
+          "value": "blockchain-address",
+          "message": "Creator must be a valid blockchain address"
+        },
+        {
+          "id": "gas-limit-range",
+          "name": "Gas Limit Range",
+          "field": "auth_info.fee.gas_limit",
+          "type": "range",
+          "value": {
+            "min": 200000,
+            "max": 10000000
+          },
+          "message": "Gas limit must be between 200000 and 10000000"
+        }
+      ]
+    }
+  },
+  "validators": {
+    "playerId": {
+      "type": "string",
+      "pattern": "^1-[0-9]+$",
+      "description": "Player ID must be in format '1-X' where X is the player index (e.g., '1-11'). Type 1 = Player."
+    },
+    "planetId": {
+      "type": "string",
+      "pattern": "^2-[0-9]+$",
+      "description": "Planet ID must be in format '2-X' where X is the planet index (e.g., '2-1'). Type 2 = Planet."
+    },
+    "blockchainAddress": {
+      "type": "string",
+      "pattern": "^structs1[a-z0-9]{38}$",
+      "description": "Blockchain address must start with 'structs1' and be 45 characters"
+    },
+    "structId": {
+      "type": "string",
+      "pattern": "^5-[0-9]+$",
+      "description": "Struct ID must be in format '5-X' where X is the struct index (e.g., '5-42'). Type 5 = Struct."
+    },
+    "fleetId": {
+      "type": "string",
+      "pattern": "^9-[0-9]+$",
+      "description": "Fleet ID must be in format '9-X' where X is the fleet index (e.g., '9-11'). Type 9 = Fleet."
+    },
+    "guildId": {
+      "type": "string",
+      "pattern": "^0-[0-9]+$",
+      "description": "Guild ID must be in format '0-X' where X is the guild index (e.g., '0-1'). Type 0 = Guild."
+    }
+  },
+  "responseValidation": {
+    "requiredFields": {
+      "/structs/player/{id}": ["Player", "gridAttributes", "playerInventory", "halted"],
+      "/structs/planet/{id}": ["Planet", "gridAttributes", "planetAttributes"],
+      "/structs/guild/{id}": ["Guild"],
+      "/api/player/{player_id}": ["player"],
+      "/api/planet/{planet_id}": ["planet"]
+    },
+    "statusCodes": {
+      "expected": [200],
+      "retryable": [500, 502, 503, 504],
+      "clientErrors": [400, 401, 403, 404],
+      "serverErrors": [500, 502, 503, 504]
+    }
+  },
+  "actionValidation": {
+    "structBuild": {
+      "id": "struct-build-validation",
+      "name": "Struct Build Validation",
+      "description": "Validation requirements for MsgStructBuild",
+      "preActionChecks": [
+        {
+          "id": "player-online",
+          "name": "Player Online",
+          "check": "Query player, verify halted = false",
+          "query": "GET /structs/player/{playerId}",
+          "field": "halted",
+          "expected": false,
+          "message": "Player must be online (not halted)"
+        },
+        {
+          "id": "command-ship-online",
+          "name": "Command Ship Online",
+          "check": "If building on planet, verify Command Ship exists and is online",
+          "query": "GET /structs/fleet/{fleetId}",
+          "condition": "locationType = planet",
+          "message": "Command Ship must be built and online in fleet"
+        },
+        {
+          "id": "fleet-on-station",
+          "name": "Fleet On Station",
+          "check": "If building on planet, verify fleet status is 'onStation'",
+          "query": "GET /structs/fleet/{fleetId}",
+          "condition": "locationType = planet",
+          "field": "status",
+          "expected": "onStation",
+          "message": "Fleet must be on station (not away)"
+        },
+        {
+          "id": "sufficient-power",
+          "name": "Sufficient Power",
+          "check": "Verify power capacity > struct passive draw",
+          "query": "GET /structs/player/{playerId}",
+          "field": "gridAttributes.power",
+          "message": "Must have sufficient power capacity"
+        }
+      ],
+      "postActionVerification": {
+        "query": "GET /structs/struct",
+        "filter": "By locationId",
+        "expected": "Struct exists at location",
+        "message": "If struct not found, check requirements and retry"
+      }
+    },
+    "planetExplore": {
+      "id": "planet-explore-validation",
+      "name": "Planet Exploration Validation",
+      "description": "Validation requirements for MsgPlanetExplore",
+      "preActionChecks": [
+        {
+          "id": "current-planet-empty",
+          "name": "Current Planet Empty",
+          "check": "Verify current planet has 0 ore remaining",
+          "query": "GET /structs/planet/{currentPlanetId}",
+          "field": "gridAttributes.ore",
+          "expected": "0",
+          "message": "Current planet must have 0 ore before exploring new planet"
+        },
+        {
+          "id": "player-online",
+          "name": "Player Online",
+          "check": "Query player, verify halted = false",
+          "query": "GET /structs/player/{playerId}",
+          "field": "halted",
+          "expected": false,
+          "message": "Player must be online"
+        }
+      ],
+      "postActionVerification": {
+        "query": "GET /structs/planet_by_player/{playerId}",
+        "expected": "New planet owned by player",
+        "message": "If planet ownership unchanged, current planet still has ore"
+      }
+    }
+  },
+  "commonFailures": {
+    "broadcastButNoResult": {
+      "id": "broadcast-no-result",
+      "name": "Transaction Broadcasts But Action Doesn't Occur",
+      "description": "Transaction shows 'broadcast' status but action didn't happen",
+      "symptom": "Transaction status = 'broadcast' but game state unchanged",
+      "cause": "on-chain validation failed (requirements not met)",
+      "diagnosis": [
+        "Query game state to verify action occurred",
+        "Compare expected vs actual game state",
+        "Check action requirements in schemas/actions.json",
+        "Identify missing requirement"
+      ],
+      "solution": [
+        "Fix missing requirement",
+        "Retry action",
+        "Verify success"
+      ],
+      "prevention": [
+        "Always check requirements before acting",
+        "Query game state before action",
+        "Verify all requirements met",
+        "Then perform action"
+      ]
+    },
+    "commandShipNotOnline": {
+      "id": "command-ship-not-online",
+      "name": "Building on Planet Without Command Ship",
+      "description": "Attempting to build on planet without Command Ship online",
+      "symptom": "MsgStructBuild broadcasts but struct not created on planet",
+      "cause": "Command Ship not built or not online in fleet",
+      "diagnosis": [
+        "Query fleet: GET /structs/fleet/{fleetId}",
+        "Check for Command Ship struct",
+        "Verify Command Ship status is 'online' (not just materialized)",
+        "Verify fleet status is 'onStation'"
+      ],
+      "solution": [
+        "Build Command Ship in fleet (MsgStructBuild)",
+        "Complete Command Ship build (MsgStructBuildComplete)",
+        "Activate Command Ship (bring online)",
+        "Then build on planets"
+      ],
+      "reference": "See schemas/actions.json#MsgStructBuild for complete requirements"
+    },
+    "insufficientPower": {
+      "id": "insufficient-power",
+      "name": "Building Without Sufficient Power",
+      "description": "Attempting to build struct without sufficient power capacity",
+      "symptom": "MsgStructBuild broadcasts but struct not created",
+      "cause": "Insufficient power capacity for struct passive draw",
+      "diagnosis": [
+        "Query player: GET /structs/player/{playerId}",
+        "Check gridAttributes.power (current power)",
+        "Check struct requirements for passive draw",
+        "Verify capacity > current load + struct load"
+      ],
+      "solution": [
+        "Increase power capacity (build reactors/generators)",
+        "Reduce current power load",
+        "Then retry build"
+      ]
+    },
+    "planetNotEmpty": {
+      "id": "planet-not-empty",
+      "name": "Exploration With Ore Remaining",
+      "description": "Attempting to explore new planet while current planet has ore",
+      "symptom": "MsgPlanetExplore broadcasts but planet ownership unchanged",
+      "cause": "Current planet still has ore remaining",
+      "diagnosis": [
+        "Query current planet: GET /structs/planet/{planetId}",
+        "Check gridAttributes.ore",
+        "Verify ore amount is 0"
+      ],
+      "solution": [
+        "Mine all ore from current planet",
+        "Verify ore = 0",
+        "Then explore new planet"
+      ]
+    }
+  },
+  "validationFlow": {
+    "transactionFlow": {
+      "1": "Create transaction (pending)",
+      "2": "Sign transaction",
+      "3": "Submit to POST /cosmos/tx/v1beta1/txs",
+      "4": "Transaction moves to 'broadcast' status",
+      "5": "on-chain validation occurs",
+      "6": "Action succeeds OR fails based on validation",
+      "7": "Query game state to verify action actually occurred",
+      "8": "If action didn't occur, check requirements and retry"
+    },
+    "verificationPattern": {
+      "1": "Submit transaction",
+      "2": "Wait for transaction to reach 'broadcast' status",
+      "3": "Query game state to verify action actually occurred",
+      "4": "If action didn't occur, check requirements",
+      "5": "Fix requirements and retry if needed"
+    },
+    "preActionCheck": {
+      "1": "Query current game state",
+      "2": "Verify all requirements met (see actionValidation)",
+      "3": "If not met, fix requirements first",
+      "4": "Then perform action"
+    }
+  },
+  "structs:validationWarning": "⚠️ IMPORTANT: Transaction status 'broadcast' does NOT mean action succeeded! Validation happens on-chain after broadcast. Always verify game state to confirm action occurred.",
+  "structs:references": {
+    "actions": "schemas/actions.json - Complete action requirements",
+    "validationPatterns": "patterns/validation-patterns.md - Detailed validation patterns",
+    "errorHandling": "protocols/error-handling.md - Error handling patterns"
+  }
+}
+

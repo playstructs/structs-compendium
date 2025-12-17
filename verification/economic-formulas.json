@@ -1,0 +1,205 @@
+{
+  "version": "1.0.0",
+  "id": "economic-formulas",
+  "name": "Economic Formulas Verification Status",
+  "description": "Verification status for all economic formulas in Structs",
+  "lastUpdated": "2025-01-XX",
+  "formulas": {
+    "energyProduction": {
+      "reactor": {
+        "formula": "Energy (kW) = Alpha Matter (grams) × 1",
+        "rate": 1,
+        "verified": true,
+        "verificationDate": "2025-01-XX",
+        "codeReference": {
+          "file": "genesis_struct_type.go",
+          "field": "GeneratingRate",
+          "description": "Reactor GeneratingRate field"
+        },
+        "status": "verified",
+        "notes": "Matches code implementation"
+      },
+      "fieldGenerator": {
+        "formula": "Energy (kW) = Alpha Matter (grams) × 2",
+        "rate": 2,
+        "verified": true,
+        "verificationDate": "2025-01-XX",
+        "codeReference": {
+          "file": "genesis_struct_type.go",
+          "field": "GeneratingRate",
+          "description": "Field Generator GeneratingRate field"
+        },
+        "status": "verified",
+        "notes": "Matches code implementation. Previous documentation said '× 2' for all generators, but code has 3 types."
+      },
+      "continentalPowerPlant": {
+        "formula": "Energy (kW) = Alpha Matter (grams) × 5",
+        "rate": 5,
+        "verified": true,
+        "verificationDate": "2025-01-XX",
+        "codeReference": {
+          "file": "genesis_struct_type.go",
+          "field": "GeneratingRate",
+          "description": "Continental Power Plant GeneratingRate field"
+        },
+        "status": "verified",
+        "notes": "Matches code implementation. Previously undocumented generator type."
+      },
+      "worldEngine": {
+        "formula": "Energy (kW) = Alpha Matter (grams) × 10",
+        "rate": 10,
+        "verified": true,
+        "verificationDate": "2025-01-XX",
+        "codeReference": {
+          "file": "genesis_struct_type.go",
+          "field": "GeneratingRate",
+          "description": "World Engine GeneratingRate field"
+        },
+        "status": "verified",
+        "notes": "Matches code implementation. Previously undocumented generator type."
+      }
+    },
+    "resourceConversion": {
+      "oreToMatter": {
+        "formula": "Alpha Matter (grams) = Alpha Ore (grams) × 1",
+        "rate": 1,
+        "verified": false,
+        "verificationDate": null,
+        "codeReference": {
+          "file": "TBD",
+          "field": "TBD",
+          "description": "Needs code verification"
+        },
+        "status": "needsVerification",
+        "notes": "Assumed 1:1 conversion, needs code verification"
+      }
+    },
+    "costCalculations": {
+      "reactorCostPerKW": {
+        "formula": "Cost per kW = Alpha Matter Cost / 1",
+        "verified": false,
+        "verificationDate": null,
+        "codeReference": {
+          "file": "TBD",
+          "description": "Theoretical calculation, needs code verification"
+        },
+        "status": "needsVerification",
+        "notes": "Theoretical calculation"
+      },
+      "fieldGeneratorCostPerKW": {
+        "formula": "Cost per kW = Alpha Matter Cost / 2",
+        "verified": false,
+        "verificationDate": null,
+        "codeReference": {
+          "file": "TBD",
+          "description": "Theoretical calculation, needs code verification"
+        },
+        "status": "needsVerification",
+        "notes": "Theoretical calculation"
+      },
+      "continentalPowerPlantCostPerKW": {
+        "formula": "Cost per kW = Alpha Matter Cost / 5",
+        "verified": false,
+        "verificationDate": null,
+        "codeReference": {
+          "file": "TBD",
+          "description": "Theoretical calculation, needs code verification"
+        },
+        "status": "needsVerification",
+        "notes": "Theoretical calculation"
+      },
+      "worldEngineCostPerKW": {
+        "formula": "Cost per kW = Alpha Matter Cost / 10",
+        "verified": false,
+        "verificationDate": null,
+        "codeReference": {
+          "file": "TBD",
+          "description": "Theoretical calculation, needs code verification"
+        },
+        "status": "needsVerification",
+        "notes": "Theoretical calculation"
+      }
+    },
+    "marketCalculations": {
+      "priceDetermination": {
+        "formula": "Market Price = f(Supply, Demand, Guild Activities, Combat Outcomes, Resource Discoveries)",
+        "verified": false,
+        "verificationDate": null,
+        "codeReference": {
+          "file": "TBD",
+          "description": "Player-driven, exact formula depends on market implementation"
+        },
+        "status": "needsVerification",
+        "notes": "Player-driven market, exact formula needs verification"
+      },
+      "tradingProfit": {
+        "formula": "Profit = (Sell Price - Buy Price) × Quantity",
+        "verified": true,
+        "verificationDate": "2025-01-XX",
+        "codeReference": {
+          "file": "N/A",
+          "description": "Mathematical calculation"
+        },
+        "status": "verified",
+        "notes": "Standard profit calculation"
+      },
+      "profitMargin": {
+        "formula": "Profit Margin = ((Sell Price - Buy Price) / Buy Price) × 100%",
+        "verified": true,
+        "verificationDate": "2025-01-XX",
+        "codeReference": {
+          "file": "N/A",
+          "description": "Mathematical calculation"
+        },
+        "status": "verified",
+        "notes": "Standard margin calculation"
+      }
+    },
+    "guildTokenCalculations": {
+      "collateralRatio": {
+        "formula": "Collateral Ratio = (Locked Alpha Matter / Total Tokens Issued) × 100%",
+        "verified": false,
+        "verificationDate": null,
+        "codeReference": {
+          "file": "TBD",
+          "description": "Theoretical calculation, needs code verification"
+        },
+        "status": "needsVerification",
+        "notes": "Theoretical calculation"
+      },
+      "tokenValue": {
+        "formula": "Token Value = Locked Alpha Matter / Tokens in Circulation",
+        "verified": false,
+        "verificationDate": null,
+        "codeReference": {
+          "file": "TBD",
+          "description": "Theoretical calculation, needs code verification"
+        },
+        "status": "needsVerification",
+        "notes": "Theoretical calculation"
+      }
+    }
+  },
+  "verificationSummary": {
+    "total": 12,
+    "verified": 6,
+    "needsVerification": 6,
+    "verifiedPercentage": 50
+  },
+  "discrepancies": {
+    "generatorRates": {
+      "description": "Previous documentation said '× 2' for all generators",
+      "codeReality": "3 generator types with rates 2, 5, and 10",
+      "status": "resolved",
+      "resolutionDate": "2025-01-XX",
+      "action": "Updated documentation to reflect code implementation"
+    }
+  },
+  "nextVerificationSteps": [
+    "Verify ore to matter conversion rate",
+    "Verify cost calculation formulas",
+    "Verify market price determination formula",
+    "Verify guild token calculation formulas"
+  ]
+}
+

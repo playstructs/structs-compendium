@@ -1,0 +1,133 @@
+{
+  "version": "1.0.0",
+  "id": "exploration",
+  "name": "Exploration Task",
+  "description": "Complete workflow for exploring and charting planets",
+  "category": "gameplay",
+  "type": "task",
+  "difficulty": "beginner",
+  "steps": [
+    {
+      "step": 1,
+      "action": "check",
+      "description": "Check if current planet is complete",
+      "condition": {
+        "type": "check",
+        "property": "currentPlanet.currentOre",
+        "operator": "==",
+        "value": 0,
+        "description": "Current planet must be depleted (ore = 0) to explore new one"
+      },
+      "result": {
+        "canExplore": "currentOre == 0"
+      }
+    },
+    {
+      "step": 2,
+      "action": "explore",
+      "description": "Explore new planet",
+      "requirements": {
+        "currentPlanetComplete": true,
+        "description": "You can only own one planet at a time"
+      },
+      "result": {
+        "newPlanetId": "generated",
+        "startingProperties": {
+          "maxOre": 5,
+          "spaceSlots": 4,
+          "airSlots": 4,
+          "landSlots": 4,
+          "waterSlots": 4
+        },
+        "fleetMoved": true
+      }
+    },
+    {
+      "step": 3,
+      "action": "chart",
+      "description": "Chart planet to reveal resources and properties",
+      "time": "instant",
+      "cost": "free",
+      "requirements": {
+        "planetExists": true
+      },
+      "result": {
+        "revealed": {
+          "resources": {
+            "maxOre": 5,
+            "currentOre": 5
+          },
+          "slots": {
+            "space": 4,
+            "air": 4,
+            "land": 4,
+            "water": 4
+          },
+          "ownership": {
+            "claimed": false,
+            "owner": null
+          },
+          "defenses": []
+        }
+      }
+    },
+    {
+      "step": 4,
+      "action": "evaluate",
+      "description": "Evaluate planet value",
+      "criteria": [
+        "Resource value (ore deposits)",
+        "Strategic value (location, chokepoints)",
+        "Defense needs",
+        "Distance from operations"
+      ]
+    },
+    {
+      "step": 5,
+      "action": "decide",
+      "description": "Decide whether to claim planet",
+      "options": [
+        "Claim if high value",
+        "Mark for later",
+        "Skip if low value"
+      ]
+    }
+  ],
+  "explorationRules": {
+    "onePlanetAtATime": {
+      "description": "You can only own one planet at a time",
+      "requirement": "Current planet must be complete (ore depleted) before exploring new one"
+    },
+    "startingProperties": {
+      "description": "All newly explored planets start with identical properties",
+      "properties": {
+        "maxOre": 5,
+        "spaceSlots": 4,
+        "airSlots": 4,
+        "landSlots": 4,
+        "waterSlots": 4
+      }
+    },
+    "charting": {
+      "description": "Charting is free and instant",
+      "reveals": [
+        "Resources (ore deposits)",
+        "Slot availability",
+        "Ownership status",
+        "Defenses (if charted)"
+      ]
+    }
+  },
+  "commonMistakes": [
+    "Trying to explore when current planet still has ore",
+    "Not charting planets before claiming",
+    "Claiming low-value planets",
+    "Not evaluating strategic value"
+  ],
+  "tips": [
+    "Chart planets before claiming to see resources",
+    "Only explore when current planet is complete",
+    "Evaluate both resource and strategic value",
+    "Plan exploration based on expansion strategy"
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "$schema": "../../schemas/cosmetic-mod.json",
+  "manifest": {
+    "modId": "multi-language-example-v1",
+    "name": {
+      "en": "Multi-Language Example Mod",
+      "es": "Mod de Ejemplo Multiidioma",
+      "fr": "Mod d'Exemple Multilingue",
+      "de": "Mehrsprachiges Beispiel-Mod"
+    },
+    "version": "1.0.0",
+    "author": "International Modder",
+    "description": {
+      "en": "An example mod demonstrating multi-language support with fallback mechanisms",
+      "es": "Un mod de ejemplo que demuestra soporte multiidioma con mecanismos de respaldo",
+      "fr": "Un mod d'exemple démontrant le support multilingue avec des mécanismes de repli",
+      "de": "Ein Beispiel-Mod, das mehrsprachige Unterstützung mit Fallback-Mechanismen demonstriert"
+    },
+    "compatibleGameVersion": "1.0.0",
+    "createdAt": "2025-01-15T10:00:00Z",
+    "updatedAt": "2025-01-15T10:00:00Z"
+  },
+  "structTypes": [
+    {
+      "structTypeId": "miner",
+      "names": {
+        "en": "Universal Extractor",
+        "es": "Extractor Universal",
+        "fr": "Extracteur Universel",
+        "de": "Universeller Extraktor"
+      },
+      "lore": {
+        "en": "A versatile mining unit designed for international operations. The Universal Extractor adapts to local conditions and naming conventions while maintaining consistent performance.",
+        "es": "Una unidad de minería versátil diseñada para operaciones internacionales. El Extractor Universal se adapta a las condiciones locales y convenciones de nomenclatura mientras mantiene un rendimiento consistente.",
+        "fr": "Une unité d'extraction polyvalente conçue pour les opérations internationales. L'Extracteur Universel s'adapte aux conditions locales et aux conventions de dénomination tout en maintenant des performances constantes.",
+        "de": "Eine vielseitige Bergbaueinheit für internationale Operationen. Der Universelle Extraktor passt sich lokalen Bedingungen und Namenskonventionen an, während er eine konsistente Leistung beibehält."
+      },
+      "weapons": [
+        {
+          "weaponType": "primary",
+          "names": {
+            "en": "Adaptive Drill",
+            "es": "Taladro Adaptativo",
+            "fr": "Foreuse Adaptative",
+            "de": "Adaptiver Bohrer"
+          },
+          "description": {
+            "en": "An intelligent drilling system that adapts to different geological formations",
+            "es": "Un sistema de perforación inteligente que se adapta a diferentes formaciones geológicas",
+            "fr": "Un système de forage intelligent qui s'adapte à différentes formations géologiques",
+            "de": "Ein intelligentes Bohrungssystem, das sich an verschiedene geologische Formationen anpasst"
+          }
+        }
+      ]
+    },
+    {
+      "structTypeId": "reactor",
+      "names": {
+        "en": "Global Power Unit",
+        "es": "Unidad de Energía Global",
+        "fr": "Unité d'Énergie Globale",
+        "de": "Globale Energieeinheit"
+      },
+      "lore": {
+        "en": "A standardized power generation system used across all international operations. The Global Power Unit ensures consistent energy supply regardless of location.",
+        "es": "Un sistema estandarizado de generación de energía utilizado en todas las operaciones internacionales. La Unidad de Energía Global garantiza un suministro de energía consistente independientemente de la ubicación.",
+        "fr": "Un système de production d'énergie standardisé utilisé dans toutes les opérations internationales. L'Unité d'Énergie Globale assure un approvisionnement énergétique constant, quel que soit l'emplacement.",
+        "de": "Ein standardisiertes Energieerzeugungssystem, das in allen internationalen Operationen verwendet wird. Die Globale Energieeinheit gewährleistet eine konsistente Energieversorgung unabhängig vom Standort."
+      }
+    }
+  ],
+  "localizations": {
+    "en": {
+      "mod_title": "Multi-Language Example Mod",
+      "fallback_message": "Using English as fallback language",
+      "struct_miner": "Miner",
+      "struct_reactor": "Reactor"
+    },
+    "es": {
+      "mod_title": "Mod de Ejemplo Multiidioma",
+      "fallback_message": "Usando español como idioma de respaldo",
+      "struct_miner": "Minero",
+      "struct_reactor": "Reactor"
+    },
+    "fr": {
+      "mod_title": "Mod d'Exemple Multilingue",
+      "fallback_message": "Utilisation du français comme langue de repli",
+      "struct_miner": "Mineur",
+      "struct_reactor": "Réacteur"
+    },
+    "de": {
+      "mod_title": "Mehrsprachiges Beispiel-Mod",
+      "fallback_message": "Verwenden von Deutsch als Fallback-Sprache",
+      "struct_miner": "Bergmann",
+      "struct_reactor": "Reaktor"
+    }
+  }
+}
+

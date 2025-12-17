@@ -1,0 +1,137 @@
+{
+  "version": "1.0.0",
+  "id": "planet-setup",
+  "name": "Planet Setup Workflow",
+  "description": "Complete workflow for setting up a new planet (explore, chart, claim, build defenses, build infrastructure)",
+  "category": "gameplay",
+  "type": "workflow",
+  "steps": [
+    {
+      "step": 1,
+      "action": "explore",
+      "description": "Explore new planet",
+      "request": {
+        "action": "explore",
+        "verify": {
+          "currentPlanetComplete": true
+        }
+      },
+      "response": {
+        "status": "explored",
+        "newPlanetId": "3-1",
+        "startingProperties": {
+          "maxOre": 5,
+          "spaceSlots": 4,
+          "airSlots": 4,
+          "landSlots": 4,
+          "waterSlots": 4
+        }
+      }
+    },
+    {
+      "step": 2,
+      "action": "chart",
+      "description": "Chart planet to reveal resources",
+      "request": {
+        "action": "chart",
+        "planetId": "3-1"
+      },
+      "response": {
+        "status": "charted",
+        "revealed": {
+          "resources": {
+            "maxOre": 5,
+            "currentOre": 5
+          },
+          "slots": {
+            "space": 4,
+            "air": 4,
+            "land": 4,
+            "water": 4
+          },
+          "ownership": {
+            "claimed": false
+          }
+        }
+      }
+    },
+    {
+      "step": 3,
+      "action": "evaluate",
+      "description": "Evaluate planet value",
+      "criteria": [
+        "Resource value",
+        "Strategic value",
+        "Defense needs"
+      ]
+    },
+    {
+      "step": 4,
+      "action": "claim",
+      "description": "Claim planet by building first structure",
+      "request": {
+        "action": "build",
+        "structType": "oreExtractor",
+        "locationType": 1,
+        "locationId": "3-1",
+        "slot": "land"
+      },
+      "requirements": {
+        "fleetOnStation": true,
+        "commandShipOnline": true,
+        "sufficientPower": 500000
+      }
+    },
+    {
+      "step": 5,
+      "action": "build",
+      "description": "Build defenses first",
+      "request": {
+        "action": "build",
+        "structType": "planetaryDefenseCannon",
+        "locationType": 1,
+        "locationId": "3-1",
+        "slot": "space"
+      },
+      "requirements": {
+        "sufficientPower": 600000,
+        "buildLimit": {
+          "maxPerPlayer": 1,
+          "currentCount": 0
+        }
+      },
+      "priority": "high"
+    },
+    {
+      "step": 6,
+      "action": "build",
+      "description": "Build infrastructure",
+      "request": {
+        "action": "build",
+        "structType": "oreRefinery",
+        "locationType": 1,
+        "locationId": "3-1",
+        "slot": "land"
+      },
+      "requirements": {
+        "sufficientPower": 500000
+      }
+    }
+  ],
+  "principles": [
+    "Explore when current planet complete",
+    "Chart before claiming",
+    "Build defenses first",
+    "Build infrastructure after defenses",
+    "Plan power needs in advance"
+  ],
+  "order": [
+    "explore",
+    "chart",
+    "evaluate",
+    "claim",
+    "defenses",
+    "infrastructure"
+  ]
+}
+

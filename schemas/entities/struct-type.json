@@ -1,0 +1,190 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "StructType Entity Schema",
+  "description": "StructType entity definition - extracted from game-state.json for context window optimization. See schemas/formats.json for format specifications.",
+  "type": "object",
+  "structs:entity": "StructType",
+  "structs:endpoint": "/structs/struct_type/{id}",
+  "structs:category": "core",
+  "properties": {
+    "id": {
+      "type": "string",
+      "structs:format": "struct-type-id",
+      "description": "Struct type identifier (integer as string, e.g., '1', '2', '3'). Note: StructType IDs use regular integers, not 'type-index' format."
+    },
+    "type": {
+      "type": "string",
+      "description": "Struct type name (e.g., 'Command Ship', 'Miner', 'Reactor')"
+    },
+    "class": {
+      "type": "string",
+      "description": "Struct class identifier (e.g., 'Command Ship', 'Miner', 'Reactor'). Used for cosmetic mod linking."
+    },
+    "classAbbreviation": {
+      "type": "string",
+      "description": "Abbreviated class name (e.g., 'CMD Ship')"
+    },
+    "defaultCosmeticModelNumber": {
+      "type": "string",
+      "description": "Default cosmetic model number (e.g., 'ST-21')"
+    },
+    "defaultCosmeticName": {
+      "type": "string",
+      "description": "Default cosmetic name (e.g., 'Spearpoint')"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["fleet", "mining", "refining", "power", "combat", "defense", "utility"],
+      "description": "Struct category"
+    },
+    "buildLimit": {
+      "type": "string",
+      "description": "Maximum number of this struct type that can be built (string representation of integer)"
+    },
+    "buildDifficulty": {
+      "type": "string",
+      "description": "Proof-of-work difficulty for building (string representation of integer)"
+    },
+    "buildDraw": {
+      "type": "string",
+      "structs:unit": "milliwatts",
+      "description": "Power draw during building (string representation of integer, in milliwatts)"
+    },
+    "maxHealth": {
+      "type": "string",
+      "description": "Maximum health points (string representation of integer)"
+    },
+    "passiveDraw": {
+      "type": "string",
+      "structs:unit": "milliwatts",
+      "description": "Power draw when active (string representation of integer, in milliwatts)"
+    },
+    "possibleAmbit": {
+      "type": "string",
+      "description": "Possible operating ambit (space/air/land/water) - bitmask (string representation of integer)"
+    },
+    "movable": {
+      "type": "boolean",
+      "description": "Whether struct can be moved"
+    },
+    "slotBound": {
+      "type": "boolean",
+      "description": "Whether struct is bound to a slot (planet/fleet)"
+    },
+    "primaryWeapon": {
+      "type": "string",
+      "description": "Primary weapon type (e.g., 'guidedWeaponry', 'noActiveWeaponry')"
+    },
+    "primaryWeaponControl": {
+      "type": "string",
+      "description": "Primary weapon control type (e.g., 'guided')"
+    },
+    "primaryWeaponCharge": {
+      "type": "string",
+      "description": "Charge cost for primary weapon (string representation of integer)"
+    },
+    "primaryWeaponAmbits": {
+      "type": "string",
+      "description": "Primary weapon operating ambits - bitmask (string representation of integer)"
+    },
+    "primaryWeaponTargets": {
+      "type": "string",
+      "description": "Number of targets primary weapon can hit (string representation of integer)"
+    },
+    "primaryWeaponShots": {
+      "type": "string",
+      "description": "Number of shots primary weapon can fire (string representation of integer)"
+    },
+    "primaryWeaponDamage": {
+      "type": "string",
+      "description": "Primary weapon damage (string representation of integer)"
+    },
+    "primaryWeaponBlockable": {
+      "type": "boolean",
+      "description": "Whether primary weapon damage can be blocked"
+    },
+    "primaryWeaponCounterable": {
+      "type": "boolean",
+      "description": "Whether primary weapon can be countered"
+    },
+    "secondaryWeapon": {
+      "type": "string",
+      "description": "Secondary weapon type (e.g., 'noActiveWeaponry')"
+    },
+    "activateCharge": {
+      "type": "string",
+      "description": "Charge cost to activate struct (string representation of integer)"
+    },
+    "buildCharge": {
+      "type": "string",
+      "description": "Charge cost to build struct (string representation of integer)"
+    },
+    "oreMiningCharge": {
+      "type": "string",
+      "description": "Charge cost for ore mining (string representation of integer, if applicable)"
+    },
+    "oreRefiningCharge": {
+      "type": "string",
+      "description": "Charge cost for ore refining (string representation of integer, if applicable)"
+    },
+    "oreMiningDifficulty": {
+      "type": "string",
+      "description": "Proof-of-work difficulty for ore mining (string representation of integer, if applicable)"
+    },
+    "oreRefiningDifficulty": {
+      "type": "string",
+      "description": "Proof-of-work difficulty for ore refining (string representation of integer, if applicable)"
+    },
+    "generatingRate": {
+      "type": "string",
+      "description": "Energy generation rate for generators (string representation of integer, if applicable)"
+    },
+    "stealthActivateCharge": {
+      "type": "string",
+      "description": "Charge cost to activate stealth (string representation of integer, if applicable)"
+    },
+    "hasStealthSystem": {
+      "type": "boolean",
+      "description": "Whether struct has stealth system capability"
+    }
+  },
+  "required": ["id", "type", "class", "category"],
+  "structs:relationships": {
+    "instances": ["schemas/entities/struct.json"]
+  },
+  "structs:verified": true,
+  "structs:codeReference": "proto/structs/structs/struct.proto:26, x/structs/types/struct.pb.go",
+  "structs:databaseReference": "structs.struct_type table (80+ columns covering all struct properties: build, weapons, defenses, economics, charges, etc.)",
+  "structs:verifiedFields": [
+    "id",
+    "class",
+    "category",
+    "buildLimit",
+    "buildDifficulty",
+    "buildDraw",
+    "passiveDraw",
+    "maxHealth",
+    "primaryWeapon",
+    "secondaryWeapon",
+    "activateCharge",
+    "buildCharge",
+    "oreMiningCharge",
+    "oreRefiningCharge",
+    "oreMiningDifficulty",
+    "oreRefiningDifficulty",
+    "generatingRate",
+    "stealthActivateCharge",
+    "hasStealthSystem"
+  ],
+  "structs:verification": {
+    "verified": true,
+    "verifiedBy": "GameCodeAnalyst",
+    "verifiedDate": "2025-01-XX",
+    "verificationMethod": "code-analysis",
+    "confidence": "high",
+    "codeReference": "proto/structs/structs/struct.proto:26, x/structs/types/struct.pb.go",
+    "databaseReference": "structs.struct_type table"
+  }
+}
+

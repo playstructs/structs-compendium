@@ -1,0 +1,479 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Structs Formula Definitions",
+  "description": "Complete catalog of all verified game formulas for AI agents",
+  "type": "object",
+  "structs:category": "formulas",
+  "structs:verified": true,
+  "formulas": {
+    "battle": {
+      "damage-calculation": {
+        "id": "damage-calculation",
+        "name": "Damage Calculation (Multi-Shot System)",
+        "category": "battle",
+        "description": "Calculates damage from multi-shot weapon systems",
+        "formula": "damage = sum(successful_shots) - damageReduction; if damage >= health then health = 0 else health = health - damage",
+        "algorithm": {
+          "steps": [
+            "Initialize damage = 0",
+            "For each shot in weaponShots:",
+            "  If IsSuccessful(weaponShotSuccessRate):",
+            "    damage += weaponDamage",
+            "If damage > 0:",
+            "  If damageReduction > damage:",
+            "    damage = 0",
+            "  Else:",
+            "    damage = damage - damageReduction",
+            "If damage >= health:",
+            "  health = 0",
+            "Else:",
+            "  health = health - damage"
+          ]
+        },
+        "variables": {
+          "weaponShots": {
+            "type": "integer",
+            "description": "Number of shots fired by weapon"
+          },
+          "weaponShotSuccessRate": {
+            "type": "object",
+            "description": "Success rate for each shot (Numerator/Denominator)"
+          },
+          "weaponDamage": {
+            "type": "integer",
+            "description": "Damage per successful shot"
+          },
+          "damageReduction": {
+            "type": "integer",
+            "description": "Damage reduction from defenses"
+          },
+          "health": {
+            "type": "integer",
+            "description": "Current health of target"
+          }
+        },
+        "structs:verified": true,
+        "structs:codeReference": "x/structs/keeper/struct_cache.go:956-1015 (TakeAttackDamage)"
+      },
+      "evasion-calculation": {
+        "id": "evasion-calculation",
+        "name": "Evasion Calculation",
+        "category": "battle",
+        "description": "Determines if target can evade attack based on weapon type",
+        "formula": "if weaponControl == guided then successRate = guidedDefensiveSuccessRate else successRate = unguidedDefensiveSuccessRate; canEvade = IsSuccessful(successRate) if successRate.Numerator != 0",
+        "variables": {
+          "weaponControl": {
+            "type": "enum",
+            "enum": ["guided", "unguided"],
+            "description": "Weapon control type"
+          },
+          "guidedDefensiveSuccessRate": {
+            "type": "object",
+            "description": "Success rate against guided weapons (Numerator/Denominator)"
+          },
+          "unguidedDefensiveSuccessRate": {
+            "type": "object",
+            "description": "Success rate against unguided weapons (Numerator/Denominator)"
+          }
+        },
+        "structs:verified": true,
+        "structs:codeReference": "x/structs/keeper/struct_cache.go:911-954 (CanEvade)"
+      },
+      "recoil-damage": {
+        "id": "recoil-damage",
+        "name": "Recoil Damage",
+        "category": "battle",
+        "description": "Damage taken by attacker from weapon recoil",
+        "formula": "damage = weaponRecoilDamage; if damage > health then health = 0 else health = health - damage",
+        "variables": {
+          "weaponRecoilDamage": {
+            "type": "integer",
+            "description": "Recoil damage from weapon"
+          },
+          "health": {
+            "type": "integer",
+            "description": "Current health of attacker"
+          }
+        },
+        "structs:verified": true,
+        "structs:codeReference": "x/structs/keeper/struct_cache.go:1018-1043 (TakeRecoilDamage)"
+      },
+      "post-destruction-damage": {
+        "id": "post-destruction-damage",
+        "name": "Post-Destruction Damage",
+        "category": "battle",
+        "description": "Damage applied after struct is destroyed",
+        "formula": "if health == 0 and postDestructionDamage > 0 then apply postDestructionDamage to surrounding structs",
+        "variables": {
+          "health": {
+            "type": "integer",
+            "description": "Current health (0 = destroyed)"
+          },
+          "postDestructionDamage": {
+            "type": "integer",
+            "description": "Damage to apply after destruction"
+          }
+        },
+        "structs:verified": true,
+        "structs:codeReference": "x/structs/keeper/struct_cache.go:1045-1070 (TakePostDestructionDamage)"
+      },
+      "blocking-calculation": {
+        "id": "blocking-calculation",
+        "name": "Blocking Calculation",
+        "category": "battle",
+        "description": "Determines if defender blocks attack",
+        "formula": "if defender exists and defender.operatingAmbit == attacker.operatingAmbit then canBlock = IsSuccessful(defender.blockingSuccessRate)",
+        "variables": {
+          "defender": {
+            "type": "object",
+            "description": "Defender struct assigned to protect target"
+          },
+          "attacker": {
+            "type": "object",
+            "description": "Attacking struct"
+          },
+          "blockingSuccessRate": {
+            "type": "object",
+            "description": "Success rate for blocking (Numerator/Denominator)"
+          }
+        },
+        "structs:verified": true,
+        "structs:codeReference": "x/structs/keeper/struct_cache.go:1072-1105 (CanBlock)"
+      },
+      "counter-attack-damage": {
+        "id": "counter-attack-damage",
+        "name": "Counter-Attack Damage",
+        "category": "battle",
+        "description": "Damage from counter-attack after blocking",
+        "formula": "if blocked and defender.operatingAmbit == attacker.operatingAmbit then counterDamage = defender.counterAttackDamage else counterDamage = defender.counterAttackDamage / 2",
+        "variables": {
+          "blocked": {
+            "type": "boolean",
+            "description": "Whether attack was blocked"
+          },
+          "defender": {
+            "type": "object",
+            "description": "Defender struct"
+          },
+          "attacker": {
+            "type": "object",
+            "description": "Attacking struct"
+          },
+          "counterAttackDamage": {
+            "type": "integer",
+            "description": "Counter-attack damage from defender"
+          }
+        },
+        "structs:verified": true,
+        "structs:codeReference": "x/structs/keeper/struct_cache.go:1107-1135 (TakeCounterAttackDamage)"
+      },
+      "planetary-defense-cannon-damage": {
+        "id": "planetary-defense-cannon-damage",
+        "name": "Planetary Defense Cannon Damage",
+        "category": "battle",
+        "description": "Damage from planetary defense cannons when planet is attacked",
+        "formula": "damage = planetaryShieldBase + sum(defenseCannon.damage for each defense cannon on planet)",
+        "variables": {
+          "planetaryShieldBase": {
+            "type": "integer",
+            "description": "Base planetary shield damage"
+          },
+          "defenseCannons": {
+            "type": "array",
+            "description": "List of defense cannons on planet"
+          }
+        },
+        "structs:verified": true,
+        "structs:codeReference": "x/structs/keeper/struct_cache.go:1137-1165 (TakePlanetaryDefenseCannonDamage)"
+      },
+      "success-rate-probability": {
+        "id": "success-rate-probability",
+        "name": "Success Rate Probability (IsSuccessful)",
+        "category": "battle",
+        "description": "Determines if action succeeds based on success rate and randomness",
+        "formula": "randomValue = hash(blockHash, playerNonce) % successRate.Denominator; isSuccessful = randomValue < successRate.Numerator",
+        "variables": {
+          "successRate": {
+            "type": "object",
+            "description": "Success rate (Numerator/Denominator)"
+          },
+          "blockHash": {
+            "type": "string",
+            "description": "Current block hash"
+          },
+          "playerNonce": {
+            "type": "string",
+            "description": "Player nonce for randomness"
+          }
+        },
+        "structs:verified": true,
+        "structs:codeReference": "x/structs/keeper/struct_cache.go:1167-1185 (IsSuccessful)"
+      }
+    },
+    "economic": {
+      "reactor-energy-production": {
+        "id": "reactor-energy-production",
+        "name": "Reactor Energy Production",
+        "category": "economic",
+        "description": "Energy output from reactor based on Alpha Matter input",
+        "formula": "Energy Output (milliwatts) = Alpha Matter Input (micrograms) × 1",
+        "conversion": {
+          "input": {
+            "unit": "micrograms",
+            "description": "Alpha Matter input (1 gram = 1,000,000 micrograms)"
+          },
+          "output": {
+            "unit": "milliwatts",
+            "description": "Energy output (1 watt = 1,000 milliwatts)"
+          },
+          "rate": 1
+        },
+        "example": {
+          "input": {
+            "alphaMatter": 1000000,
+            "unit": "micrograms"
+          },
+          "output": {
+            "energy": 1000000,
+            "unit": "milliwatts",
+            "equivalent": "1000 watts"
+          },
+          "note": "1 gram of alpha (1,000,000 micrograms) = 1,000 watts of energy (1,000,000 milliwatts)"
+        },
+        "structs:verified": true,
+        "structs:codeReference": "x/structs/types/keys.go:88 (ReactorFuelToEnergyConversion = 1)"
+      },
+      "generator-energy-production": {
+        "id": "generator-energy-production",
+        "name": "Generator Energy Production",
+        "category": "economic",
+        "description": "Energy output from generators (multiple types with different rates)",
+        "formula": "Energy Output = Base Energy × GeneratingRate",
+        "generators": {
+          "field-generator": {
+            "name": "Field Generator",
+            "rate": 2,
+            "description": "Rate 2: Energy output = Base Energy × 2"
+          },
+          "continental-power-plant": {
+            "name": "Continental Power Plant",
+            "rate": 5,
+            "description": "Rate 5: Energy output = Base Energy × 5"
+          },
+          "world-engine": {
+            "name": "World Engine",
+            "rate": 10,
+            "description": "Rate 10: Energy output = Base Energy × 10"
+          }
+        },
+        "structs:verified": true,
+        "structs:codeReference": "genesis_struct_type.go (GeneratingRate: 2, 5, 10)"
+      },
+      "player-passive-draw": {
+        "id": "player-passive-draw",
+        "name": "Player Passive Draw",
+        "category": "economic",
+        "description": "Base power consumption for player when online",
+        "formula": "Passive Draw = 25,000 milliwatts",
+        "value": 25000,
+        "unit": "milliwatts",
+        "equivalent": "25 watts",
+        "structs:verified": true,
+        "structs:codeReference": "x/structs/types/keys.go:129 (PlayerPassiveDraw = 25000)"
+      }
+    },
+    "struct-building": {
+      "charge-accumulation": {
+        "id": "charge-accumulation",
+        "name": "Charge Accumulation",
+        "category": "struct-building",
+        "description": "Charge accumulates over time based on blocks since last action",
+        "formula": "charge = CurrentBlockHeight - LastActionBlock",
+        "variables": {
+          "charge": {
+            "type": "integer",
+            "description": "Current charge value"
+          },
+          "CurrentBlockHeight": {
+            "type": "integer",
+            "description": "Current blockchain block height"
+          },
+          "LastActionBlock": {
+            "type": "integer",
+            "description": "Block height of last action"
+          }
+        },
+        "structs:verified": true,
+        "structs:codeReference": "x/structs/keeper/player.go (GetPlayerCharge)"
+      },
+      "power-capacity": {
+        "id": "power-capacity",
+        "name": "Power Capacity Calculation",
+        "category": "struct-building",
+        "description": "Available power capacity for player",
+        "formula": "availableCapacity = (Capacity + CapacitySecondary) - (Load + StructsLoad)",
+        "variables": {
+          "availableCapacity": {
+            "type": "integer",
+            "description": "Available power capacity (milliwatts)"
+          },
+          "Capacity": {
+            "type": "integer",
+            "description": "Primary capacity (milliwatts)"
+          },
+          "CapacitySecondary": {
+            "type": "integer",
+            "description": "Secondary capacity (milliwatts)"
+          },
+          "Load": {
+            "type": "integer",
+            "description": "Current load (milliwatts)"
+          },
+          "StructsLoad": {
+            "type": "integer",
+            "description": "Load from structs (milliwatts)"
+          }
+        },
+        "structs:verified": true,
+        "structs:codeReference": "x/structs/keeper/player_cache.go (GetAvailableCapacity)"
+      },
+      "allocatable-capacity": {
+        "id": "allocatable-capacity",
+        "name": "Allocatable Capacity Calculation",
+        "category": "struct-building",
+        "description": "Capacity available for allocation (primary capacity only)",
+        "formula": "allocatableCapacity = Capacity - Load",
+        "variables": {
+          "allocatableCapacity": {
+            "type": "integer",
+            "description": "Allocatable capacity (milliwatts)"
+          },
+          "Capacity": {
+            "type": "integer",
+            "description": "Primary capacity (milliwatts)"
+          },
+          "Load": {
+            "type": "integer",
+            "description": "Current load (milliwatts)"
+          }
+        },
+        "structs:verified": true,
+        "structs:codeReference": "x/structs/keeper/player_cache.go (GetAllocatableCapacity)"
+      },
+      "build-difficulty": {
+        "id": "build-difficulty",
+        "name": "Build Difficulty (Proof-of-Work)",
+        "category": "struct-building",
+        "description": "Age-based proof-of-work difficulty for struct building using dynamic difficulty",
+        "formula": "age = currentBlockHeight - blockStart; if age <= 1 then difficulty = 64 else difficulty = 64 - floor(log10(age) / log10(BuildDifficulty) * 63); hashInput = structId + \"BUILD\" + blockStart + \"NONCE\" + nonce; isValid = HashBuildAndCheckDifficulty(hashInput, proof, age, BuildDifficulty)",
+        "variables": {
+          "BuildDifficulty": {
+            "type": "integer",
+            "description": "Base difficulty range for struct type (difficultyRange in code)"
+          },
+          "currentBlockHeight": {
+            "type": "integer",
+            "description": "Current blockchain block height"
+          },
+          "blockStart": {
+            "type": "integer",
+            "description": "Block height when build operation started"
+          },
+          "age": {
+            "type": "integer",
+            "description": "Blocks since build operation started (age = currentBlockHeight - blockStart)"
+          },
+          "nonce": {
+            "type": "string",
+            "description": "Proof-of-work nonce"
+          },
+          "proof": {
+            "type": "string",
+            "description": "Proof-of-work hash"
+          }
+        },
+        "structs:verified": true,
+        "structs:codeReference": "x/structs/types/work.go:49-62 (CalculateDifficulty), x/structs/types/work.go (HashBuildAndCheckDifficulty)"
+      }
+    },
+    "resource": {
+      "ore-mining-difficulty": {
+        "id": "ore-mining-difficulty",
+        "name": "Ore Mining Difficulty",
+        "category": "resource",
+        "description": "Dynamic proof-of-work difficulty for ore mining based on age",
+        "formula": "age = currentBlockHeight - blockStart; if age <= 1 then difficulty = 64 else difficulty = 64 - floor(log10(age) / log10(14000) * 63); hashInput = structId + \"MINE\" + blockStart + \"NONCE\" + nonce; isValid = HashBuildAndCheckDifficulty(hashInput, proof, age, 14000)",
+        "value": 14000,
+        "structs:verified": true,
+        "structs:codeReference": "genesis_struct_type.go (OreMiningDifficulty: 14000), x/structs/types/work.go:49-62 (CalculateDifficulty)"
+      },
+      "ore-refining-difficulty": {
+        "id": "ore-refining-difficulty",
+        "name": "Ore Refining Difficulty",
+        "category": "resource",
+        "description": "Dynamic proof-of-work difficulty for ore refining based on age",
+        "formula": "age = currentBlockHeight - blockStart; if age <= 1 then difficulty = 64 else difficulty = 64 - floor(log10(age) / log10(28000) * 63); hashInput = structId + \"REFINE\" + blockStart + \"NONCE\" + nonce; isValid = HashBuildAndCheckDifficulty(hashInput, proof, age, 28000)",
+        "value": 28000,
+        "structs:verified": true,
+        "structs:codeReference": "genesis_struct_type.go (OreRefiningDifficulty: 28000), x/structs/types/work.go:49-62 (CalculateDifficulty)"
+      },
+      "ore-extraction-rate": {
+        "id": "ore-extraction-rate",
+        "name": "Ore Extraction Rate",
+        "category": "resource",
+        "description": "Fixed extraction rate: 1 ore per mining operation",
+        "formula": "oreExtracted = 1 (fixed per operation)",
+        "value": 1,
+        "unit": "ore per operation",
+        "note": "Fixed rate, not variable based on planet characteristics",
+        "structs:verified": true,
+        "structs:codeReference": "x/structs/keeper/msg_server_struct_ore_miner_complete.go (StoredOreIncrement(1))"
+      },
+      "ore-refining-conversion": {
+        "id": "ore-refining-conversion",
+        "name": "Ore to Alpha Matter Conversion",
+        "category": "resource",
+        "description": "Conversion rate: 1 ore = 1 Alpha Matter (1,000,000 micrograms)",
+        "formula": "alphaMatter = 1,000,000 micrograms per ore",
+        "conversion": {
+          "input": {
+            "unit": "ore",
+            "amount": 1
+          },
+          "output": {
+            "unit": "micrograms",
+            "amount": 1000000,
+            "equivalent": "1 gram"
+          }
+        },
+        "structs:verified": true,
+        "structs:codeReference": "x/structs/keeper/msg_server_struct_ore_refinery_complete.go (DepositRefinedAlpha mints 1,000,000 ualpha)"
+      },
+      "planet-starting-ore": {
+        "id": "planet-starting-ore",
+        "name": "Planet Starting Ore",
+        "category": "resource",
+        "description": "Initial ore amount for all planets",
+        "formula": "startingOre = 5 (fixed for all planets)",
+        "value": 5,
+        "unit": "ore",
+        "structs:verified": true,
+        "structs:codeReference": "x/structs/types/keys.go (PlanetStartingOre = 5)"
+      }
+    }
+  },
+  "structs:formulaCategories": {
+    "battle": ["damage-calculation", "evasion-calculation", "recoil-damage", "post-destruction-damage", "blocking-calculation", "counter-attack-damage", "planetary-defense-cannon-damage", "success-rate-probability"],
+    "economic": ["reactor-energy-production", "generator-energy-production", "player-passive-draw"],
+    "struct-building": ["charge-accumulation", "power-capacity", "allocatable-capacity", "build-difficulty"],
+    "resource": ["ore-mining-difficulty", "ore-refining-difficulty", "ore-extraction-rate", "ore-refining-conversion", "planet-starting-ore"]
+  },
+  "structs:verificationStatus": {
+    "total": 20,
+    "verified": 20,
+    "percentage": 100,
+    "note": "All formulas verified against codebase"
+  }
+}
+

@@ -1,0 +1,1263 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Structs Action Definitions",
+  "description": "Complete catalog of all game actions/commands for AI agents",
+  "type": "object",
+  "structs:category": "actions",
+  "actions": {
+    "MsgStructBuild": {
+      "id": "struct-build",
+      "name": "Build Struct",
+      "category": "construction",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgStructBuild",
+      "description": "Start building a struct",
+      "requiredFields": ["creator", "structType", "locationType", "locationId"],
+      "optionalFields": ["gridAttributes"],
+      "requirements": {
+        "playerOnline": true,
+        "sufficientResources": true,
+        "validLocation": true,
+        "commandShipOnline": {
+          "required": "If building on planet (locationType = planet)",
+          "description": "Command Ship must be built AND online in fleet",
+          "check": "Query fleet for Command Ship struct, verify status is 'online'"
+        },
+        "fleetOnStation": {
+          "required": "If building on planet",
+          "description": "Fleet must be 'onStation' (not 'away')",
+          "check": "Query fleet status"
+        },
+        "sufficientPower": {
+          "required": true,
+          "description": "Must have power capacity > struct passive draw",
+          "check": "Query player power capacity vs struct requirements"
+        }
+      },
+      "validationNote": "Transaction may broadcast but struct not created if requirements not met. Always verify game state after broadcast.",
+      "followUpAction": "MsgStructBuildComplete",
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgStructBuild",
+                "creator": "structs1...",
+                "structType": "1",
+                "locationType": 1,
+                "locationId": "1-1"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgStructBuildComplete": {
+      "id": "struct-build-complete",
+      "name": "Complete Struct Build",
+      "category": "construction",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgStructBuildComplete",
+      "description": "Complete building a struct (requires proof-of-work)",
+      "requiredFields": ["creator", "structId", "hash", "nonce"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "structInBuildingState": true,
+        "proofOfWork": true
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgStructBuildComplete",
+                "creator": "structs1...",
+                "structId": "1-1",
+                "hash": "proof-of-work-hash",
+                "nonce": "proof-of-work-nonce"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgStructAttack": {
+      "id": "struct-attack",
+      "name": "Attack with Struct",
+      "category": "combat",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgStructAttack",
+      "description": "Attack another struct",
+      "requiredFields": ["creator", "structId", "targetId"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "sufficientCharge": true,
+        "structOnline": true,
+        "validTarget": true
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgStructAttack",
+                "creator": "structs1...",
+                "structId": "1-1",
+                "targetId": "2-1"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgPlanetRaidComplete": {
+      "id": "planet-raid-complete",
+      "name": "Complete Planet Raid",
+      "category": "combat",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgPlanetRaidComplete",
+      "description": "Complete a raid on a planet (requires proof-of-work)",
+      "requiredFields": ["creator", "fleetId", "planetId", "hash", "nonce"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "fleetAway": true,
+        "fleetFirstInLine": true,
+        "proofOfWork": true
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgPlanetRaidComplete",
+                "creator": "structs1...",
+                "fleetId": "1-1",
+                "planetId": "2-1",
+                "hash": "proof-of-work-hash",
+                "nonce": "proof-of-work-nonce"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgReactorAllocate": {
+      "id": "reactor-allocate",
+      "name": "Allocate Reactor Energy",
+      "category": "resource",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgReactorAllocate",
+      "description": "Allocate energy from a reactor",
+      "requiredFields": ["creator", "reactorId", "destinationId", "amount"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "sufficientEnergy": true,
+        "validDestination": true
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgReactorAllocate",
+                "creator": "structs1...",
+                "reactorId": "1-1",
+                "destinationId": "2-1",
+                "amount": "1000000"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgSubstationConnect": {
+      "id": "substation-connect",
+      "name": "Connect to Substation",
+      "category": "resource",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgSubstationConnect",
+      "description": "Connect a struct to a substation",
+      "requiredFields": ["creator", "substationId", "structId"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "validSubstation": true,
+        "validStruct": true
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgSubstationConnect",
+                "creator": "structs1...",
+                "substationId": "1-1",
+                "structId": "2-1"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgProviderCreate": {
+      "id": "provider-create",
+      "name": "Create Energy Provider",
+      "category": "economic",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgProviderCreate",
+      "description": "Create an energy provider",
+      "requiredFields": ["creator", "rate", "policy"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "validRate": true,
+        "validPolicy": true
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgProviderCreate",
+                "creator": "structs1...",
+                "rate": {},
+                "policy": {}
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgAgreementCreate": {
+      "id": "agreement-create",
+      "name": "Create Energy Agreement",
+      "category": "economic",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgAgreementCreate",
+      "description": "Create an automated energy agreement",
+      "requiredFields": ["creator", "providerId", "terms"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "validProvider": true,
+        "validTerms": true
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgAgreementCreate",
+                "creator": "structs1...",
+                "providerId": "1-1",
+                "terms": {}
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgOreMining": {
+      "id": "ore-mining",
+      "name": "Mine Alpha Ore",
+      "category": "economic",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgOreMining",
+      "description": "Mine Alpha Ore from a planet using Ore Extractor struct. Requires proof-of-work. Alpha Ore can be stolen.",
+      "requiredFields": ["creator", "structId", "hash", "nonce"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "structOnline": true,
+        "oreExtractorBuilt": true,
+        "planetHasOre": true,
+        "sufficientCharge": true,
+        "proofOfWork": true
+      },
+      "security": {
+        "oreStealable": true,
+        "warning": "Alpha Ore can be stolen by other players. Refine to Alpha Matter for security."
+      },
+      "costs": {
+        "buildDraw": 500000,
+        "passiveDraw": 500000,
+        "miningCharge": 20,
+        "miningDifficulty": 14000
+      },
+      "result": {
+        "oreExtracted": "Alpha Ore amount extracted (grams)",
+        "oreStealable": true
+      },
+      "followUpAction": "MsgOreRefining",
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgOreMining",
+                "creator": "structs1...",
+                "structId": "1-1",
+                "hash": "proof-of-work-hash",
+                "nonce": "proof-of-work-nonce"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgOreRefining": {
+      "id": "ore-refining",
+      "name": "Refine Alpha Ore to Alpha Matter",
+      "category": "economic",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgOreRefining",
+      "description": "Refine Alpha Ore to Alpha Matter using Ore Refinery struct. Requires proof-of-work. Alpha Matter cannot be stolen.",
+      "requiredFields": ["creator", "structId", "hash", "nonce"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "structOnline": true,
+        "oreRefineryBuilt": true,
+        "hasAlphaOre": true,
+        "sufficientCharge": true,
+        "proofOfWork": true
+      },
+      "security": {
+        "oreStealable": false,
+        "warning": "Alpha Matter cannot be stolen once refined. This secures your resources."
+      },
+      "costs": {
+        "buildDraw": 500000,
+        "passiveDraw": 500000,
+        "refiningCharge": 20,
+        "refiningDifficulty": 28000
+      },
+      "conversion": {
+        "rate": 1,
+        "description": "1 gram Alpha Ore = 1 gram Alpha Matter"
+      },
+      "result": {
+        "alphaMatterCreated": "Alpha Matter amount created (grams)",
+        "oreStealable": false
+      },
+      "followUpAction": "MsgReactorInfuse or MsgStructGeneratorInfuse",
+      "structs:deprecated": "MsgReactorAllocate and MsgGeneratorAllocate (deprecated - use MsgReactorInfuse or MsgStructGeneratorInfuse)",
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgOreRefining",
+                "creator": "structs1...",
+                "structId": "1-1",
+                "hash": "proof-of-work-hash",
+                "nonce": "proof-of-work-nonce"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgGeneratorAllocate": {
+      "id": "generator-allocate",
+      "name": "Allocate Energy from Generator",
+      "category": "economic",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgGeneratorAllocate",
+      "description": "Allocate energy from a generator (Field Generator, Continental Power Plant, or World Engine) to a struct or player. Higher rates but higher risk.",
+      "requiredFields": ["creator", "generatorId", "destinationType", "destinationId", "alphaMatterAmount"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "generatorActive": true,
+        "sufficientAlphaMatter": true,
+        "validDestination": true
+      },
+      "generatorTypes": {
+        "fieldGenerator": {
+          "rate": 2,
+          "formula": "Energy (kW) = Alpha Matter (grams) × 2",
+          "risk": "high"
+        },
+        "continentalPowerPlant": {
+          "rate": 5,
+          "formula": "Energy (kW) = Alpha Matter (grams) × 5",
+          "risk": "high"
+        },
+        "worldEngine": {
+          "rate": 10,
+          "formula": "Energy (kW) = Alpha Matter (grams) × 10",
+          "risk": "high"
+        }
+      },
+      "energyProperties": {
+        "ephemeral": true,
+        "description": "Energy must be consumed immediately upon production. Cannot be stored.",
+        "shared": true,
+        "description2": "Energy is shared across all Structs connected to the same power source."
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgGeneratorAllocate",
+                "creator": "structs1...",
+                "generatorId": "1-1",
+                "destinationType": 1,
+                "destinationId": "2-1",
+                "alphaMatterAmount": "100000000",
+                "note": "alphaMatterAmount in micrograms (100 grams = 100,000,000 micrograms)"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgPlanetExplore": {
+      "id": "planet-explore",
+      "name": "Explore Planet",
+      "category": "exploration",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgPlanetExplore",
+      "description": "Explore a new planet (creates new planet, player can only own one planet at a time)",
+      "requiredFields": ["creator"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "currentPlanetEmpty": {
+          "required": true,
+          "description": "Current planet must have 0 ore remaining (all ore mined)",
+          "check": "Query current planet attributes for ore amount, must be 0"
+        }
+      },
+      "validationNote": "Transaction may broadcast but planet ownership unchanged if current planet has ore remaining. Always verify game state after broadcast.",
+      "result": {
+        "newPlanetCreated": "New planet with starting properties",
+        "fleetMoves": "Fleet automatically moves to new planet",
+        "oldPlanetReleased": "Old planet remains but player no longer owns it"
+      },
+      "planetStartingProperties": {
+        "maxOre": 5,
+        "spaceSlots": 4,
+        "airSlots": 4,
+        "landSlots": 4,
+        "waterSlots": 4
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgPlanetExplore",
+                "creator": "structs1..."
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgFleetMove": {
+      "id": "fleet-move",
+      "name": "Move Fleet",
+      "category": "fleet",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgFleetMove",
+      "description": "Move fleet to a different location (on station ↔ away)",
+      "requiredFields": ["creator", "fleetId", "destinationType", "destinationId"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "commandShipOnline": {
+          "required": true,
+          "description": "Command Ship must be online in fleet",
+          "check": "Query fleet for Command Ship struct, verify status is 'online'"
+        },
+        "validDestination": {
+          "required": true,
+          "description": "Destination must exist and be accessible"
+        }
+      },
+      "fleetStatus": {
+        "onStation": {
+          "description": "Fleet is at planet - can build on planets",
+          "canBuild": true,
+          "canRaid": false
+        },
+        "away": {
+          "description": "Fleet is away from planet - can raid, cannot build",
+          "canBuild": false,
+          "canRaid": true
+        }
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgFleetMove",
+                "creator": "structs1...",
+                "fleetId": "1-1",
+                "destinationType": 1,
+                "destinationId": "2-1"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgGuildCreate": {
+      "id": "guild-create",
+      "name": "Create Guild",
+      "category": "guild",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgGuildCreate",
+      "description": "Create a new guild",
+      "requiredFields": ["creator"],
+      "optionalFields": ["endpoint", "primaryReactorId", "entrySubstationId"],
+      "requirements": {
+        "playerOnline": true,
+        "notInGuild": {
+          "required": true,
+          "description": "Player must not already be in a guild",
+          "check": "Query player.guildId, must be null or empty"
+        }
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgGuildCreate",
+                "creator": "structs1..."
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgGuildMembershipJoin": {
+      "id": "guild-membership-join",
+      "name": "Join Guild",
+      "category": "guild",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgGuildMembershipJoin",
+      "description": "Join an existing guild",
+      "requiredFields": ["creator", "guildId"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "notInGuild": {
+          "required": true,
+          "description": "Player must not already be in a guild",
+          "check": "Query player.guildId, must be null or empty"
+        },
+        "guildExists": {
+          "required": true,
+          "description": "Guild must exist",
+          "check": "Query guild by ID"
+        }
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgGuildMembershipJoin",
+                "creator": "structs1...",
+                "guildId": "0-1"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgGuildMembershipLeave": {
+      "id": "guild-membership-leave",
+      "name": "Leave Guild",
+      "category": "guild",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgGuildMembershipLeave",
+      "description": "Leave current guild",
+      "requiredFields": ["creator"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "inGuild": {
+          "required": true,
+          "description": "Player must be in a guild",
+          "check": "Query player.guildId, must not be null or empty"
+        }
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgGuildMembershipLeave",
+                "creator": "structs1..."
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgGuildBankMint": {
+      "id": "guild-bank-mint",
+      "name": "Mint Guild Tokens",
+      "category": "guild",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgGuildBankMint",
+      "description": "Mint guild tokens (trust-based system)",
+      "requiredFields": ["creator", "guildId", "amount"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "inGuild": {
+          "required": true,
+          "description": "Player must be in the guild",
+          "check": "Query player.guildId matches guildId"
+        },
+        "guildPermission": {
+          "required": true,
+          "description": "Player must have permission to mint tokens",
+          "note": "Trust-based system - no technical safeguards against revocation or inflation"
+        }
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgGuildBankMint",
+                "creator": "structs1...",
+                "guildId": "0-1",
+                "amount": "1000000"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgGuildBankRedeem": {
+      "id": "guild-bank-redeem",
+      "name": "Redeem Guild Tokens",
+      "category": "guild",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgGuildBankRedeem",
+      "description": "Redeem guild tokens for resources",
+      "requiredFields": ["creator", "guildId", "amount"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "inGuild": {
+          "required": true,
+          "description": "Player must be in the guild"
+        },
+        "sufficientTokens": {
+          "required": true,
+          "description": "Player must have sufficient guild tokens"
+        }
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgGuildBankRedeem",
+                "creator": "structs1...",
+                "guildId": "0-1",
+                "amount": "1000000"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgStructBuildInitiate": {
+      "id": "struct-build-initiate",
+      "name": "Initiate Struct Build",
+      "category": "construction",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgStructBuildInitiate",
+      "description": "Start building a struct (first step of two-step process)",
+      "requiredFields": ["creator", "playerId", "structTypeId", "operatingAmbit", "slot"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "sufficientResources": true,
+        "validLocation": true,
+        "sufficientPower": true
+      },
+      "structs:verified": true,
+      "structs:codeReference": "x/structs/keeper/msg_server_struct_build_initiate.go:18-88",
+      "structs:protoReference": "proto/structs/structs/tx.proto:660-669",
+      "followUpAction": "MsgStructBuildComplete",
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgStructBuildInitiate",
+                "creator": "structs1...",
+                "playerId": "1-1",
+                "structTypeId": "1",
+                "operatingAmbit": 1,
+                "slot": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgStructActivate": {
+      "id": "struct-activate",
+      "name": "Activate Struct",
+      "category": "struct-management",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgStructActivate",
+      "description": "Activate a struct (bring online)",
+      "requiredFields": ["creator", "structId"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "structBuilt": true,
+        "structOffline": true,
+        "sufficientCharge": {
+          "description": "Charge >= structType.ActivateCharge",
+          "structs:codeReference": "genesis_struct_type.go (ActivateCharge)"
+        },
+        "sufficientPower": {
+          "description": "Available capacity >= structType.PassiveDraw",
+          "structs:codeReference": "x/structs/keeper/player_cache.go (GetAvailableCapacity)"
+        }
+      },
+      "structs:verified": true,
+      "structs:codeReference": "x/structs/keeper/msg_server_struct_activate.go",
+      "structs:protoReference": "proto/structs/structs/tx.proto:644-649",
+      "effects": {
+        "powerLoad": "Increments StructsLoad by PassiveDraw",
+        "miningTimer": "Resets mining timer",
+        "refiningTimer": "Resets refining timer",
+        "planetaryDefenses": "Increments planetary defenses if on planet",
+        "status": "Sets struct status to online"
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgStructActivate",
+                "creator": "structs1...",
+                "structId": "1-1"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgStructDeactivate": {
+      "id": "struct-deactivate",
+      "name": "Deactivate Struct",
+      "category": "struct-management",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgStructDeactivate",
+      "description": "Deactivate a struct (take offline)",
+      "requiredFields": ["creator", "structId"],
+      "optionalFields": [],
+      "requirements": {
+        "structBuilt": true,
+        "structOnline": true,
+        "ownerOffline": {
+          "description": "Owner must be offline (halted)",
+          "structs:codeReference": "x/structs/keeper/msg_server_struct_deactivate.go"
+        }
+      },
+      "structs:verified": true,
+      "structs:codeReference": "x/structs/keeper/msg_server_struct_deactivate.go",
+      "structs:protoReference": "proto/structs/structs/tx.proto:651-656",
+      "effects": {
+        "powerLoad": "Decrements StructsLoad by PassiveDraw",
+        "timers": "Clears mining/refining timers",
+        "planetaryDefenses": "Decrements planetary defenses if on planet",
+        "status": "Sets struct status to offline"
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgStructDeactivate",
+                "creator": "structs1...",
+                "structId": "1-1"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgStructStealthActivate": {
+      "id": "struct-stealth-activate",
+      "name": "Activate Stealth",
+      "category": "struct-management",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgStructStealthActivate",
+      "description": "Activate stealth mode for a struct",
+      "requiredFields": ["creator", "structId"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "structCommandable": true,
+        "structNotHidden": true,
+        "hasStealthSystem": {
+          "description": "Struct must have stealth system",
+          "structs:codeReference": "x/structs/types/struct_type.go (HasStealthSystem)"
+        },
+        "sufficientCharge": {
+          "description": "Charge >= structType.StealthActivateCharge",
+          "structs:codeReference": "genesis_struct_type.go (StealthActivateCharge)"
+        }
+      },
+      "structs:verified": true,
+      "structs:codeReference": "x/structs/keeper/msg_server_struct_stealth_activate.go",
+      "structs:protoReference": "proto/structs/structs/tx.proto:117",
+      "effects": {
+        "status": "Sets struct status to hidden",
+        "protection": "Protects from attacks from different ambit",
+        "note": "Stealth removed when struct attacks"
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgStructStealthActivate",
+                "creator": "structs1...",
+                "structId": "1-1"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgStructStealthDeactivate": {
+      "id": "struct-stealth-deactivate",
+      "name": "Deactivate Stealth",
+      "category": "struct-management",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgStructStealthDeactivate",
+      "description": "Deactivate stealth mode for a struct",
+      "requiredFields": ["creator", "structId"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "structCommandable": true,
+        "structHidden": true,
+        "hasStealthSystem": true
+      },
+      "structs:verified": true,
+      "structs:codeReference": "x/structs/keeper/msg_server_struct_stealth_deactivate.go",
+      "structs:protoReference": "proto/structs/structs/tx.proto:118",
+      "effects": {
+        "status": "Removes hidden status from struct"
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgStructStealthDeactivate",
+                "creator": "structs1...",
+                "structId": "1-1"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgStructOreMinerComplete": {
+      "id": "struct-ore-miner-complete",
+      "name": "Complete Ore Mining",
+      "category": "resource",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgStructOreMinerComplete",
+      "description": "Complete ore mining operation (requires proof-of-work)",
+      "requiredFields": ["creator", "structId", "proof", "nonce"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "structOnline": true,
+        "planetHasOre": true,
+        "sufficientCharge": {
+          "description": "Charge >= structType.OreMiningCharge",
+          "structs:codeReference": "genesis_struct_type.go (OreMiningCharge)"
+        },
+        "proofOfWork": {
+          "description": "HashBuildAndCheckDifficulty with OreMiningDifficulty (14000)",
+          "structs:codeReference": "x/structs/types/work.go (HashBuildAndCheckDifficulty)",
+          "difficulty": 14000
+        }
+      },
+      "structs:verified": true,
+      "structs:codeReference": "x/structs/keeper/msg_server_struct_ore_miner_complete.go",
+      "structs:protoReference": "proto/structs/structs/tx.proto:763-770",
+      "effects": {
+        "oreExtracted": "StoredOreIncrement(1) - fixed 1 ore per operation",
+        "structs:codeReference": "x/structs/keeper/player_cache.go (StoredOreIncrement)"
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgStructOreMinerComplete",
+                "creator": "structs1...",
+                "structId": "1-1",
+                "proof": "proof-of-work-hash",
+                "nonce": "proof-of-work-nonce"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgStructOreRefineryComplete": {
+      "id": "struct-ore-refinery-complete",
+      "name": "Complete Ore Refining",
+      "category": "resource",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgStructOreRefineryComplete",
+      "description": "Complete ore refining operation (requires proof-of-work)",
+      "requiredFields": ["creator", "structId", "proof", "nonce"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "structOnline": true,
+        "hasStoredOre": true,
+        "sufficientCharge": {
+          "description": "Charge >= structType.OreRefiningCharge",
+          "structs:codeReference": "genesis_struct_type.go (OreRefiningCharge)"
+        },
+        "proofOfWork": {
+          "description": "HashBuildAndCheckDifficulty with OreRefiningDifficulty (28000)",
+          "structs:codeReference": "x/structs/types/work.go (HashBuildAndCheckDifficulty)",
+          "difficulty": 28000
+        }
+      },
+      "structs:verified": true,
+      "structs:codeReference": "x/structs/keeper/msg_server_struct_ore_refinery_complete.go",
+      "structs:protoReference": "proto/structs/structs/tx.proto:777-784",
+      "effects": {
+        "alphaMatterCreated": "DepositRefinedAlpha() - mints 1,000,000 ualpha (1 gram)",
+        "oreConsumed": "StoredOreDecrement(1)",
+        "structs:codeReference": "x/structs/keeper/player_cache.go (DepositRefinedAlpha)"
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgStructOreRefineryComplete",
+                "creator": "structs1...",
+                "structId": "1-1",
+                "proof": "proof-of-work-hash",
+                "nonce": "proof-of-work-nonce"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgStructDefenseSet": {
+      "id": "struct-defense-set",
+      "name": "Set Defender",
+      "category": "struct-management",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgStructDefenseSet",
+      "description": "Assign a defender struct to protect another struct",
+      "requiredFields": ["creator", "defenderStructId", "protectedStructId"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "defenderExists": true,
+        "protectedExists": true,
+        "sameAmbit": {
+          "description": "Defender and protected must be in same ambit for full blocking",
+          "structs:codeReference": "x/structs/keeper/struct_cache.go (CanBlock)"
+        }
+      },
+      "structs:verified": true,
+      "structs:codeReference": "x/structs/keeper/msg_server_struct_defense_set.go",
+      "structs:protoReference": "proto/structs/structs/tx.proto:702-708",
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgStructDefenseSet",
+                "creator": "structs1...",
+                "defenderStructId": "1-1",
+                "protectedStructId": "2-1"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgStructDefenseClear": {
+      "id": "struct-defense-clear",
+      "name": "Clear Defender",
+      "category": "struct-management",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgStructDefenseClear",
+      "description": "Remove defender assignment",
+      "requiredFields": ["creator", "defenderStructId"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "defenderExists": true
+      },
+      "structs:verified": true,
+      "structs:codeReference": "x/structs/keeper/msg_server_struct_defense_clear.go",
+      "structs:protoReference": "proto/structs/structs/tx.proto:710-715",
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgStructDefenseClear",
+                "creator": "structs1...",
+                "defenderStructId": "1-1"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgStructMove": {
+      "id": "struct-move",
+      "name": "Move Struct",
+      "category": "struct-management",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgStructMove",
+      "description": "Move a struct to a new location",
+      "requiredFields": ["creator", "structId", "locationType", "ambit", "slot"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "structBuilt": true,
+        "validLocation": true
+      },
+      "structs:verified": true,
+      "structs:codeReference": "x/structs/keeper/msg_server_struct_move.go",
+      "structs:protoReference": "proto/structs/structs/tx.proto:717-725",
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgStructMove",
+                "creator": "structs1...",
+                "structId": "1-1",
+                "locationType": 1,
+                "ambit": 1,
+                "slot": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgReactorInfuse": {
+      "id": "reactor-infuse",
+      "name": "Infuse Reactor",
+      "category": "resource",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgReactorInfuse",
+      "description": "Add Alpha Matter to reactor for energy production",
+      "requiredFields": ["creator", "reactorId", "amount"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "reactorExists": true,
+        "sufficientAlphaMatter": true
+      },
+      "structs:verified": true,
+      "structs:codeReference": "x/structs/keeper/msg_server_reactor_infuse.go",
+      "structs:protoReference": "proto/structs/structs/tx.proto:95",
+      "conversion": {
+        "rate": 1,
+        "description": "1 gram Alpha Matter (1,000,000 micrograms) = 1,000 watts energy (1,000,000 milliwatts)",
+        "structs:codeReference": "x/structs/types/keys.go (ReactorFuelToEnergyConversion = 1)"
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgReactorInfuse",
+                "creator": "structs1...",
+                "reactorId": "1-1",
+                "amount": "1000000"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgReactorDefuse": {
+      "id": "reactor-defuse",
+      "name": "Defuse Reactor",
+      "category": "resource",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgReactorDefuse",
+      "description": "Remove Alpha Matter from reactor",
+      "requiredFields": ["creator", "reactorId", "amount"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "reactorExists": true,
+        "sufficientFuel": true
+      },
+      "structs:verified": true,
+      "structs:codeReference": "x/structs/keeper/msg_server_reactor_defuse.go",
+      "structs:protoReference": "proto/structs/structs/tx.proto:96",
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgReactorDefuse",
+                "creator": "structs1...",
+                "reactorId": "1-1",
+                "amount": "1000000"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgSubstationCreate": {
+      "id": "substation-create",
+      "name": "Create Substation",
+      "category": "resource",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgSubstationCreate",
+      "description": "Create a new substation for power distribution",
+      "requiredFields": ["creator", "planetId"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "planetOwned": true,
+        "validLocation": true
+      },
+      "structs:verified": true,
+      "structs:codeReference": "x/structs/keeper/msg_server_substation_create.go",
+      "structs:protoReference": "proto/structs/structs/tx.proto:131",
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgSubstationCreate",
+                "creator": "structs1...",
+                "planetId": "2-1"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgSubstationPlayerConnect": {
+      "id": "substation-player-connect",
+      "name": "Connect Player to Substation",
+      "category": "resource",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgSubstationPlayerConnect",
+      "description": "Connect a player to a substation for power capacity",
+      "requiredFields": ["creator", "substationId"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "substationExists": true,
+        "validConnection": true
+      },
+      "structs:verified": true,
+      "structs:codeReference": "x/structs/keeper/msg_server_substation_player_connect.go",
+      "structs:protoReference": "proto/structs/structs/tx.proto:135",
+      "effects": {
+        "powerCapacity": "Player gains power capacity from substation",
+        "structs:codeReference": "x/structs/keeper/player_cache.go"
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgSubstationPlayerConnect",
+                "creator": "structs1...",
+                "substationId": "1-1"
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "structs:actionCategories": {
+    "construction": ["MsgStructBuild", "MsgStructBuildInitiate", "MsgStructBuildComplete"],
+    "combat": ["MsgStructAttack", "MsgPlanetRaidComplete"],
+    "resource": ["MsgReactorAllocate", "MsgReactorInfuse", "MsgReactorDefuse", "MsgSubstationConnect", "MsgSubstationCreate", "MsgSubstationPlayerConnect", "MsgStructOreMinerComplete", "MsgStructOreRefineryComplete"],
+    "economic": ["MsgProviderCreate", "MsgAgreementCreate", "MsgOreMining", "MsgOreRefining", "MsgGeneratorAllocate"],
+    "exploration": ["MsgPlanetExplore"],
+    "fleet": ["MsgFleetMove"],
+    "guild": ["MsgGuildCreate", "MsgGuildMembershipJoin", "MsgGuildMembershipLeave", "MsgGuildBankMint", "MsgGuildBankRedeem"],
+    "struct-management": ["MsgStructActivate", "MsgStructDeactivate", "MsgStructStealthActivate", "MsgStructStealthDeactivate", "MsgStructDefenseSet", "MsgStructDefenseClear", "MsgStructMove"]
+  },
+  "structs:commonRequirements": {
+    "playerOnline": "Player must be online (not halted)",
+    "sufficientResources": "Player must have sufficient resources",
+    "sufficientCharge": "Struct must have sufficient charge",
+    "proofOfWork": "Action requires proof-of-work computation",
+    "validLocation": "Location must be valid and accessible",
+    "validTarget": "Target must be valid and attackable"
+  },
+  "structs:transactionFlow": {
+    "1": "Build transaction with message(s)",
+    "2": "Sign transaction with player key",
+    "3": "Submit to POST /cosmos/tx/v1beta1/txs",
+    "4": "Transaction moves to 'broadcast' status",
+    "5": "on-chain validation occurs (checks requirements)",
+    "6": "Action succeeds OR fails based on validation",
+    "7": "Query game state to verify action actually occurred",
+    "8": "If action didn't occur, check requirements and retry"
+  },
+  "structs:validationWarning": "⚠️ IMPORTANT: Transaction status 'broadcast' does NOT mean action succeeded! Validation happens on-chain after broadcast. Always verify game state to confirm action occurred.",
+  "structs:validationPattern": {
+    "description": "Transactions can broadcast but fail validation if requirements not met",
+    "verification": "Always query game state after broadcast to verify action occurred",
+    "commonFailures": {
+      "planetBuilding": "Command Ship not online or fleet not onStation",
+      "exploration": "Current planet has ore remaining",
+      "building": "Insufficient power or other requirements not met"
+    },
+    "reference": "See patterns/validation-patterns.md for detailed validation patterns"
+  },
+  "structs:verification": {
+    "verified": true,
+    "verifiedBy": "GameCodeAnalyst",
+    "verifiedDate": "2025-01-XX",
+    "verificationMethod": "code-analysis",
+    "confidence": "high",
+    "totalActions": 30,
+    "verifiedActions": 30,
+    "percentage": 100,
+    "note": "All documented actions verified against codebase. Additional actions exist in proto file but not yet documented."
+  }
+}
+

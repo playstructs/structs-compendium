@@ -1,0 +1,49 @@
+version: "1.0.0"
+lastUpdated: "2025-01-XX"
+baseUrl: "http://localhost:1317"
+basePath: "/cosmos/tx/v1beta1"
+category: "transaction"
+
+endpoints:
+  - id: "submit-transaction"
+    method: "POST"
+    path: "/cosmos/tx/v1beta1/txs"
+    description: "Submit transaction to blockchain"
+    category: "transaction"
+    parameters:
+      - name: "body"
+        type: "object"
+        required: true
+        description: "Transaction body with messages"
+    request:
+      schema: "schemas/requests.json#/definitions/Transaction"
+      contentType: "application/json"
+    response:
+      schema: "schemas/responses.json#/definitions/TransactionResponse"
+      contentType: "application/json"
+    example:
+      request: |
+        POST /cosmos/tx/v1beta1/txs
+        {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgStructBuild",
+                "creator": "structs1...",
+                "structType": "1",
+                "locationType": 1,
+                "locationId": "2-1"
+              }
+            ]
+          }
+        }
+      response: |
+        {
+          "tx_response": {
+            "code": 0,
+            "txhash": "...",
+            "height": 12345
+          }
+        }
+    note: "All game actions are submitted through this endpoint. See schemas/actions.json for message types."
+

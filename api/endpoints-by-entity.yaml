@@ -1,0 +1,501 @@
+version: "1.0.0"
+lastUpdated: "2025-01-XX"
+description: "API endpoints organized by entity type for easier discovery"
+
+entities:
+  Player:
+    description: "Player entity endpoints"
+    queries:
+      - id: "player-by-id"
+        method: "GET"
+        path: "/structs/player/{id}"
+        baseUrl: "${baseUrl}"
+        description: "Get player by ID (Consensus Network)"
+        schema: "schemas/entities.json#/definitions/Player"
+      
+      - id: "webapp-player-by-id"
+        method: "GET"
+        path: "/api/player/{player_id}"
+        baseUrl: "${webappBaseUrl}"
+        description: "Get player by ID (Web Application)"
+        schema: "schemas/responses.json#/definitions/WebappPlayerResponse"
+      
+      - id: "webapp-player-ore-stats"
+        method: "GET"
+        path: "/api/player/{player_id}/ore/stats"
+        baseUrl: "${webappBaseUrl}"
+        description: "Get player ore statistics"
+        schema: "schemas/responses.json#/definitions/OreStatsResponse"
+      
+      - id: "webapp-player-action-last-block"
+        method: "GET"
+        path: "/api/player/{player_id}/action/last/block/height"
+        baseUrl: "${webappBaseUrl}"
+        description: "Get player's last action block height"
+        schema: "schemas/responses.json#/definitions/BlockHeightResponse"
+      
+      - id: "webapp-player-completed-planets"
+        method: "GET"
+        path: "/api/player/{player_id}/planet/completed"
+        baseUrl: "${webappBaseUrl}"
+        description: "Get player's completed planets"
+        schema: "schemas/entities.json#/definitions/Planet[]"
+      
+      - id: "webapp-player-launched-raids"
+        method: "GET"
+        path: "/api/player/{player_id}/raid/launched"
+        baseUrl: "${webappBaseUrl}"
+        description: "Get player's launched raids"
+        schema: "schemas/entities.json#/definitions/Raid[]"
+    
+    actions:
+      - id: "webapp-player-username-update"
+        method: "PUT"
+        path: "/api/player/username"
+        baseUrl: "${webappBaseUrl}"
+        description: "Update player username"
+        requestSchema: "schemas/requests.json#/definitions/PlayerUsernameUpdateRequest"
+        responseSchema: "schemas/responses.json#/definitions/SuccessResponse"
+    
+    dependencies:
+      - entity: "Guild"
+        relationship: "memberOf"
+        description: "Player may be a member of a guild"
+      
+      - entity: "Planet"
+        relationship: "owns"
+        description: "Player may own planets"
+      
+      - entity: "Struct"
+        relationship: "owns"
+        description: "Player may own structs"
+    
+    streaming:
+      - subject: "structs.player.*"
+        description: "Player updates via GRASS/NATS"
+        eventTypes: ["player_consensus", "player_meta"]
+        schema: "api/streaming/event-schemas.json#/definitions/PlayerConsensusEvent"
+  
+  Planet:
+    description: "Planet entity endpoints"
+    queries:
+      - id: "planet-by-id"
+        method: "GET"
+        path: "/structs/planet/{id}"
+        baseUrl: "${baseUrl}"
+        description: "Get planet by ID (Consensus Network)"
+        schema: "schemas/entities.json#/definitions/Planet"
+      
+      - id: "planet-by-player"
+        method: "GET"
+        path: "/structs/planet_by_player/{playerId}"
+        baseUrl: "${baseUrl}"
+        description: "Get planets owned by player"
+        schema: "schemas/entities.json#/definitions/Planet[]"
+      
+      - id: "webapp-planet-by-id"
+        method: "GET"
+        path: "/api/planet/{planet_id}"
+        baseUrl: "${webappBaseUrl}"
+        description: "Get planet by ID (Web Application)"
+        schema: "schemas/entities.json#/definitions/Planet"
+      
+      - id: "webapp-planet-shield-health"
+        method: "GET"
+        path: "/api/planet/{planet_id}/shield/health"
+        baseUrl: "${webappBaseUrl}"
+        description: "Get planetary shield health"
+        schema: "schemas/responses.json#/definitions/ShieldHealthResponse"
+      
+      - id: "webapp-planet-shield"
+        method: "GET"
+        path: "/api/planet/{planet_id}/shield"
+        baseUrl: "${webappBaseUrl}"
+        description: "Get planetary shield information"
+        schema: "schemas/responses.json#/definitions/ShieldResponse"
+      
+      - id: "webapp-planet-raid-active"
+        method: "GET"
+        path: "/api/planet/{planet_id}/raid/active"
+        baseUrl: "${webappBaseUrl}"
+        description: "Get active raid for planet"
+        schema: "schemas/entities.json#/definitions/Raid"
+    
+    dependencies:
+      - entity: "Player"
+        relationship: "ownedBy"
+        description: "Planet is owned by a player"
+      
+      - entity: "Struct"
+        relationship: "contains"
+        description: "Planet contains structs"
+      
+      - entity: "Fleet"
+        relationship: "targetedBy"
+        description: "Planet may be targeted by fleets"
+    
+    streaming:
+      - subject: "structs.planet.*"
+        description: "Planet updates via GRASS/NATS"
+        eventTypes: ["raid_status", "fleet_arrive", "fleet_advance", "fleet_depart"]
+        schema: "api/streaming/event-schemas.json#/definitions/PlanetRaidStatusEvent"
+  
+  Guild:
+    description: "Guild entity endpoints"
+    queries:
+      - id: "guild-by-id"
+        method: "GET"
+        path: "/structs/guild/{id}"
+        baseUrl: "${baseUrl}"
+        description: "Get guild by ID (Consensus Network)"
+        schema: "schemas/entities.json#/definitions/Guild"
+      
+      - id: "webapp-guild-by-id"
+        method: "GET"
+        path: "/api/guild/{guild_id}"
+        baseUrl: "${webappBaseUrl}"
+        description: "Get guild by ID (Web Application)"
+        schema: "schemas/entities.json#/definitions/Guild"
+      
+      - id: "webapp-guild-current"
+        method: "GET"
+        path: "/api/guild/this"
+        baseUrl: "${webappBaseUrl}"
+        description: "Get current guild for authenticated player"
+        schema: "schemas/entities.json#/definitions/Guild"
+        authentication: "required"
+      
+      - id: "webapp-guild-count"
+        method: "GET"
+        path: "/api/guild/count"
+        baseUrl: "${webappBaseUrl}"
+        description: "Get total guild count"
+        schema: "schemas/responses.json#/definitions/CountResponse"
+      
+      - id: "webapp-guild-member-count"
+        method: "GET"
+        path: "/api/guild/{guild_id}/members/count"
+        baseUrl: "${webappBaseUrl}"
+        description: "Get guild member count"
+        schema: "schemas/responses.json#/definitions/CountResponse"
+      
+      - id: "webapp-guild-power-stats"
+        method: "GET"
+        path: "/api/guild/{guild_id}/power/stats"
+        baseUrl: "${webappBaseUrl}"
+        description: "Get guild power statistics"
+        schema: "schemas/responses.json#/definitions/PowerStatsResponse"
+      
+      - id: "webapp-guild-roster"
+        method: "GET"
+        path: "/api/guild/{guild_id}/roster"
+        baseUrl: "${webappBaseUrl}"
+        description: "Get guild roster"
+        schema: "schemas/responses.json#/definitions/GuildRosterResponse"
+      
+      - id: "webapp-guild-directory"
+        method: "GET"
+        path: "/api/guild/directory"
+        baseUrl: "${webappBaseUrl}"
+        description: "Get guild directory"
+        schema: "schemas/entities.json#/definitions/Guild[]"
+        pagination: true
+    
+    dependencies:
+      - entity: "Player"
+        relationship: "hasMembers"
+        description: "Guild has player members"
+    
+    streaming:
+      - subject: "structs.guild.*"
+        description: "Guild updates via GRASS/NATS"
+        eventTypes: ["guild_consensus", "guild_meta", "guild_membership"]
+        schema: "api/streaming/event-schemas.json#/definitions/GuildConsensusEvent"
+  
+  Struct:
+    description: "Struct entity endpoints"
+    queries:
+      - id: "struct-by-id"
+        method: "GET"
+        path: "/structs/struct/{id}"
+        baseUrl: "${baseUrl}"
+        description: "Get struct by ID (Consensus Network)"
+        schema: "schemas/entities.json#/definitions/Struct"
+      
+      - id: "webapp-struct-by-id"
+        method: "GET"
+        path: "/api/struct/{struct_id}"
+        baseUrl: "${webappBaseUrl}"
+        description: "Get struct by ID (Web Application)"
+        schema: "schemas/entities.json#/definitions/Struct"
+      
+      - id: "webapp-struct-by-planet"
+        method: "GET"
+        path: "/api/struct/planet/{planet_id}"
+        baseUrl: "${webappBaseUrl}"
+        description: "Get all structs on a planet"
+        schema: "schemas/entities.json#/definitions/Struct[]"
+      
+      - id: "webapp-struct-types"
+        method: "GET"
+        path: "/api/struct/type"
+        baseUrl: "${webappBaseUrl}"
+        description: "Get all struct types"
+        schema: "schemas/entities.json#/definitions/StructType[]"
+      
+      - id: "cosmetic-struct-type"
+        method: "GET"
+        path: "/api/cosmetic/struct-type/{structTypeId}"
+        baseUrl: "${webappBaseUrl}"
+        description: "Get cosmetic data for struct type (with mod overrides)"
+        schema: "schemas/responses.json#/definitions/StructTypeCosmeticResponse"
+      
+      - id: "struct-type-with-cosmetics"
+        method: "GET"
+        path: "/api/struct-type/{structTypeId}/full"
+        baseUrl: "${webappBaseUrl}"
+        description: "Get struct type with cosmetic overrides merged (integration endpoint)"
+        schema: "schemas/responses.json#/definitions/StructTypeFullResponse"
+    
+    dependencies:
+      - entity: "Planet"
+        relationship: "locatedOn"
+        description: "Struct is located on a planet"
+      
+      - entity: "Player"
+        relationship: "ownedBy"
+        description: "Struct is owned by a player"
+    
+    streaming:
+      - subject: "structs.struct.*"
+        description: "Struct updates via GRASS/NATS"
+        eventTypes: ["struct_status", "struct_move", "struct_attack", "struct_block_build_start"]
+        schema: "api/streaming/event-schemas.json#/definitions/StructStatusEvent"
+  
+  Fleet:
+    description: "Fleet entity endpoints"
+    queries:
+      - id: "fleet-by-id"
+        method: "GET"
+        path: "/structs/fleet/{id}"
+        baseUrl: "${baseUrl}"
+        description: "Get fleet by ID (Consensus Network)"
+        schema: "schemas/entities.json#/definitions/Fleet"
+      
+      - id: "fleet-by-index"
+        method: "GET"
+        path: "/structs/fleet_by_index/{index}"
+        baseUrl: "${baseUrl}"
+        description: "Get fleet by index"
+        schema: "schemas/entities.json#/definitions/Fleet"
+    
+    dependencies:
+      - entity: "Player"
+        relationship: "ownedBy"
+        description: "Fleet is owned by a player"
+      
+      - entity: "Planet"
+        relationship: "targets"
+        description: "Fleet may target planets"
+    
+    streaming:
+      - subject: "structs.fleet.*"
+        description: "Fleet updates via GRASS/NATS"
+        eventTypes: ["fleet_arrive", "fleet_advance", "fleet_depart"]
+        schema: "api/streaming/event-schemas.json#/definitions/FleetArriveEvent"
+  
+  Reactor:
+    description: "Reactor entity endpoints"
+    queries:
+      - id: "reactor-by-id"
+        method: "GET"
+        path: "/structs/reactor/{id}"
+        baseUrl: "${baseUrl}"
+        description: "Get reactor by ID"
+        schema: "schemas/entities.json#/definitions/Reactor"
+    
+    dependencies:
+      - entity: "Planet"
+        relationship: "locatedOn"
+        description: "Reactor is located on a planet"
+      
+      - entity: "Player"
+        relationship: "ownedBy"
+        description: "Reactor is owned by a player"
+  
+  Substation:
+    description: "Substation entity endpoints"
+    queries:
+      - id: "substation-by-id"
+        method: "GET"
+        path: "/structs/substation/{id}"
+        baseUrl: "${baseUrl}"
+        description: "Get substation by ID"
+        schema: "schemas/entities.json#/definitions/Substation"
+    
+    dependencies:
+      - entity: "Planet"
+        relationship: "locatedOn"
+        description: "Substation is located on a planet"
+      
+      - entity: "Player"
+        relationship: "ownedBy"
+        description: "Substation is owned by a player"
+  
+  Provider:
+    description: "Provider entity endpoints"
+    queries:
+      - id: "provider-by-id"
+        method: "GET"
+        path: "/structs/provider/{id}"
+        baseUrl: "${baseUrl}"
+        description: "Get provider by ID"
+        schema: "schemas/entities.json#/definitions/Provider"
+    
+    dependencies:
+      - entity: "Substation"
+        relationship: "partOf"
+        description: "Provider is part of a substation"
+  
+  Agreement:
+    description: "Agreement entity endpoints"
+    queries:
+      - id: "agreement-by-id"
+        method: "GET"
+        path: "/structs/agreement/{id}"
+        baseUrl: "${baseUrl}"
+        description: "Get agreement by ID"
+        schema: "schemas/entities.json#/definitions/Agreement"
+      
+      - id: "agreement-by-provider"
+        method: "GET"
+        path: "/structs/agreement_by_provider/{providerId}"
+        baseUrl: "${baseUrl}"
+        description: "Get agreements by provider"
+        schema: "schemas/entities.json#/definitions/Agreement[]"
+    
+    dependencies:
+      - entity: "Provider"
+        relationship: "associatedWith"
+        description: "Agreement is associated with a provider"
+  
+  Allocation:
+    description: "Allocation entity endpoints"
+    queries:
+      - id: "allocation-by-id"
+        method: "GET"
+        path: "/structs/allocation/{id}"
+        baseUrl: "${baseUrl}"
+        description: "Get allocation by ID"
+        schema: "schemas/entities.json#/definitions/Allocation"
+      
+      - id: "allocation-by-source"
+        method: "GET"
+        path: "/structs/allocation_by_source/{sourceId}"
+        baseUrl: "${baseUrl}"
+        description: "Get allocations by source"
+        schema: "schemas/entities.json#/definitions/Allocation[]"
+      
+      - id: "allocation-by-destination"
+        method: "GET"
+        path: "/structs/allocation_by_destination/{destinationId}"
+        baseUrl: "${baseUrl}"
+        description: "Get allocations by destination"
+        schema: "schemas/entities.json#/definitions/Allocation[]"
+    
+    dependencies:
+      - entity: "Struct"
+        relationship: "sourceFrom"
+        description: "Allocation sources from a struct"
+      
+      - entity: "Struct"
+        relationship: "destinedTo"
+        description: "Allocation is destined to a struct"
+  
+  Address:
+    description: "Address entity endpoints"
+    queries:
+      - id: "address-by-address"
+        method: "GET"
+        path: "/structs/address/{address}"
+        baseUrl: "${baseUrl}"
+        description: "Get address by blockchain address"
+        schema: "schemas/entities.json#/definitions/Address"
+      
+      - id: "address-by-player"
+        method: "GET"
+        path: "/structs/address_by_player/{playerId}"
+        baseUrl: "${baseUrl}"
+        description: "Get addresses by player"
+        schema: "schemas/entities.json#/definitions/Address[]"
+    
+    dependencies:
+      - entity: "Player"
+        relationship: "associatedWith"
+        description: "Address is associated with a player"
+  
+  Permission:
+    description: "Permission entity endpoints"
+    queries:
+      - id: "permission-by-id"
+        method: "GET"
+        path: "/structs/permission/{permissionId}"
+        baseUrl: "${baseUrl}"
+        description: "Get permission by ID"
+        schema: "schemas/entities.json#/definitions/Permission"
+      
+      - id: "permission-by-object"
+        method: "GET"
+        path: "/structs/permission/object/{objectId}"
+        baseUrl: "${baseUrl}"
+        description: "Get permissions by object"
+        schema: "schemas/entities.json#/definitions/Permission[]"
+      
+      - id: "permission-by-player"
+        method: "GET"
+        path: "/structs/permission/player/{playerId}"
+        baseUrl: "${baseUrl}"
+        description: "Get permissions by player"
+        schema: "schemas/entities.json#/definitions/Permission[]"
+    
+    dependencies:
+      - entity: "Player"
+        relationship: "grantedTo"
+        description: "Permission is granted to a player"
+      
+      - entity: "Struct"
+        relationship: "appliesTo"
+        description: "Permission applies to a struct or other object"
+  
+  Transaction:
+    description: "Transaction endpoints"
+    actions:
+      - id: "submit-transaction"
+        method: "POST"
+        path: "/cosmos/tx/v1beta1/txs"
+        baseUrl: "${baseUrl}"
+        description: "Submit a transaction"
+        requestSchema: "schemas/requests.json#/definitions/TransactionRequest"
+        responseSchema: "schemas/responses.json#/definitions/TransactionResponse"
+        authentication: "required"
+  
+  BlockHeight:
+    description: "Block height endpoint"
+    queries:
+      - id: "block-height"
+        method: "GET"
+        path: "/blockheight"
+        baseUrl: "${baseUrl}"
+        description: "Get current block height"
+        schema: "schemas/responses.json#/definitions/BlockHeightResponse"
+  
+  Params:
+    description: "Module parameters endpoint"
+    queries:
+      - id: "params"
+        method: "GET"
+        path: "/structs/params"
+        baseUrl: "${baseUrl}"
+        description: "Get module parameters"
+        schema: "schemas/entities.json#/definitions/Params"
+

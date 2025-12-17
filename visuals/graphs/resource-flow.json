@@ -1,0 +1,308 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "id": "resource-flow",
+  "type": "flow",
+  "title": "Resource Conversion Flow",
+  "description": "Complete resource flow from extraction to consumption, showing security levels and conversion methods",
+  "category": "gameplay",
+  "steps": [
+    {
+      "id": "step-1-extract",
+      "label": "Extract Ore",
+      "type": "action",
+      "action": "mine",
+      "actionReference": "schemas/actions.json#/definitions/MineAction",
+      "input": {
+        "source": "planet",
+        "resource": "Alpha Ore"
+      },
+      "output": {
+        "resource": "Stored Ore",
+        "location": "planet",
+        "security": "stealable"
+      },
+      "requirements": [
+        "Ore Extractor struct",
+        "Planet with ore deposits",
+        "Sufficient power (500k Watts)"
+      ],
+      "metadata": {
+        "security": "stealable",
+        "risk": "high",
+        "action": "refine immediately"
+      }
+    },
+    {
+      "id": "step-2-refine",
+      "label": "Refine Ore to Alpha Matter",
+      "type": "action",
+      "action": "refine",
+      "actionReference": "schemas/actions.json#/definitions/RefineAction",
+      "input": {
+        "resource": "Stored Ore",
+        "location": "planet"
+      },
+      "output": {
+        "resource": "Alpha Matter",
+        "location": "bank account",
+        "security": "secure"
+      },
+      "requirements": [
+        "Ore Refinery struct",
+        "Stored ore available",
+        "Sufficient power (500k Watts)"
+      ],
+      "metadata": {
+        "security": "secure",
+        "risk": "none",
+        "action": "maintain reserve (20-30%)",
+        "conversionRate": "1:1"
+      }
+    },
+    {
+      "id": "step-3-convert-reactor",
+      "label": "Convert to Watts (Reactor)",
+      "type": "conversion",
+      "action": "convert",
+      "actionReference": "schemas/actions.json#/definitions/ConvertAction",
+      "input": {
+        "resource": "Alpha Matter",
+        "amount": 1,
+        "unit": "gram"
+      },
+      "output": {
+        "resource": "Watts",
+        "amount": 1,
+        "unit": "kilowatt"
+      },
+      "requirements": [
+        "Reactor struct",
+        "Alpha Matter available",
+        "Maintain reserve (20-30%)"
+      ],
+      "metadata": {
+        "method": "reactor",
+        "rate": "1g:1kW",
+        "risk": "low",
+        "security": "secure",
+        "description": "Safe, reliable conversion"
+      }
+    },
+    {
+      "id": "step-3-convert-generator",
+      "label": "Convert to Watts (Field Generator)",
+      "type": "conversion",
+      "action": "convert",
+      "actionReference": "schemas/actions.json#/definitions/ConvertAction",
+      "input": {
+        "resource": "Alpha Matter",
+        "amount": 1,
+        "unit": "gram"
+      },
+      "output": {
+        "resource": "Watts",
+        "amount": 2,
+        "unit": "kilowatt"
+      },
+      "requirements": [
+        "Field Generator struct",
+        "Alpha Matter available",
+        "Maintain reserve (20-30%)"
+      ],
+      "metadata": {
+        "method": "fieldGenerator",
+        "rate": "1g:2kW",
+        "risk": "high",
+        "security": "secure",
+        "description": "Efficient but risky conversion"
+      }
+    },
+    {
+      "id": "step-3-convert-continental",
+      "label": "Convert to Watts (Continental Power Plant)",
+      "type": "conversion",
+      "action": "convert",
+      "actionReference": "schemas/actions.json#/definitions/ConvertAction",
+      "input": {
+        "resource": "Alpha Matter",
+        "amount": 1,
+        "unit": "gram"
+      },
+      "output": {
+        "resource": "Watts",
+        "amount": 5,
+        "unit": "kilowatt"
+      },
+      "requirements": [
+        "Continental Power Plant struct",
+        "Alpha Matter available",
+        "Maintain reserve (20-30%)"
+      ],
+      "metadata": {
+        "method": "continentalPowerPlant",
+        "rate": "1g:5kW",
+        "risk": "high",
+        "security": "secure",
+        "description": "Very efficient but higher risk"
+      }
+    },
+    {
+      "id": "step-3-convert-world-engine",
+      "label": "Convert to Watts (World Engine)",
+      "type": "conversion",
+      "action": "convert",
+      "actionReference": "schemas/actions.json#/definitions/ConvertAction",
+      "input": {
+        "resource": "Alpha Matter",
+        "amount": 1,
+        "unit": "gram"
+      },
+      "output": {
+        "resource": "Watts",
+        "amount": 10,
+        "unit": "kilowatt"
+      },
+      "requirements": [
+        "World Engine struct",
+        "Alpha Matter available",
+        "Maintain reserve (20-30%)"
+      ],
+      "metadata": {
+        "method": "worldEngine",
+        "rate": "1g:10kW",
+        "risk": "high",
+        "security": "secure",
+        "description": "Most efficient but highest risk"
+      }
+    },
+    {
+      "id": "step-4-consume",
+      "label": "Consume Watts",
+      "type": "process",
+      "input": {
+        "resource": "Watts",
+        "location": "player power system"
+      },
+      "output": {
+        "result": "Operations enabled",
+        "examples": [
+          "Command Ship: 50,000 W",
+          "Starfighter: 100,000 W",
+          "Planetary Battleship: 135,000 W",
+          "Economic Structs: 500,000 W"
+        ]
+      },
+      "requirements": [
+        "Sufficient Watts available",
+        "Power capacity sufficient"
+      ],
+      "metadata": {
+        "security": "secure",
+        "risk": "none",
+        "consumption": "continuous"
+      }
+    }
+  ],
+  "transitions": [
+    {
+      "id": "t1",
+      "from": "step-1-extract",
+      "to": "step-2-refine",
+      "label": "Refine immediately",
+      "condition": "Ore available",
+      "metadata": {
+        "priority": "high",
+        "reason": "Ore is stealable, must refine to secure"
+      }
+    },
+    {
+      "id": "t2",
+      "from": "step-2-refine",
+      "to": "step-3-convert-reactor",
+      "label": "Convert via Reactor",
+      "condition": "Alpha Matter available, choose safe method",
+      "metadata": {
+        "method": "reactor",
+        "risk": "low"
+      }
+    },
+    {
+      "id": "t3",
+      "from": "step-2-refine",
+      "to": "step-3-convert-generator",
+      "label": "Convert via Field Generator",
+      "condition": "Alpha Matter available, choose efficient method",
+      "metadata": {
+        "method": "fieldGenerator",
+        "risk": "high"
+      }
+    },
+    {
+      "id": "t4",
+      "from": "step-2-refine",
+      "to": "step-3-convert-continental",
+      "label": "Convert via Continental Power Plant",
+      "condition": "Alpha Matter available, choose very efficient method",
+      "metadata": {
+        "method": "continentalPowerPlant",
+        "risk": "high"
+      }
+    },
+    {
+      "id": "t5",
+      "from": "step-2-refine",
+      "to": "step-3-convert-world-engine",
+      "label": "Convert via World Engine",
+      "condition": "Alpha Matter available, choose most efficient method",
+      "metadata": {
+        "method": "worldEngine",
+        "risk": "high"
+      }
+    },
+    {
+      "id": "t6",
+      "from": "step-3-convert-reactor",
+      "to": "step-4-consume",
+      "label": "Use Watts",
+      "condition": "Watts available"
+    },
+    {
+      "id": "t7",
+      "from": "step-3-convert-generator",
+      "to": "step-4-consume",
+      "label": "Use Watts",
+      "condition": "Watts available"
+    },
+    {
+      "id": "t8",
+      "from": "step-3-convert-continental",
+      "to": "step-4-consume",
+      "label": "Use Watts",
+      "condition": "Watts available"
+    },
+    {
+      "id": "t9",
+      "from": "step-3-convert-world-engine",
+      "to": "step-4-consume",
+      "label": "Use Watts",
+      "condition": "Watts available"
+    }
+  ],
+  "relatedSchemas": [
+    "schemas/entities.json#/definitions/Resource",
+    "schemas/gameplay.json#/definitions/ResourceConversion",
+    "schemas/actions.json#/definitions/MineAction",
+    "schemas/actions.json#/definitions/RefineAction",
+    "schemas/actions.json#/definitions/ConvertAction"
+  ],
+  "relatedEndpoints": [
+    "/structs/player/{id}",
+    "/structs/planet/{id}",
+    "/structs/struct/{id}"
+  ],
+  "relatedDiagrams": [
+    "visuals/graphs/entity-relationships.json"
+  ]
+}
+

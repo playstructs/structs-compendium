@@ -1,0 +1,712 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Structs Entity Definitions",
+  "description": "Complete catalog of all game entities for AI agents. See schemas/formats.json for format specifications.",
+  "type": "object",
+  "structs:category": "core",
+  "entities": {
+    "Player": {
+      "id": "player",
+      "name": "Player",
+      "category": "core",
+      "endpoint": "/structs/player/{id}",
+      "listEndpoint": "/structs/player",
+      "schema": "schemas/entities.json#/definitions/Player",
+      "description": "A player in the game",
+      "relationships": {
+        "owns": ["Planet", "Struct", "Fleet", "Reactor", "Substation", "Provider"],
+        "memberOf": ["Guild"]
+      },
+      "queryPatterns": {
+        "byId": "/structs/player/{id}",
+        "all": "/structs/player",
+        "halted": "/structs/player_halted"
+      }
+    },
+    "Planet": {
+      "id": "planet",
+      "name": "Planet",
+      "category": "core",
+      "endpoint": "/structs/planet/{id}",
+      "listEndpoint": "/structs/planet",
+      "schema": "schemas/entities.json#/definitions/Planet",
+      "description": "A planet in the game",
+      "relationships": {
+        "ownedBy": ["Player"],
+        "contains": ["Struct", "Reactor", "Substation"],
+        "hasAttributes": ["PlanetAttribute"]
+      },
+      "queryPatterns": {
+        "byId": "/structs/planet/{id}",
+        "all": "/structs/planet",
+        "byPlayer": "/structs/planet_by_player/{playerId}",
+        "attributes": "/structs/planet_attribute/{planetId}/{attributeType}",
+        "allAttributes": "/structs/planet_attribute"
+      },
+      "startingProperties": {
+        "description": "All newly explored planets start with identical properties",
+        "maxOre": 5,
+        "spaceSlots": 4,
+        "airSlots": 4,
+        "landSlots": 4,
+        "waterSlots": 4
+      },
+      "ownershipRules": {
+        "onePlanetPerPlayer": "Players can only own one planet at a time",
+        "explorationRequirement": "Current planet must be empty (0 ore) before exploring new planet",
+        "onExploration": "New planet created, fleet moves to new planet, old planet released"
+      }
+    },
+    "Struct": {
+      "id": "struct",
+      "name": "Struct",
+      "category": "core",
+      "endpoint": "/structs/struct/{id}",
+      "listEndpoint": "/structs/struct",
+      "schema": "schemas/entities.json#/definitions/Struct",
+      "description": "A struct (unit) in the game",
+      "relationships": {
+        "ownedBy": ["Player"],
+        "typeOf": ["StructType"],
+        "locatedOn": ["Planet", "Fleet"],
+        "hasAttributes": ["StructAttribute"]
+      },
+      "queryPatterns": {
+        "byId": "/structs/struct/{id}",
+        "all": "/structs/struct",
+        "attributes": "/structs/struct_attribute/{structId}/{attributeType}",
+        "allAttributes": "/structs/struct_attribute"
+      }
+    },
+    "StructType": {
+      "id": "struct-type",
+      "name": "Struct Type",
+      "category": "core",
+      "endpoint": "/structs/struct_type/{id}",
+      "listEndpoint": "/structs/struct_type",
+      "schema": "schemas/entities.json#/definitions/StructType",
+      "description": "A struct type definition (template)",
+      "relationships": {
+        "instances": ["Struct"]
+      },
+      "queryPatterns": {
+        "byId": "/structs/struct_type/{id}",
+        "all": "/structs/struct_type"
+      }
+    },
+    "Fleet": {
+      "id": "fleet",
+      "name": "Fleet",
+      "category": "core",
+      "endpoint": "/structs/fleet/{id}",
+      "listEndpoint": "/structs/fleet",
+      "schema": "schemas/entities.json#/definitions/Fleet",
+      "description": "A fleet (group of structs)",
+      "relationships": {
+        "ownedBy": ["Player"],
+        "contains": ["Struct"]
+      },
+      "queryPatterns": {
+        "byId": "/structs/fleet/{id}",
+        "byIndex": "/structs/fleet_by_index/{index}",
+        "all": "/structs/fleet"
+      }
+    },
+    "Guild": {
+      "id": "guild",
+      "name": "Guild",
+      "category": "social",
+      "endpoint": "/structs/guild/{id}",
+      "listEndpoint": "/structs/guild",
+      "schema": "schemas/entities.json#/definitions/Guild",
+      "description": "A guild (player organization)",
+      "relationships": {
+        "hasMembers": ["Player"]
+      },
+      "queryPatterns": {
+        "byId": "/structs/guild/{id}",
+        "all": "/structs/guild"
+      }
+    },
+    "Reactor": {
+      "id": "reactor",
+      "name": "Reactor",
+      "category": "resource",
+      "endpoint": "/structs/reactor/{id}",
+      "listEndpoint": "/structs/reactor",
+      "schema": "schemas/entities.json#/definitions/Reactor",
+      "description": "A reactor (energy production)",
+      "relationships": {
+        "ownedBy": ["Player"],
+        "locatedOn": ["Planet"]
+      },
+      "queryPatterns": {
+        "byId": "/structs/reactor/{id}",
+        "all": "/structs/reactor"
+      }
+    },
+    "Substation": {
+      "id": "substation",
+      "name": "Substation",
+      "category": "resource",
+      "endpoint": "/structs/substation/{id}",
+      "listEndpoint": "/structs/substation",
+      "schema": "schemas/entities.json#/definitions/Substation",
+      "description": "A substation (power distribution)",
+      "relationships": {
+        "ownedBy": ["Player"],
+        "locatedOn": ["Planet"]
+      },
+      "queryPatterns": {
+        "byId": "/structs/substation/{id}",
+        "all": "/structs/substation"
+      }
+    },
+    "Provider": {
+      "id": "provider",
+      "name": "Provider",
+      "category": "economic",
+      "endpoint": "/structs/provider/{id}",
+      "listEndpoint": "/structs/provider",
+      "schema": "schemas/entities.json#/definitions/Provider",
+      "description": "An energy provider",
+      "relationships": {
+        "ownedBy": ["Player"],
+        "hasAgreements": ["Agreement"]
+      },
+      "queryPatterns": {
+        "byId": "/structs/provider/{id}",
+        "all": "/structs/provider"
+      }
+    },
+    "Agreement": {
+      "id": "agreement",
+      "name": "Agreement",
+      "category": "economic",
+      "endpoint": "/structs/agreement/{id}",
+      "listEndpoint": "/structs/agreement",
+      "schema": "schemas/entities.json#/definitions/Agreement",
+      "description": "An energy agreement (automated contract)",
+      "relationships": {
+        "providedBy": ["Provider"]
+      },
+      "queryPatterns": {
+        "byId": "/structs/agreement/{id}",
+        "all": "/structs/agreement",
+        "byProvider": "/structs/agreement_by_provider/{providerId}"
+      }
+    },
+    "Allocation": {
+      "id": "allocation",
+      "name": "Allocation",
+      "category": "economic",
+      "endpoint": "/structs/allocation/{id}",
+      "listEndpoint": "/structs/allocation",
+      "schema": "schemas/entities.json#/definitions/Allocation",
+      "description": "An energy allocation",
+      "relationships": {
+        "from": ["Provider", "Reactor"],
+        "to": ["Player", "Struct"]
+      },
+      "queryPatterns": {
+        "byId": "/structs/allocation/{id}",
+        "all": "/structs/allocation",
+        "bySource": "/structs/allocation_by_source/{sourceId}",
+        "byDestination": "/structs/allocation_by_destination/{destinationId}"
+      }
+    },
+    "Address": {
+      "id": "address",
+      "name": "Address",
+      "category": "core",
+      "endpoint": "/structs/address/{address}",
+      "listEndpoint": "/structs/address",
+      "schema": "schemas/entities.json#/definitions/Address",
+      "description": "A blockchain address",
+      "relationships": {
+        "belongsTo": ["Player"]
+      },
+      "queryPatterns": {
+        "byAddress": "/structs/address/{address}",
+        "all": "/structs/address",
+        "byPlayer": "/structs/address_by_player/{playerId}"
+      }
+    },
+    "Permission": {
+      "id": "permission",
+      "name": "Permission",
+      "category": "core",
+      "endpoint": "/structs/permission/{permissionId}",
+      "listEndpoint": "/structs/permission",
+      "schema": "schemas/entities.json#/definitions/Permission",
+      "description": "A permission (access control)",
+      "relationships": {
+        "grantedTo": ["Player"],
+        "appliesTo": ["Planet", "Struct", "Fleet"]
+      },
+      "queryPatterns": {
+        "byId": "/structs/permission/{permissionId}",
+        "all": "/structs/permission",
+        "byObject": "/structs/permission/object/{objectId}",
+        "byPlayer": "/structs/permission/player/{playerId}"
+      }
+    },
+    "Infusion": {
+      "id": "infusion",
+      "name": "Infusion",
+      "category": "economic",
+      "endpoint": "/structs/infusion/{destinationId}/{address}",
+      "listEndpoint": "/structs/infusion",
+      "schema": "schemas/entities.json#/definitions/Infusion",
+      "description": "An infusion (resource transfer)",
+      "relationships": {
+        "toDestination": ["Player", "Struct"],
+        "fromAddress": ["Address"]
+      },
+      "queryPatterns": {
+        "byDestinationAndAddress": "/structs/infusion/{destinationId}/{address}",
+        "all": "/structs/infusion",
+        "byDestination": "/structs/infusion_by_destination/{destinationId}"
+      }
+    }
+  },
+  "structs:entityCategories": {
+    "core": ["Player", "Planet", "Struct", "StructType", "Fleet", "Address", "Permission"],
+    "social": ["Guild"],
+    "resource": ["Reactor", "Substation"],
+    "economic": ["Provider", "Agreement", "Allocation", "Infusion"]
+  },
+  "structs:queryPatterns": {
+    "single": "{endpoint}/{id}",
+    "list": "{listEndpoint}",
+    "filtered": "{endpoint}_by_{filter}/{filterValue}",
+    "attributes": "{endpoint}_attribute/{entityId}/{attributeType}",
+    "allAttributes": "{endpoint}_attribute"
+  },
+  "definitions": {
+    "Player": {
+      "type": "object",
+      "structs:entity": "Player",
+      "structs:verified": true,
+      "structs:codeReference": "x/structs/types/player.pb.go, x/structs/keeper/player_cache.go",
+      "description": "Complete Player entity with verified field definitions",
+      "properties": {
+        "id": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "description": "Unique player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player.",
+          "structs:verified": true
+        },
+        "index": {
+          "type": "string",
+          "description": "Player index number",
+          "structs:verified": true
+        },
+        "guildId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^0-[0-9]+$",
+          "structs:relationship": "Guild",
+          "description": "Guild ID if player is a member, empty string if not. Format: 'type-index' (e.g., '0-1' for guild type 0, index 1). Type 0 = Guild.",
+          "structs:verified": true
+        },
+        "substationId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^4-[0-9]+$",
+          "structs:relationship": "Substation",
+          "description": "Substation ID if connected, empty string if not. Format: 'type-index' (e.g., '4-3' for substation type 4, index 3). Type 4 = Substation.",
+          "structs:verified": true
+        },
+        "creator": {
+          "type": "string",
+          "structs:format": "blockchain-address",
+          "description": "Blockchain address that created this player",
+          "structs:verified": true
+        },
+        "primaryAddress": {
+          "type": "string",
+          "structs:format": "blockchain-address",
+          "description": "Primary blockchain address for this player",
+          "structs:verified": true
+        },
+        "planetId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^2-[0-9]+$",
+          "structs:relationship": "Planet",
+          "description": "Planet ID if player owns a planet, empty string if not. Format: 'type-index' (e.g., '2-1' for planet type 2, index 1). Type 2 = Planet.",
+          "structs:verified": true
+        },
+        "fleetId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^9-[0-9]+$",
+          "structs:relationship": "Fleet",
+          "description": "Fleet ID if player owns a fleet, empty string if not. Format: 'type-index' (e.g., '9-11' for fleet type 9, index 11). Type 9 = Fleet.",
+          "structs:verified": true
+        },
+        "capacity": {
+          "type": "integer",
+          "structs:unit": "milliwatts",
+          "description": "Primary power capacity from substation connection",
+          "structs:verified": true,
+          "structs:codeReference": "x/structs/keeper/player_cache.go",
+          "structs:formula": "From substation connection"
+        },
+        "capacitySecondary": {
+          "type": "integer",
+          "structs:unit": "milliwatts",
+          "description": "Secondary power capacity from additional substation connection",
+          "structs:verified": true,
+          "structs:codeReference": "x/structs/keeper/player_cache.go"
+        },
+        "load": {
+          "type": "integer",
+          "structs:unit": "milliwatts",
+          "description": "Current power consumption (active operations)",
+          "structs:verified": true,
+          "structs:codeReference": "x/structs/keeper/player_cache.go"
+        },
+        "structsLoad": {
+          "type": "integer",
+          "structs:unit": "milliwatts",
+          "description": "Total power consumption from all active structs (passive draw)",
+          "structs:verified": true,
+          "structs:codeReference": "x/structs/keeper/player_cache.go",
+          "structs:formula": "Sum of all struct PassiveDraw values"
+        },
+        "availableCapacity": {
+          "type": "integer",
+          "structs:unit": "milliwatts",
+          "description": "Available power capacity",
+          "structs:verified": true,
+          "structs:codeReference": "x/structs/keeper/player_cache.go (GetAvailableCapacity)",
+          "structs:formula": "(Capacity + CapacitySecondary) - (Load + StructsLoad)"
+        },
+        "allocatableCapacity": {
+          "type": "integer",
+          "structs:unit": "milliwatts",
+          "description": "Allocatable capacity (primary capacity only)",
+          "structs:verified": true,
+          "structs:codeReference": "x/structs/keeper/player_cache.go (GetAllocatableCapacity)",
+          "structs:formula": "Capacity - Load"
+        },
+        "playerOnline": {
+          "type": "boolean",
+          "description": "Player online status",
+          "structs:verified": true,
+          "structs:codeReference": "x/structs/keeper/player_cache.go (IsOnline)",
+          "structs:formula": "(Load + StructsLoad) <= (Capacity + CapacitySecondary)"
+        },
+        "lastActionBlock": {
+          "type": "integer",
+          "description": "Block height of last action",
+          "structs:verified": true,
+          "structs:codeReference": "x/structs/keeper/player.go (GetPlayerCharge)"
+        },
+        "charge": {
+          "type": "integer",
+          "description": "Current charge (blocks since last action)",
+          "structs:verified": true,
+          "structs:codeReference": "x/structs/keeper/player.go (GetPlayerCharge)",
+          "structs:formula": "CurrentBlockHeight - LastActionBlock"
+        },
+        "storedOre": {
+          "type": "integer",
+          "structs:unit": "ore",
+          "description": "Raw ore stored by player (can be stolen in raids)",
+          "structs:verified": true,
+          "structs:codeReference": "x/structs/keeper/player_cache.go",
+          "structs:note": "Separate from refined Alpha Matter"
+        },
+        "halted": {
+          "type": "boolean",
+          "description": "Whether player is halted (disabled)",
+          "structs:verified": true,
+          "structs:codeReference": "x/structs/keeper/player_cache.go"
+        },
+        "nonce": {
+          "type": "integer",
+          "description": "Nonce for randomness generation (increments with each use)",
+          "structs:verified": true,
+          "structs:codeReference": "x/structs/keeper/player_cache.go"
+        }
+      },
+      "required": ["id"]
+    },
+    "Planet": {
+      "type": "object",
+      "structs:entity": "Planet",
+      "structs:verified": true,
+      "structs:codeReference": "x/structs/types/planet.pb.go, x/structs/keeper/planet_cache.go",
+      "description": "Complete Planet entity with verified field definitions",
+      "properties": {
+        "id": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^2-[0-9]+$",
+          "description": "Unique planet identifier in format 'type-index' (e.g., '2-1' for planet type 2, index 1). Type 2 = Planet.",
+          "structs:verified": true
+        },
+        "ownerId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "structs:relationship": "Player",
+          "description": "Player who owns this planet. Format: 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player.",
+          "structs:verified": true
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "complete"],
+          "description": "Planet status (active = has ore, complete = depleted)",
+          "structs:verified": true,
+          "structs:codeReference": "x/structs/keeper/planet_cache.go (AttemptComplete)"
+        },
+        "remainingOre": {
+          "type": "integer",
+          "structs:unit": "ore",
+          "description": "Remaining ore on planet",
+          "structs:verified": true,
+          "structs:codeReference": "x/structs/keeper/planet_cache.go"
+        },
+        "startingOre": {
+          "type": "integer",
+          "structs:unit": "ore",
+          "description": "Initial ore amount (all planets start with 5)",
+          "structs:verified": true,
+          "structs:codeReference": "x/structs/types/keys.go (PlanetStartingOre = 5)",
+          "default": 5
+        },
+        "spaceSlots": {
+          "type": "integer",
+          "description": "Number of space slots available",
+          "default": 4,
+          "structs:verified": true
+        },
+        "airSlots": {
+          "type": "integer",
+          "description": "Number of air slots available",
+          "default": 4,
+          "structs:verified": true
+        },
+        "landSlots": {
+          "type": "integer",
+          "description": "Number of land slots available",
+          "default": 4,
+          "structs:verified": true
+        },
+        "waterSlots": {
+          "type": "integer",
+          "description": "Number of water slots available",
+          "default": 4,
+          "structs:verified": true
+        },
+        "planetaryShieldBase": {
+          "type": "integer",
+          "description": "Base planetary shield damage",
+          "structs:verified": true,
+          "structs:codeReference": "x/structs/keeper/planet.go"
+        }
+      },
+      "required": ["id"]
+    },
+    "Struct": {
+      "type": "object",
+      "structs:entity": "Struct",
+      "structs:verified": true,
+      "structs:codeReference": "x/structs/types/struct.pb.go, x/structs/keeper/struct_cache.go",
+      "description": "Complete Struct entity with verified field definitions",
+      "properties": {
+        "id": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^5-[0-9]+$",
+          "description": "Unique struct identifier in format 'type-index' (e.g., '5-42' for struct type 5, index 42). Type 5 = Struct.",
+          "structs:verified": true
+        },
+        "typeId": {
+          "type": "string",
+          "structs:format": "struct-type-id",
+          "structs:relationship": "StructType",
+          "description": "Type of struct",
+          "structs:verified": true
+        },
+        "ownerId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "structs:relationship": "Player",
+          "description": "Player who owns this struct. Format: 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player.",
+          "structs:verified": true
+        },
+        "locationType": {
+          "type": "integer",
+          "description": "Type of location (9 = fleet, 1 = planet, etc.)",
+          "structs:verified": true
+        },
+        "locationId": {
+          "type": "string",
+          "description": "ID of location where struct is located",
+          "structs:verified": true
+        },
+        "operatingAmbit": {
+          "type": "integer",
+          "description": "Operating range/ambit (space/air/land/water)",
+          "structs:verified": true
+        },
+        "status": {
+          "type": "string",
+          "enum": ["building", "built", "online", "offline", "hidden"],
+          "description": "Struct status",
+          "structs:verified": true,
+          "structs:codeReference": "x/structs/keeper/struct_cache.go"
+        },
+        "buildDraw": {
+          "type": "integer",
+          "structs:unit": "milliwatts",
+          "description": "Power draw during building",
+          "structs:verified": true,
+          "structs:codeReference": "genesis_struct_type.go (BuildDraw)"
+        },
+        "passiveDraw": {
+          "type": "integer",
+          "structs:unit": "milliwatts",
+          "description": "Power draw when active (online)",
+          "structs:verified": true,
+          "structs:codeReference": "genesis_struct_type.go (PassiveDraw)"
+        },
+        "buildDifficulty": {
+          "type": "integer",
+          "description": "Proof-of-work difficulty for building",
+          "structs:verified": true,
+          "structs:codeReference": "genesis_struct_type.go (BuildDifficulty)"
+        },
+        "activateCharge": {
+          "type": "integer",
+          "description": "Charge cost to activate struct",
+          "structs:verified": true,
+          "structs:codeReference": "genesis_struct_type.go (ActivateCharge)"
+        },
+        "buildCharge": {
+          "type": "integer",
+          "description": "Charge cost to build struct",
+          "structs:verified": true,
+          "structs:codeReference": "genesis_struct_type.go (BuildCharge)"
+        },
+        "oreMiningCharge": {
+          "type": "integer",
+          "description": "Charge cost for ore mining",
+          "structs:verified": true,
+          "structs:codeReference": "genesis_struct_type.go (OreMiningCharge)"
+        },
+        "oreRefiningCharge": {
+          "type": "integer",
+          "description": "Charge cost for ore refining",
+          "structs:verified": true,
+          "structs:codeReference": "genesis_struct_type.go (OreRefiningCharge)"
+        },
+        "oreMiningDifficulty": {
+          "type": "integer",
+          "description": "Proof-of-work difficulty for ore mining",
+          "structs:verified": true,
+          "structs:codeReference": "genesis_struct_type.go (OreMiningDifficulty: 14000)",
+          "default": 14000
+        },
+        "oreRefiningDifficulty": {
+          "type": "integer",
+          "description": "Proof-of-work difficulty for ore refining",
+          "structs:verified": true,
+          "structs:codeReference": "genesis_struct_type.go (OreRefiningDifficulty: 28000)",
+          "default": 28000
+        },
+        "stealthActivateCharge": {
+          "type": "integer",
+          "description": "Charge cost to activate stealth",
+          "structs:verified": true,
+          "structs:codeReference": "genesis_struct_type.go (StealthActivateCharge)"
+        },
+        "hasStealthSystem": {
+          "type": "boolean",
+          "description": "Whether struct has stealth system",
+          "structs:verified": true,
+          "structs:codeReference": "x/structs/types/struct_type.go (HasStealthSystem)"
+        },
+        "isHidden": {
+          "type": "boolean",
+          "description": "Whether struct is currently hidden (stealth active)",
+          "structs:verified": true,
+          "structs:codeReference": "x/structs/keeper/struct_cache.go (IsHidden)"
+        }
+      },
+      "required": ["id", "typeId", "ownerId"]
+    },
+    "Fleet": {
+      "type": "object",
+      "structs:entity": "Fleet",
+      "structs:verified": true,
+      "structs:codeReference": "x/structs/types/fleet.pb.go, x/structs/keeper/fleet_cache.go",
+      "description": "Complete Fleet entity with verified field definitions",
+      "properties": {
+        "id": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^9-[0-9]+$",
+          "description": "Unique fleet identifier in format 'type-index' (e.g., '9-11' for fleet type 9, index 11). Type 9 = Fleet.",
+          "structs:verified": true
+        },
+        "ownerId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "structs:relationship": "Player",
+          "description": "Player who owns this fleet. Format: 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player.",
+          "structs:verified": true
+        },
+        "slots": {
+          "type": "array",
+          "description": "Structs in this fleet",
+          "items": {
+            "type": "string",
+            "structs:format": "entity-id",
+            "pattern": "^5-[0-9]+$",
+            "description": "Struct identifier in format 'type-index' (e.g., '5-42' for struct type 5, index 42). Type 5 = Struct.",
+            "structs:relationship": "Struct"
+          },
+          "structs:verified": true
+        },
+        "status": {
+          "type": "string",
+          "enum": ["station", "away"],
+          "description": "Fleet status (station = on planet, away = raiding)",
+          "structs:verified": true,
+          "structs:codeReference": "x/structs/keeper/fleet_cache.go"
+        },
+        "canMove": {
+          "type": "boolean",
+          "description": "Whether fleet can move (readiness check)",
+          "structs:verified": true,
+          "structs:codeReference": "x/structs/keeper/fleet_cache.go (PlanetMoveReadinessCheck)",
+          "structs:requirements": [
+            "Owner is online (not offline)",
+            "Fleet has command struct",
+            "Command struct is online"
+          ]
+        }
+      },
+      "required": ["id", "ownerId"]
+    }
+  },
+  "structs:verification": {
+    "verified": true,
+    "verifiedBy": "GameCodeAnalyst",
+    "verifiedDate": "2025-01-XX",
+    "verificationMethod": "code-analysis",
+    "confidence": "high",
+    "note": "Field definitions verified against codebase. Some entities need additional field verification."
+  }
+}
+

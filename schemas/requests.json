@@ -1,0 +1,495 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "API Request Schemas",
+  "description": "Complete catalog of all API request body formats for AI agents. See schemas/formats.json for format specifications.",
+  "type": "object",
+  "structs:category": "api",
+  "definitions": {
+    "AuthSignupRequest": {
+      "type": "object",
+      "description": "Sign up request - Register a new player account",
+      "structs:endpoint": "/api/auth/signup",
+      "structs:method": "POST",
+      "properties": {
+        "address": {
+          "type": "string",
+          "format": "blockchain-address",
+          "description": "Blockchain address (e.g., cosmos1...)"
+        },
+        "signature": {
+          "type": "string",
+          "description": "Signature for authentication"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message to sign"
+        }
+      },
+      "required": ["address", "signature", "message"]
+    },
+    "AuthLoginRequest": {
+      "type": "object",
+      "description": "Login request - Authenticate and log in a player",
+      "structs:endpoint": "/api/auth/login",
+      "structs:method": "POST",
+      "properties": {
+        "address": {
+          "type": "string",
+          "format": "blockchain-address",
+          "description": "Blockchain address"
+        },
+        "signature": {
+          "type": "string",
+          "description": "Signature for authentication"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message to sign"
+        }
+      },
+      "required": ["address", "signature", "message"]
+    },
+    "PlayerUsernameUpdateRequest": {
+      "type": "object",
+      "description": "Update player username",
+      "structs:endpoint": "/api/player/username",
+      "structs:method": "PUT",
+      "properties": {
+        "username": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 20,
+          "pattern": "^[a-zA-Z0-9_]+$",
+          "description": "New username"
+        }
+      },
+      "required": ["username"]
+    },
+    "PlayerAddressAddPendingRequest": {
+      "type": "object",
+      "description": "Add player pending address",
+      "structs:endpoint": "/api/auth/player-address",
+      "structs:method": "POST",
+      "properties": {
+        "address": {
+          "type": "string",
+          "format": "blockchain-address",
+          "description": "Blockchain address to add"
+        },
+        "player_id": {
+          "type": "string",
+          "format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "description": "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        }
+      },
+      "required": ["address", "player_id"]
+    },
+    "PlayerAddressMetaRequest": {
+      "type": "object",
+      "description": "Add player address metadata",
+      "structs:endpoint": "/api/player-address/meta",
+      "structs:method": "POST",
+      "properties": {
+        "address": {
+          "type": "string",
+          "format": "blockchain-address",
+          "description": "Blockchain address"
+        },
+        "meta": {
+          "type": "object",
+          "description": "Metadata object",
+          "additionalProperties": true
+        }
+      },
+      "required": ["address", "meta"]
+    },
+    "PlayerAddressActivationCodeRequest": {
+      "type": "object",
+      "description": "Create player address activation code",
+      "structs:endpoint": "/api/player-address/activation-code",
+      "structs:method": "POST",
+      "properties": {
+        "address": {
+          "type": "string",
+          "format": "blockchain-address",
+          "description": "Blockchain address"
+        },
+        "player_id": {
+          "type": "string",
+          "format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "description": "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        }
+      },
+      "required": ["address", "player_id"]
+    },
+    "PlayerAddressPendingPermissionsRequest": {
+      "type": "object",
+      "description": "Set pending address permissions",
+      "structs:endpoint": "/api/player-address/pending/permissions",
+      "structs:method": "PUT",
+      "properties": {
+        "address": {
+          "type": "string",
+          "format": "blockchain-address",
+          "description": "Blockchain address"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of permissions"
+        }
+      },
+      "required": ["address", "permissions"]
+    },
+    "PlayerAddressPermissionsRequest": {
+      "type": "object",
+      "description": "Set address permissions",
+      "structs:endpoint": "/api/player-address/permissions",
+      "structs:method": "PUT",
+      "properties": {
+        "address": {
+          "type": "string",
+          "format": "blockchain-address",
+          "description": "Blockchain address"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of permissions"
+        }
+      },
+      "required": ["address", "permissions"]
+    },
+    "TransactionRequest": {
+      "type": "object",
+      "description": "Cosmos SDK transaction request",
+      "structs:endpoint": "/cosmos/tx/v1beta1/txs",
+      "structs:method": "POST",
+      "structs:reference": "See schemas/actions.json for complete message type definitions",
+      "properties": {
+        "body": {
+          "type": "object",
+          "description": "Transaction body",
+          "properties": {
+            "messages": {
+              "type": "array",
+              "description": "Array of transaction messages. See schemas/actions.json for complete message schemas.",
+              "items": {
+                "oneOf": [
+                  {
+                    "$ref": "#/definitions/TransactionMessage"
+                  }
+                ]
+              },
+              "minItems": 1
+            },
+            "memo": {
+              "type": "string",
+              "description": "Transaction memo (optional)"
+            },
+            "timeout_height": {
+              "type": "string",
+              "description": "Timeout height (optional)"
+            }
+          },
+          "required": ["messages"]
+        },
+        "auth_info": {
+          "type": "object",
+          "description": "Authentication information",
+          "properties": {
+            "signer_infos": {
+              "type": "array",
+              "description": "Signer information",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "public_key": {
+                    "type": "object",
+                    "description": "Public key information"
+                  },
+                  "mode_info": {
+                    "type": "object",
+                    "description": "Signing mode information"
+                  },
+                  "sequence": {
+                    "type": "string",
+                    "description": "Account sequence number"
+                  }
+                }
+              }
+            },
+            "fee": {
+              "type": "object",
+              "description": "Transaction fee",
+              "properties": {
+                "amount": {
+                  "type": "array",
+                  "description": "Fee amount",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "denom": {
+                        "type": "string",
+                        "description": "Denomination (e.g., 'ustructs')"
+                      },
+                      "amount": {
+                        "type": "string",
+                        "description": "Amount as string"
+                      }
+                    }
+                  }
+                },
+                "gas_limit": {
+                  "type": "string",
+                  "description": "Gas limit"
+                },
+                "payer": {
+                  "type": "string",
+                  "format": "blockchain-address",
+                  "description": "Fee payer address (optional)"
+                },
+                "granter": {
+                  "type": "string",
+                  "format": "blockchain-address",
+                  "description": "Fee granter address (optional)"
+                }
+              }
+            }
+          },
+          "required": ["signer_infos", "fee"]
+        },
+        "signatures": {
+          "type": "array",
+          "description": "Transaction signatures",
+          "items": {
+            "type": "string",
+            "description": "Transaction signature (base64 encoded)"
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["body", "auth_info", "signatures"]
+    },
+    "TransactionMessage": {
+      "type": "object",
+      "description": "Base transaction message structure. All messages must include @type. See schemas/actions.json for specific message schemas.",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "Message type URL (e.g., /structs.structs.MsgStructBuild). See schemas/actions.json for all available message types.",
+          "enum": [
+            "/structs.structs.MsgStructBuild",
+            "/structs.structs.MsgStructBuildInitiate",
+            "/structs.structs.MsgStructBuildComplete",
+            "/structs.structs.MsgStructActivate",
+            "/structs.structs.MsgStructDeactivate",
+            "/structs.structs.MsgStructStealthActivate",
+            "/structs.structs.MsgStructStealthDeactivate",
+            "/structs.structs.MsgStructAttack",
+            "/structs.structs.MsgStructDefenseSet",
+            "/structs.structs.MsgStructDefenseClear",
+            "/structs.structs.MsgStructMove",
+            "/structs.structs.MsgStructOreMinerComplete",
+            "/structs.structs.MsgStructOreRefineryComplete",
+            "/structs.structs.MsgPlanetExplore",
+            "/structs.structs.MsgPlanetRaidComplete",
+            "/structs.structs.MsgFleetMove",
+            "/structs.structs.MsgReactorInfuse",
+            "/structs.structs.MsgReactorDefuse",
+            "/structs.structs.MsgSubstationCreate",
+            "/structs.structs.MsgSubstationPlayerConnect",
+            "/structs.structs.MsgProviderCreate",
+            "/structs.structs.MsgGuildCreate",
+            "/structs.structs.MsgGuildMembershipJoin",
+            "/structs.structs.MsgGuildBankMint",
+            "/structs.structs.MsgGuildBankRedeem"
+          ],
+          "structs:note": "See schemas/actions.json for complete list of all message types and their schemas. This enum includes all 25 active (non-deprecated) message types. For deprecated message types and their replacements, see reference/action-index.json. Deprecated types removed from enum: MsgReactorAllocate, MsgSubstationConnect, MsgAgreementCreate, MsgOreMining, MsgOreRefining, MsgGeneratorAllocate, MsgGuildMembershipLeave."
+        },
+        "creator": {
+          "type": "string",
+          "format": "blockchain-address",
+          "description": "Transaction creator address (required for most messages)"
+        }
+      },
+      "required": ["@type"],
+      "additionalProperties": true,
+      "structs:note": "Each message type has specific required fields. See schemas/actions.json for complete message schemas with all required and optional fields."
+    },
+    "QueryParameters": {
+      "type": "object",
+      "description": "Common query parameters for list endpoints",
+      "properties": {
+        "pagination.key": {
+          "type": "string",
+          "description": "Pagination key for next page"
+        },
+        "pagination.limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 50,
+          "description": "Number of items per page"
+        },
+        "pagination.offset": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of items to skip"
+        }
+      }
+    },
+    "PlayerRaidSearchQuery": {
+      "type": "object",
+      "description": "Query parameters for player raid search",
+      "structs:endpoint": "/api/player/raid/search",
+      "structs:method": "GET",
+      "properties": {
+        "player_id": {
+          "type": "string",
+          "format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "description": "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "completed", "failed"],
+          "description": "Raid status filter"
+        }
+      }
+    },
+    "PlayerTransferSearchQuery": {
+      "type": "object",
+      "description": "Query parameters for player transfer search",
+      "structs:endpoint": "/api/player/transfer/search",
+      "structs:method": "GET",
+      "properties": {
+        "player_id": {
+          "type": "string",
+          "format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "description": "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        },
+        "from": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Start date for search"
+        },
+        "to": {
+          "type": "string",
+          "format": "date-time",
+          "description": "End date for search"
+        }
+      }
+    },
+    "GuildNameFilterQuery": {
+      "type": "object",
+      "description": "Query parameters for guild name filter",
+      "structs:endpoint": "/api/guild/name",
+      "structs:method": "GET",
+      "properties": {
+        "filter": {
+          "type": "string",
+          "description": "Name filter string"
+        }
+      }
+    },
+    "GuildDirectoryQuery": {
+      "type": "object",
+      "description": "Query parameters for guild directory",
+      "structs:endpoint": "/api/guild/directory",
+      "structs:method": "GET",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1,
+          "description": "Page number"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20,
+          "description": "Items per page"
+        }
+      }
+    },
+    "CosmeticModInstallRequest": {
+      "type": "object",
+      "description": "Install cosmetic mod request",
+      "structs:endpoint": "/api/cosmetic-mods/install",
+      "structs:method": "POST",
+      "properties": {
+        "file": {
+          "type": "string",
+          "description": "Path to mod file (ZIP) or directory, or file upload in multipart/form-data"
+        },
+        "validate": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to validate mod before installation"
+        },
+        "activate": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to activate mod after installation"
+        }
+      },
+      "required": ["file"]
+    },
+    "CosmeticModValidateRequest": {
+      "type": "object",
+      "description": "Validate cosmetic mod request",
+      "structs:endpoint": "/api/cosmetic-mods/validate",
+      "structs:method": "POST",
+      "properties": {
+        "file": {
+          "type": "string",
+          "description": "Path to mod file (ZIP) or directory, or file upload in multipart/form-data"
+        }
+      },
+      "required": ["file"]
+    }
+  },
+  "structs:requestTypes": {
+    "authentication": [
+      "AuthSignupRequest",
+      "AuthLoginRequest"
+    ],
+    "player": [
+      "PlayerUsernameUpdateRequest",
+      "PlayerRaidSearchQuery",
+      "PlayerTransferSearchQuery"
+    ],
+    "playerAddress": [
+      "PlayerAddressAddPendingRequest",
+      "PlayerAddressMetaRequest",
+      "PlayerAddressActivationCodeRequest",
+      "PlayerAddressPendingPermissionsRequest",
+      "PlayerAddressPermissionsRequest"
+    ],
+    "transaction": [
+      "TransactionRequest"
+    ],
+    "query": [
+      "QueryParameters",
+      "PlayerRaidSearchQuery",
+      "PlayerTransferSearchQuery",
+      "GuildNameFilterQuery",
+      "GuildDirectoryQuery"
+    ],
+    "cosmeticMod": [
+      "CosmeticModInstallRequest",
+      "CosmeticModValidateRequest"
+    ]
+  }
+}
+

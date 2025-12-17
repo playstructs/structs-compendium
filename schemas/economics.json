@@ -1,0 +1,511 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Structs Economic Entity Definitions",
+  "description": "Complete catalog of economic entities and resources for AI agents. See schemas/formats.json for format specifications.",
+  "type": "object",
+  "structs:category": "economic",
+  "entities": {
+    "AlphaOre": {
+      "id": "alpha-ore",
+      "name": "Alpha Ore",
+      "category": "economic",
+      "description": "Raw material mined from planets. Can be stolen by other players. Must be refined to Alpha Matter before use.",
+      "security": {
+        "stealable": true,
+        "refinementRequired": true,
+        "refinedTo": "AlphaMatter"
+      },
+      "unit": "grams",
+      "blockchainUnit": "micrograms (μAlpha)",
+      "conversion": {
+        "toAlphaMatter": {
+          "rate": 1,
+          "description": "1 gram Alpha Ore = 1 gram Alpha Matter (after refinement)"
+        }
+      },
+      "properties": {
+        "amount": {
+          "type": "number",
+          "description": "Amount in grams",
+          "minimum": 0
+        },
+        "location": {
+          "type": "string",
+          "description": "Where the ore is located (planet ID, player inventory, etc.)",
+          "structs:format": "entity-id"
+        },
+        "stealable": {
+          "type": "boolean",
+          "description": "Whether this ore can be stolen",
+          "default": true
+        }
+      }
+    },
+    "AlphaMatter": {
+      "id": "alpha-matter",
+      "name": "Alpha Matter",
+      "category": "economic",
+      "description": "Refined Alpha Ore. Cannot be stolen. Used for energy production, trading, and guild token collateral.",
+      "security": {
+        "stealable": false,
+        "refinementRequired": false,
+        "refinedFrom": "AlphaOre"
+      },
+      "unit": "grams",
+      "blockchainUnit": "micrograms (μAlpha)",
+      "standard": {
+        "definition": "1 Alpha = 1 gram of Alpha Matter",
+        "microgramConversion": 1000000,
+        "description": "Blockchain uses micrograms for precision: 1 gram = 1,000,000 micrograms"
+      },
+      "uses": [
+        "energy-production",
+        "trading",
+        "guild-token-collateral",
+        "marketplace"
+      ],
+      "properties": {
+        "amount": {
+          "type": "number",
+          "description": "Amount in grams",
+          "minimum": 0
+        },
+        "owner": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "description": "Owner player ID in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        },
+        "locked": {
+          "type": "boolean",
+          "description": "Whether this Alpha Matter is locked (e.g., as collateral)",
+          "default": false
+        },
+        "lockedFor": {
+          "type": "string",
+          "description": "What this Alpha Matter is locked for (e.g., guild token collateral)",
+          "enum": ["guild-token", "agreement", "other"]
+        }
+      },
+      "conversion": {
+        "toEnergy": {
+          "reactor": {
+            "rate": 1,
+            "unit": "kW per gram",
+            "description": "1 gram Alpha Matter = 1 kW energy (Reactor)"
+          },
+          "fieldGenerator": {
+            "rate": 2,
+            "unit": "kW per gram",
+            "description": "1 gram Alpha Matter = 2 kW energy (Field Generator)"
+          },
+          "continentalPowerPlant": {
+            "rate": 5,
+            "unit": "kW per gram",
+            "description": "1 gram Alpha Matter = 5 kW energy (Continental Power Plant)"
+          },
+          "worldEngine": {
+            "rate": 10,
+            "unit": "kW per gram",
+            "description": "1 gram Alpha Matter = 10 kW energy (World Engine)"
+          }
+        }
+      }
+    },
+    "Energy": {
+      "id": "energy",
+      "name": "Energy",
+      "category": "economic",
+      "description": "Energy measured in Watts (kilowatts). Ephemeral - must be consumed immediately upon production. Shared across connected Structs.",
+      "unit": "kilowatts (kW)",
+      "ephemeral": true,
+      "shared": true,
+      "properties": {
+        "amount": {
+          "type": "number",
+          "description": "Amount in kilowatts (kW)",
+          "minimum": 0
+        },
+        "source": {
+          "type": "string",
+          "description": "Source of energy (reactor ID, generator ID, agreement ID)",
+          "structs:format": "entity-id"
+        },
+        "consumed": {
+          "type": "boolean",
+          "description": "Whether this energy has been consumed",
+          "default": false
+        },
+        "sharedWith": {
+          "type": "array",
+          "description": "List of Struct IDs that share this energy",
+          "items": {
+            "type": "string",
+            "structs:format": "entity-id",
+          "pattern": "^5-[0-9]+$",
+          "description": "Struct identifier in format 'type-index' (e.g., '5-42' for struct type 5, index 42). Type 5 = Struct."
+          }
+        }
+      },
+      "production": {
+        "fromAlphaMatter": {
+          "reactor": {
+            "formula": "Energy (kW) = Alpha Matter (grams) × 1",
+            "rate": 1,
+            "risk": "low"
+          },
+          "fieldGenerator": {
+            "formula": "Energy (kW) = Alpha Matter (grams) × 2",
+            "rate": 2,
+            "risk": "high"
+          },
+          "continentalPowerPlant": {
+            "formula": "Energy (kW) = Alpha Matter (grams) × 5",
+            "rate": 5,
+            "risk": "high"
+          },
+          "worldEngine": {
+            "formula": "Energy (kW) = Alpha Matter (grams) × 10",
+            "rate": 10,
+            "risk": "high"
+          }
+        }
+      }
+    },
+    "Reactor": {
+      "id": "reactor",
+      "name": "Reactor",
+      "category": "economic",
+      "description": "Standard energy production facility. Converts Alpha Matter to energy at 1 kW per gram. Lower risk, designed for network stability.",
+      "endpoint": "/structs/reactor/{id}",
+      "listEndpoint": "/structs/reactor",
+      "productionRate": {
+        "input": "Alpha Matter (grams)",
+        "output": "Energy (kW)",
+        "rate": 1,
+        "formula": "Energy (kW) = Alpha Matter (grams) × 1"
+      },
+      "risk": "low",
+      "designIntent": "network-stability",
+      "properties": {
+        "id": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^3-[0-9]+$",
+          "description": "Reactor identifier in format 'type-index' (e.g., '3-1' for reactor type 3, index 1). Type 3 = Reactor."
+        },
+        "owner": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "description": "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        },
+        "location": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^2-[0-9]+$",
+          "description": "Planet identifier in format 'type-index' (e.g., '2-1' for planet type 2, index 1). Type 2 = Planet."
+        },
+        "active": {
+          "type": "boolean",
+          "description": "Whether the reactor is active"
+        },
+        "alphaMatterInput": {
+          "type": "number",
+          "description": "Alpha Matter input in grams",
+          "minimum": 0
+        },
+        "energyOutput": {
+          "type": "number",
+          "description": "Energy output in kW",
+          "minimum": 0
+        }
+      },
+      "relationships": {
+        "ownedBy": ["Player"],
+        "locatedOn": ["Planet"],
+        "produces": ["Energy"]
+      }
+    },
+    "Generator": {
+      "id": "generator",
+      "name": "Generator",
+      "category": "economic",
+      "description": "High-yield energy production facility. Multiple types with different rates. Higher risk, designed for higher returns and inflation control.",
+      "types": {
+        "fieldGenerator": {
+          "id": "field-generator",
+          "name": "Field Generator",
+          "productionRate": {
+            "input": "Alpha Matter (grams)",
+            "output": "Energy (kW)",
+            "rate": 2,
+            "formula": "Energy (kW) = Alpha Matter (grams) × 2"
+          },
+          "risk": "high",
+          "efficiency": "200% of Reactor"
+        },
+        "continentalPowerPlant": {
+          "id": "continental-power-plant",
+          "name": "Continental Power Plant",
+          "productionRate": {
+            "input": "Alpha Matter (grams)",
+            "output": "Energy (kW)",
+            "rate": 5,
+            "formula": "Energy (kW) = Alpha Matter (grams) × 5"
+          },
+          "risk": "high",
+          "efficiency": "500% of Reactor"
+        },
+        "worldEngine": {
+          "id": "world-engine",
+          "name": "World Engine",
+          "productionRate": {
+            "input": "Alpha Matter (grams)",
+            "output": "Energy (kW)",
+            "rate": 10,
+            "formula": "Energy (kW) = Alpha Matter (grams) × 10"
+          },
+          "risk": "high",
+          "efficiency": "1000% of Reactor"
+        }
+      },
+      "designIntent": "higher-returns-inflation-control",
+      "risk": "high",
+      "properties": {
+        "id": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^[0-9]+-[0-9]+$",
+          "description": "Generator identifier in format 'type-index'. Generator types may use different object type codes."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["fieldGenerator", "continentalPowerPlant", "worldEngine"],
+          "description": "Generator type"
+        },
+        "owner": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "description": "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        },
+        "location": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^2-[0-9]+$",
+          "description": "Planet identifier in format 'type-index' (e.g., '2-1' for planet type 2, index 1). Type 2 = Planet."
+        },
+        "active": {
+          "type": "boolean",
+          "description": "Whether the generator is active"
+        },
+        "alphaMatterInput": {
+          "type": "number",
+          "description": "Alpha Matter input in grams",
+          "minimum": 0
+        },
+        "energyOutput": {
+          "type": "number",
+          "description": "Energy output in kW",
+          "minimum": 0
+        }
+      },
+      "relationships": {
+        "ownedBy": ["Player"],
+        "locatedOn": ["Planet"],
+        "produces": ["Energy"]
+      },
+      "note": "Verified from code (January 2025). Previous documentation said '2 kW/g' for all generators, but code has 3 generator types with rates 2, 5, and 10."
+    },
+    "GuildCentralBank": {
+      "id": "guild-central-bank",
+      "name": "Guild Central Bank",
+      "category": "economic",
+      "description": "Economic institution for minting guild tokens collateralized by Alpha Matter. Trust-based system with no technical safeguards.",
+      "endpoint": "/structs/guild/{id}/bank",
+      "security": {
+        "trustBased": true,
+        "technicalSafeguards": false,
+        "minimumCollateral": false,
+        "maxSupply": false,
+        "guildControl": "full"
+      },
+      "properties": {
+        "guildId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^0-[0-9]+$",
+          "description": "Guild identifier in format 'type-index' (e.g., '0-1' for guild type 0, index 1). Type 0 = Guild."
+        },
+        "collateral": {
+          "type": "number",
+          "description": "Locked Alpha Matter as collateral (grams)",
+          "minimum": 0
+        },
+        "tokensIssued": {
+          "type": "number",
+          "description": "Total tokens issued",
+          "minimum": 0
+        },
+        "tokensInCirculation": {
+          "type": "number",
+          "description": "Tokens currently in circulation",
+          "minimum": 0
+        },
+        "collateralRatio": {
+          "type": "number",
+          "description": "Collateral ratio (Locked Alpha Matter / Total Tokens Issued)",
+          "minimum": 0
+        }
+      },
+      "operations": {
+        "mint": {
+          "description": "Mint new guild tokens",
+          "requires": ["collateral"]
+        },
+        "revoke": {
+          "description": "Revoke and burn tokens (enemy-held tokens can be revoked)",
+          "result": "tokens-burned"
+        }
+      },
+      "warning": "Guild tokens are trust-based. Guilds have full control. No technical safeguards against inflation or revocation. Reliance on reputation."
+    },
+    "EnergyAgreement": {
+      "id": "energy-agreement",
+      "name": "Automated Energy Agreement",
+      "category": "economic",
+      "description": "Self-enforcing, persistent energy subscription with automatic, on-chain penalty protections.",
+      "endpoint": "/structs/agreement/{id}",
+      "enforcement": {
+        "type": "automatic",
+        "onChain": true,
+        "penaltyProtection": true,
+        "selfEnforcing": true
+      },
+      "properties": {
+        "id": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^11-[0-9]+$",
+          "description": "Agreement identifier in format 'type-index' (e.g., '11-1' for agreement type 11, index 1). Type 11 = Agreement."
+        },
+        "provider": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^10-[0-9]+$",
+          "description": "Provider identifier in format 'type-index' (e.g., '10-1' for provider type 10, index 1). Type 10 = Provider."
+        },
+        "consumer": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "description": "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        },
+        "energyAmount": {
+          "type": "number",
+          "description": "Energy amount in kW",
+          "minimum": 0
+        },
+        "price": {
+          "type": "number",
+          "description": "Price per unit",
+          "minimum": 0
+        },
+        "duration": {
+          "type": "number",
+          "description": "Agreement duration",
+          "minimum": 0
+        },
+        "active": {
+          "type": "boolean",
+          "description": "Whether the agreement is active"
+        },
+        "penaltyProtection": {
+          "type": "boolean",
+          "description": "Whether penalty protection is enabled",
+          "default": true
+        }
+      },
+      "relationships": {
+        "providedBy": ["Provider"],
+        "consumedBy": ["Player"]
+      }
+    }
+  },
+  "formulas": {
+    "alphaMatterToEnergy": {
+      "reactor": {
+        "formula": "Energy (kW) = Alpha Matter (grams) × 1",
+        "rate": 1,
+        "risk": "low",
+        "implementationNote": "Current implementation is deterministic - conversion is guaranteed at specified rate"
+      },
+      "fieldGenerator": {
+        "formula": "Energy (kW) = Alpha Matter (grams) × 2",
+        "rate": 2,
+        "risk": "high",
+        "implementationNote": "Design intent mentions risk, but current code implementation is deterministic (verified January 2025). Risk may refer to strategic uncertainty or future implementation."
+      },
+      "continentalPowerPlant": {
+        "formula": "Energy (kW) = Alpha Matter (grams) × 5",
+        "rate": 5,
+        "risk": "high",
+        "implementationNote": "Design intent mentions risk, but current code implementation is deterministic (verified January 2025). Risk may refer to strategic uncertainty or future implementation."
+      },
+      "worldEngine": {
+        "formula": "Energy (kW) = Alpha Matter (grams) × 10",
+        "rate": 10,
+        "risk": "high",
+        "implementationNote": "Design intent mentions risk, but current code implementation is deterministic (verified January 2025). Risk may refer to strategic uncertainty or future implementation."
+      },
+      "codeVerification": {
+        "verifiedDate": "2025-01",
+        "verifiedBy": "GameCodeAnalyst",
+        "finding": "Generator conversion is deterministic. Alpha Matter is burned and converted to energy at the specified rate. No risk calculation or probability of loss is implemented in current code.",
+        "codeReference": "x/structs/keeper/msg_server_struct_generator_infuse.go"
+      }
+    },
+    "energyProductionCost": {
+      "reactor": {
+        "formula": "Cost per kW = Alpha Matter Cost / 1",
+        "description": "Cost per kilowatt for Reactor"
+      },
+      "fieldGenerator": {
+        "formula": "Cost per kW = Alpha Matter Cost / 2",
+        "description": "Cost per kilowatt for Field Generator"
+      },
+      "continentalPowerPlant": {
+        "formula": "Cost per kW = Alpha Matter Cost / 5",
+        "description": "Cost per kilowatt for Continental Power Plant"
+      },
+      "worldEngine": {
+        "formula": "Cost per kW = Alpha Matter Cost / 10",
+        "description": "Cost per kilowatt for World Engine"
+      }
+    },
+    "productionEfficiency": {
+      "formula": "Efficiency = (Energy Output / Alpha Matter Input) × 100%",
+      "description": "Energy production efficiency calculation"
+    },
+    "guildTokenCollateralRatio": {
+      "formula": "Collateral Ratio = (Locked Alpha Matter / Total Tokens Issued) × 100%",
+      "description": "Guild token collateral ratio calculation"
+    },
+    "tradingProfit": {
+      "formula": "Profit = (Sell Price - Buy Price) × Quantity",
+      "description": "Trading profit calculation"
+    },
+    "profitMargin": {
+      "formula": "Profit Margin = ((Sell Price - Buy Price) / Buy Price) × 100%",
+      "description": "Trading profit margin calculation"
+    }
+  },
+  "verified": {
+    "date": "2025-01-XX",
+    "source": "code-verification",
+    "notes": "Generator rates verified from code. Previous documentation said '2 kW/g' for all generators, but code has 3 generator types with rates 2, 5, and 10."
+  }
+}
+

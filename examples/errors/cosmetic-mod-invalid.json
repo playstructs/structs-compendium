@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "structs:error": "cosmetic-mod-invalid",
+  "description": "Error handling example for invalid cosmetic mod",
+  "category": "modding",
+  "scenario": "Attempting to install a cosmetic mod with invalid manifest",
+  "request": {
+    "endpoint": "cosmetic-mod-validate",
+    "method": "POST",
+    "url": "http://localhost:8080/api/cosmetic-mods/validate",
+    "body": {
+      "file": "path/to/invalid-mod.zip"
+    }
+  },
+  "response": {
+    "status": 400,
+    "body": {
+      "valid": false,
+      "errors": [
+        "Invalid modId format: must match pattern ^[a-z0-9-]+$",
+        "Missing required field: manifest.version",
+        "Invalid struct type ID: 'invalid-type' does not exist in game"
+      ],
+      "warnings": [
+        "Missing fallback language (en) in localizations",
+        "Referenced animation file not found: animations/miner-idle.json"
+      ],
+      "modId": null,
+      "version": null
+    },
+    "schema": "schemas/responses.json#/definitions/CosmeticModValidateResponse"
+  },
+  "errorHandling": {
+    "action": "Fix mod file and retry",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Review validation errors",
+        "description": "Check all errors in response.body.errors"
+      },
+      {
+        "step": 2,
+        "action": "Fix mod manifest",
+        "description": "Update manifest.json with correct modId format and required fields"
+      },
+      {
+        "step": 3,
+        "action": "Verify struct type IDs",
+        "description": "Ensure all struct type IDs in mod exist in game"
+      },
+      {
+        "step": 4,
+        "action": "Fix asset references",
+        "description": "Ensure all referenced asset files exist in mod directory"
+      },
+      {
+        "step": 5,
+        "action": "Re-validate",
+        "description": "Call validate endpoint again to verify fixes"
+      }
+    ],
+    "recovery": "Check validation errors, fix mod manifest and structure, then retry",
+    "retry": false,
+    "note": "Do not attempt to install invalid mods. Always validate first."
+  },
+  "relatedErrors": [
+    "COSMETIC_MOD_INVALID",
+    "COSMETIC_STRUCT_TYPE_NOT_FOUND"
+  ],
+  "documentation": {
+    "errorCodes": "api/error-codes.yaml#COSMETIC_MOD_INVALID",
+    "modSchema": "schemas/cosmetic-mod.json",
+    "validationProtocol": "protocols/cosmetic-mod-protocol.md#validate-mod-structure"
+  }
+}
+

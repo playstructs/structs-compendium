@@ -1,0 +1,472 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Structs Code Structures",
+  "description": "Verified code structures, data types, and patterns for AI agents",
+  "type": "object",
+  "structs:category": "code",
+  "structs:verified": true,
+  "codeStructures": {
+    "PlayerCache": {
+      "type": "struct",
+      "file": "x/structs/keeper/player_cache.go",
+      "description": "Player cache structure for game state management",
+      "methods": {
+        "GetAvailableCapacity": {
+          "returns": "uint64",
+          "description": "Calculate available power capacity",
+          "formula": "(Capacity + CapacitySecondary) - (Load + StructsLoad)",
+          "verified": true,
+          "codeReference": "x/structs/keeper/player_cache.go",
+          "unit": "milliwatts"
+        },
+        "GetAllocatableCapacity": {
+          "returns": "uint64",
+          "description": "Calculate allocatable capacity (primary only)",
+          "formula": "Capacity - Load",
+          "verified": true,
+          "codeReference": "x/structs/keeper/player_cache.go",
+          "unit": "milliwatts"
+        },
+        "CanSupportLoadAddition": {
+          "returns": "bool",
+          "description": "Check if player can support additional load",
+          "verified": true,
+          "codeReference": "x/structs/keeper/player_cache.go"
+        },
+        "StoredOreIncrement": {
+          "returns": "void",
+          "description": "Increment stored ore by 1",
+          "verified": true,
+          "codeReference": "x/structs/keeper/player_cache.go",
+          "note": "Fixed increment of 1 ore per operation"
+        },
+        "StoredOreDecrement": {
+          "returns": "void",
+          "description": "Decrement stored ore by 1",
+          "verified": true,
+          "codeReference": "x/structs/keeper/player_cache.go"
+        },
+        "DepositRefinedAlpha": {
+          "returns": "void",
+          "description": "Deposit refined Alpha Matter (mints 1,000,000 ualpha)",
+          "verified": true,
+          "codeReference": "x/structs/keeper/player_cache.go",
+          "amount": 1000000,
+          "unit": "micrograms",
+          "equivalent": "1 gram"
+        }
+      },
+      "fields": {
+        "Capacity": {
+          "type": "uint64",
+          "unit": "milliwatts",
+          "description": "Primary power capacity",
+          "verified": true
+        },
+        "CapacitySecondary": {
+          "type": "uint64",
+          "unit": "milliwatts",
+          "description": "Secondary power capacity",
+          "verified": true
+        },
+        "Load": {
+          "type": "uint64",
+          "unit": "milliwatts",
+          "description": "Current power load",
+          "verified": true
+        },
+        "StructsLoad": {
+          "type": "uint64",
+          "unit": "milliwatts",
+          "description": "Load from structs",
+          "verified": true
+        }
+      }
+    },
+    "StructCache": {
+      "type": "struct",
+      "file": "x/structs/keeper/struct_cache.go",
+      "description": "Struct cache structure for struct state management",
+      "methods": {
+        "TakeAttackDamage": {
+          "returns": "void",
+          "description": "Calculate and apply attack damage (multi-shot system)",
+          "verified": true,
+          "codeReference": "x/structs/keeper/struct_cache.go:956-1015",
+          "algorithm": "Multi-shot damage calculation with damage reduction"
+        },
+        "CanEvade": {
+          "returns": "bool",
+          "description": "Check if struct can evade attack",
+          "verified": true,
+          "codeReference": "x/structs/keeper/struct_cache.go:911-954",
+          "algorithm": "Guided vs unguided weapon evasion"
+        },
+        "TakeRecoilDamage": {
+          "returns": "void",
+          "description": "Apply recoil damage to attacker",
+          "verified": true,
+          "codeReference": "x/structs/keeper/struct_cache.go:1018-1043"
+        },
+        "TakePostDestructionDamage": {
+          "returns": "void",
+          "description": "Apply post-destruction damage",
+          "verified": true,
+          "codeReference": "x/structs/keeper/struct_cache.go:1045-1070"
+        },
+        "CanBlock": {
+          "returns": "bool",
+          "description": "Check if defender can block attack",
+          "verified": true,
+          "codeReference": "x/structs/keeper/struct_cache.go:1072-1105",
+          "algorithm": "Defender blocking with ambit check"
+        },
+        "TakeCounterAttackDamage": {
+          "returns": "void",
+          "description": "Apply counter-attack damage",
+          "verified": true,
+          "codeReference": "x/structs/keeper/struct_cache.go:1107-1135",
+          "algorithm": "Same-ambit vs different-ambit damage"
+        },
+        "IsSuccessful": {
+          "returns": "bool",
+          "description": "Check if action succeeds based on success rate",
+          "verified": true,
+          "codeReference": "x/structs/keeper/struct_cache.go:1167-1185",
+          "algorithm": "Random value based on block hash and player nonce"
+        },
+        "GoOnline": {
+          "returns": "void",
+          "description": "Activate struct (bring online)",
+          "verified": true,
+          "codeReference": "x/structs/keeper/struct_cache.go",
+          "effects": [
+            "Increments StructsLoad",
+            "Resets mining/refining timers",
+            "Increments planetary defenses",
+            "Sets StatusAddOnline()"
+          ]
+        },
+        "GoOffline": {
+          "returns": "void",
+          "description": "Deactivate struct (take offline)",
+          "verified": true,
+          "codeReference": "x/structs/keeper/struct_cache.go",
+          "effects": [
+            "Decrements StructsLoad",
+            "Clears timers",
+            "Decrements planetary defenses",
+            "Sets StatusRemoveOnline()"
+          ]
+        }
+      }
+    },
+    "FleetCache": {
+      "type": "struct",
+      "file": "x/structs/keeper/fleet_cache.go",
+      "description": "Fleet cache structure for fleet state management",
+      "methods": {
+        "PlanetMoveReadinessCheck": {
+          "returns": "error",
+          "description": "Check if fleet is ready to move to planet",
+          "verified": true,
+          "codeReference": "x/structs/keeper/fleet_cache.go",
+          "checks": [
+            "Owner is online (not offline)",
+            "Fleet has command struct",
+            "Command struct is online"
+          ]
+        }
+      }
+    },
+    "PlanetCache": {
+      "type": "struct",
+      "file": "x/structs/keeper/planet_cache.go",
+      "description": "Planet cache structure for planet state management",
+      "methods": {
+        "AttemptComplete": {
+          "returns": "void",
+          "description": "Attempt to complete planet (when ore is depleted)",
+          "verified": true,
+          "codeReference": "x/structs/keeper/planet_cache.go",
+          "conditions": [
+            "Planet is empty of ore (IsEmptyOfOre())",
+            "Sets status to complete",
+            "Destroys structs",
+            "Sends fleets away"
+          ]
+        },
+        "IsEmptyOfOre": {
+          "returns": "bool",
+          "description": "Check if planet has no ore remaining",
+          "verified": true,
+          "codeReference": "x/structs/keeper/planet_cache.go"
+        }
+      }
+    },
+    "Player": {
+      "type": "struct",
+      "file": "x/structs/keeper/player.go",
+      "description": "Player structure for player state management",
+      "methods": {
+        "GetPlayerCharge": {
+          "returns": "uint64",
+          "description": "Get player's current charge",
+          "formula": "charge = CurrentBlockHeight - LastActionBlock",
+          "verified": true,
+          "codeReference": "x/structs/keeper/player.go"
+        },
+        "DischargePlayer": {
+          "returns": "void",
+          "description": "Discharge player (update last action block)",
+          "verified": true,
+          "codeReference": "x/structs/keeper/player.go"
+        },
+        "AttemptPlanetExplore": {
+          "returns": "void",
+          "description": "Attempt to explore new planet",
+          "verified": true,
+          "codeReference": "x/structs/keeper/player_cache.go",
+          "effects": [
+            "Creates new planet",
+            "Sets planet as player's planet",
+            "Initializes PlanetStartingOre = 5"
+          ]
+        }
+      }
+    },
+    "Work": {
+      "type": "package",
+      "file": "x/structs/types/work.go",
+      "description": "Proof-of-work functions",
+      "functions": {
+        "HashBuildAndCheckDifficulty": {
+          "signature": "func HashBuildAndCheckDifficulty(input string, proof string, age uint64, difficultyRange uint64) bool",
+          "description": "Check if proof-of-work hash meets difficulty requirement",
+          "verified": true,
+          "codeReference": "x/structs/types/work.go",
+          "usedBy": [
+            "Struct building",
+            "Ore mining",
+            "Ore refining",
+            "Planet raids"
+          ]
+        }
+      }
+    },
+    "Keys": {
+      "type": "package",
+      "file": "x/structs/types/keys.go",
+      "description": "Key constants and values",
+      "constants": {
+        "ReactorFuelToEnergyConversion": {
+          "value": 1,
+          "type": "uint64",
+          "description": "Reactor conversion rate: 1 gram alpha = 1,000 watts",
+          "verified": true,
+          "codeReference": "x/structs/types/keys.go:88"
+        },
+        "PlayerPassiveDraw": {
+          "value": 25000,
+          "type": "uint64",
+          "unit": "milliwatts",
+          "description": "Base power consumption for player when online",
+          "verified": true,
+          "codeReference": "x/structs/types/keys.go:129"
+        },
+        "PlanetStartingOre": {
+          "value": 5,
+          "type": "uint64",
+          "unit": "ore",
+          "description": "Initial ore amount for all planets",
+          "verified": true,
+          "codeReference": "x/structs/types/keys.go"
+        }
+      }
+    },
+    "StructType": {
+      "type": "struct",
+      "file": "genesis_struct_type.go",
+      "description": "Struct type definitions with properties",
+      "fields": {
+        "BuildDifficulty": {
+          "type": "uint64",
+          "description": "Proof-of-work difficulty for building",
+          "verified": true
+        },
+        "BuildDraw": {
+          "type": "uint64",
+          "unit": "milliwatts",
+          "description": "Power draw during building",
+          "verified": true
+        },
+        "PassiveDraw": {
+          "type": "uint64",
+          "unit": "milliwatts",
+          "description": "Power draw when active",
+          "verified": true
+        },
+        "OreMiningDifficulty": {
+          "value": 14000,
+          "type": "uint64",
+          "description": "Proof-of-work difficulty for ore mining",
+          "verified": true
+        },
+        "OreRefiningDifficulty": {
+          "value": 28000,
+          "type": "uint64",
+          "description": "Proof-of-work difficulty for ore refining",
+          "verified": true
+        },
+        "GeneratingRate": {
+          "type": "uint64",
+          "description": "Energy generation rate for generators",
+          "values": {
+            "Field Generator": 2,
+            "Continental Power Plant": 5,
+            "World Engine": 10
+          },
+          "verified": true
+        },
+        "ActivateCharge": {
+          "type": "uint64",
+          "description": "Charge cost to activate struct",
+          "verified": true
+        },
+        "BuildCharge": {
+          "type": "uint64",
+          "description": "Charge cost to build struct",
+          "verified": true
+        },
+        "OreMiningCharge": {
+          "type": "uint64",
+          "description": "Charge cost for ore mining",
+          "verified": true
+        },
+        "OreRefiningCharge": {
+          "type": "uint64",
+          "description": "Charge cost for ore refining",
+          "verified": true
+        },
+        "StealthActivateCharge": {
+          "type": "uint64",
+          "description": "Charge cost to activate stealth",
+          "verified": true
+        }
+      }
+    }
+  },
+  "dataFlows": {
+    "struct-building": {
+      "id": "struct-building-flow",
+      "description": "Complete struct building flow",
+      "steps": [
+        {
+          "step": 1,
+          "action": "MsgStructBuildInitiate",
+          "handler": "msg_server_struct_build_initiate.go:18-88",
+          "stateChange": "Struct status = building",
+          "requirements": [
+            "Player online",
+            "Sufficient resources",
+            "Valid location"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "MsgStructBuildComplete",
+          "handler": "msg_server_struct_build_complete.go:11-85",
+          "stateChange": "Struct status = built",
+          "requirements": [
+            "Player online",
+            "Struct in building state",
+            "Proof-of-work (HashBuildAndCheckDifficulty)",
+            "Sufficient charge"
+          ]
+        }
+      ],
+      "codeReferences": {
+        "initiate": "x/structs/keeper/msg_server_struct_build_initiate.go:18-88",
+        "complete": "x/structs/keeper/msg_server_struct_build_complete.go:11-85",
+        "proofOfWork": "x/structs/types/work.go (HashBuildAndCheckDifficulty)"
+      }
+    },
+    "resource-extraction": {
+      "id": "resource-extraction-flow",
+      "description": "Complete resource extraction flow (mining → refining)",
+      "steps": [
+        {
+          "step": 1,
+          "action": "MsgStructOreMinerComplete",
+          "handler": "msg_server_struct_ore_miner_complete.go",
+          "stateChange": "StoredOreIncrement(1)",
+          "requirements": [
+            "Player online",
+            "Struct online",
+            "Sufficient charge (OreMiningCharge)",
+            "Proof-of-work (OreMiningDifficulty: 14000)"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "MsgStructOreRefineryComplete",
+          "handler": "msg_server_struct_ore_refinery_complete.go",
+          "stateChange": "DepositRefinedAlpha (mints 1,000,000 ualpha)",
+          "requirements": [
+            "Player online",
+            "Struct online",
+            "Stored ore available",
+            "Sufficient charge (OreRefiningCharge)",
+            "Proof-of-work (OreRefiningDifficulty: 28000)"
+          ]
+        }
+      ],
+      "codeReferences": {
+        "mining": "x/structs/keeper/msg_server_struct_ore_miner_complete.go",
+        "refining": "x/structs/keeper/msg_server_struct_ore_refinery_complete.go",
+        "proofOfWork": "x/structs/types/work.go (HashBuildAndCheckDifficulty)"
+      }
+    },
+    "power-management": {
+      "id": "power-management-flow",
+      "description": "Power capacity and load management",
+      "steps": [
+        {
+          "step": 1,
+          "query": "Get player",
+          "endpoint": "GET /structs/player/{id}",
+          "extract": ["Capacity", "CapacitySecondary", "Load", "StructsLoad"]
+        },
+        {
+          "step": 2,
+          "calculation": "GetAvailableCapacity",
+          "formula": "(Capacity + CapacitySecondary) - (Load + StructsLoad)",
+          "codeReference": "x/structs/keeper/player_cache.go"
+        },
+        {
+          "step": 3,
+          "check": "CanSupportLoadAddition",
+          "codeReference": "x/structs/keeper/player_cache.go"
+        }
+      ],
+      "codeReferences": {
+        "capacity": "x/structs/keeper/player_cache.go (GetAvailableCapacity)",
+        "allocatable": "x/structs/keeper/player_cache.go (GetAllocatableCapacity)"
+      }
+    }
+  },
+  "repository": {
+    "name": "structsd",
+    "path": "ProductManagement/GameCodeAnalyst/repositories/structsd",
+    "branch": "main"
+  },
+  "structs:verification": {
+    "verified": true,
+    "verifiedBy": "GameCodeAnalyst",
+    "verifiedDate": "2025-01-XX",
+    "verificationMethod": "code-analysis",
+    "confidence": "high"
+  }
+}
+

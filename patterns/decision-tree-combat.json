@@ -1,0 +1,199 @@
+{
+  "version": "1.0.0",
+  "id": "combat",
+  "name": "Combat Decision Tree",
+  "description": "Decision tree for scouting, assessing, preparing, and executing combat operations",
+  "category": "gameplay",
+  "type": "decision-tree",
+  "root": {
+    "condition": {
+      "type": "check",
+      "property": "combatType",
+      "operator": "==",
+      "value": "attack",
+      "description": "Determine combat type"
+    },
+    "evaluation": {
+      "attack": {
+        "step": 1,
+        "action": {
+          "type": "scout",
+          "description": "Chart target planet to assess defenses"
+        },
+        "next": {
+          "step": 2,
+          "condition": {
+            "type": "assess",
+            "properties": [
+              "enemyDefenses",
+              "enemyForces",
+              "requiredForces",
+              "risk"
+            ],
+            "description": "Assess enemy strength and required forces"
+          },
+          "evaluation": {
+            "condition": {
+              "type": "check",
+              "property": "risk",
+              "operator": "<=",
+              "value": "acceptable",
+              "description": "Check if risk is acceptable"
+            },
+            "true": {
+              "step": 3,
+              "action": {
+                "type": "prepare",
+                "ensure": [
+                  "sufficientPower",
+                  "forcesReady",
+                  "playerOnline"
+                ],
+                "description": "Ensure sufficient power and forces ready"
+              },
+              "next": {
+                "step": 4,
+                "action": {
+                  "type": "execute",
+                  "combatType": "attack",
+                  "description": "Execute attack on target"
+                }
+              }
+            },
+            "false": {
+              "action": {
+                "type": "abort",
+                "reason": "Risk too high - abort attack",
+                "description": "Do not proceed with attack"
+              }
+            }
+          }
+        }
+      },
+      "raid": {
+        "step": 1,
+        "condition": {
+          "type": "check",
+          "property": "fleetAway",
+          "operator": "==",
+          "value": true,
+          "description": "Check if fleet is away (required for raids)"
+        },
+        "true": {
+          "step": 2,
+          "condition": {
+            "type": "check",
+            "property": "commandShipOnline",
+            "operator": "==",
+            "value": true,
+            "description": "Check if Command Ship is online"
+          },
+          "true": {
+            "step": 3,
+            "condition": {
+              "type": "check",
+              "property": "playerOnline",
+              "operator": "==",
+              "value": true,
+              "description": "Check if player is online"
+            },
+            "true": {
+              "step": 4,
+              "action": {
+                "type": "execute",
+                "combatType": "raid",
+                "requires": ["proofOfWork"],
+                "description": "Execute raid (requires proof-of-work)"
+              }
+            },
+            "false": {
+              "action": {
+                "type": "error",
+                "message": "Player must be online to raid"
+              }
+            }
+          },
+          "false": {
+            "action": {
+              "type": "error",
+              "message": "Command Ship must be online to raid"
+            }
+          }
+        },
+        "false": {
+          "action": {
+            "type": "error",
+            "message": "Fleet must be away to raid - move fleet first"
+          }
+        }
+      },
+      "defend": {
+        "step": 1,
+        "action": {
+          "type": "automatic",
+          "description": "Defensive structures fire automatically"
+        },
+        "next": {
+          "step": 2,
+          "action": {
+            "type": "monitor",
+            "description": "Monitor battle resolution"
+          },
+          "next": {
+            "step": 3,
+            "condition": {
+              "type": "check",
+              "property": "battleOutcome",
+              "operator": "==",
+              "value": "victory"
+            },
+            "evaluation": {
+              "true": {
+                "action": {
+                  "type": "secure",
+                  "description": "Secure position, rebuild if needed"
+                }
+              },
+              "false": {
+                "action": {
+                  "type": "recover",
+                  "description": "Rebuild forces, strengthen defenses"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "principles": [
+    "Always scout before attacking",
+    "Assess enemy strength and required forces",
+    "Prepare sufficient power and forces",
+    "Ensure online status before combat",
+    "For raids: fleet must be away, Command Ship online, player online, proof-of-work required"
+  ],
+  "requirements": {
+    "attack": [
+      "playerOnline",
+      "sufficientPower",
+      "structsOnline",
+      "validTarget"
+    ],
+    "raid": [
+      "playerOnline",
+      "fleetAway",
+      "commandShipOnline",
+      "proofOfWork"
+    ],
+    "defend": [
+      "defensiveStructuresActive"
+    ]
+  },
+  "workflow": {
+    "attack": ["scout", "assess", "prepare", "execute"],
+    "raid": ["moveFleet", "verifyRequirements", "execute"],
+    "defend": ["automatic", "monitor", "respond"]
+  }
+}
+

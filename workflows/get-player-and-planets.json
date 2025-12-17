@@ -1,0 +1,94 @@
+{
+  "version": "1.0.0",
+  "id": "get-player-and-planets",
+  "name": "Get Player and Planets Workflow",
+  "description": "Multi-step workflow to get player information and all associated planets",
+  "category": "gameplay",
+  "type": "workflow",
+  "steps": [
+    {
+      "step": 1,
+      "action": "query",
+      "endpoint": "GET /structs/player/{playerId}",
+      "description": "Get player information",
+      "request": {
+        "playerId": "structs1..."
+      },
+      "response": {
+        "player": {
+          "id": "structs1...",
+          "powerStatus": {
+            "capacity": 1000000,
+            "capacitySecondary": 0,
+            "load": 500000,
+            "structsLoad": 500000,
+            "playerOnline": true
+          }
+        }
+      }
+    },
+    {
+      "step": 2,
+      "action": "query",
+      "endpoint": "GET /structs/planet_by_player/{playerId}",
+      "description": "Get all planets owned by player",
+      "request": {
+        "playerId": "structs1..."
+      },
+      "response": {
+        "planets": [
+          {
+            "id": "2-1",
+            "owner": "structs1...",
+            "currentOre": 3,
+            "maxOre": 5
+          }
+        ]
+      }
+    },
+    {
+      "step": 3,
+      "action": "query",
+      "endpoint": "GET /structs/planet/{planetId}",
+      "description": "Get detailed information for each planet",
+      "request": {
+        "planetId": "2-1"
+      },
+      "response": {
+        "planet": {
+          "id": "2-1",
+          "owner": "structs1...",
+          "resources": {
+            "currentOre": 3,
+            "maxOre": 5
+          },
+          "slots": {
+            "space": 4,
+            "air": 4,
+            "land": 4,
+            "water": 4
+          },
+          "structs": []
+        }
+      },
+      "loop": "for each planet"
+    }
+  ],
+  "result": {
+    "player": "player information",
+    "planets": "array of planet information",
+    "complete": true
+  },
+  "errorHandling": {
+    "playerNotFound": {
+      "action": "error",
+      "message": "Player not found"
+    },
+    "noPlanets": {
+      "action": "continue",
+      "message": "Player has no planets",
+      "planets": []
+    }
+  }
+}
+

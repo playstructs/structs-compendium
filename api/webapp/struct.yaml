@@ -1,0 +1,47 @@
+# Webapp Struct API Endpoints
+
+**Version**: 1.0.0  
+**Category**: webapp  
+**Entity**: Struct  
+**Base URL**: ${webappBaseUrl} (default: http://localhost:8080)
+
+---
+
+## Endpoints
+
+endpoints:
+  - id: "webapp-struct-by-planet"
+    method: "GET"
+    path: "/api/struct/planet/{planet_id}"
+    description: "Get structs on planet"
+    category: "webapp"
+    entity: "Struct"
+    parameters:
+      - name: "planet_id"
+        type: "string"
+        required: true
+        format: "planet-id"
+
+  - id: "webapp-struct-type"
+    method: "GET"
+    path: "/api/struct/type"
+    description: "Get struct types"
+    category: "webapp"
+    entity: "Struct"
+
+  - id: "webapp-struct-by-id"
+    method: "GET"
+    path: "/api/struct/{struct_id}"
+    description: "Get struct by ID"
+    category: "webapp"
+    entity: "Struct"
+    parameters:
+      - name: "struct_id"
+        type: "string"
+        required: true
+        format: "struct-id"
+
+---
+
+*Last Updated: January 2025*
+

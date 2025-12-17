@@ -1,0 +1,133 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Simple Bot Example",
+  "description": "Example implementation of a simple Structs bot",
+  "type": "object",
+  "bot": {
+    "name": "SimpleBot",
+    "purpose": "Monitor player state and perform basic actions",
+    "configuration": {
+      "baseUrl": "http://localhost:1317",
+      "playerId": "1",
+      "updateFrequency": 10000,
+      "actions": {
+        "enabled": ["monitor", "build"],
+        "disabled": ["attack", "raid"]
+      }
+    },
+    "state": {
+      "blockHeight": 0,
+      "lastSyncTime": 0,
+      "player": null,
+      "planets": [],
+      "structs": []
+    },
+    "behaviors": [
+      {
+        "id": "monitor-state",
+        "name": "Monitor Game State",
+        "frequency": 10000,
+        "steps": [
+          {
+            "action": "query",
+            "endpoint": "GET /blockheight",
+            "store": "state.blockHeight"
+          },
+          {
+            "action": "query",
+            "endpoint": "GET /structs/player/{playerId}",
+            "store": "state.player"
+          },
+          {
+            "action": "query",
+            "endpoint": "GET /structs/planet_by_player/{playerId}",
+            "store": "state.planets"
+          },
+          {
+            "action": "query",
+            "endpoint": "GET /structs/struct",
+            "filter": "ownerId == {playerId}",
+            "store": "state.structs"
+          }
+        ]
+      },
+      {
+        "id": "build-struct",
+        "name": "Build Struct When Possible",
+        "trigger": "state.player.playerInventory.resources >= required",
+        "steps": [
+          {
+            "action": "check",
+            "condition": "state.player.halted == false",
+            "ifFalse": "abort"
+          },
+          {
+            "action": "check",
+            "condition": "state.player.playerInventory.alphaMatter >= 1000000",
+            "ifFalse": "abort"
+          },
+          {
+            "action": "check",
+            "condition": "state.planets.length > 0",
+            "ifFalse": "abort"
+          },
+          {
+            "action": "transaction",
+            "type": "MsgStructBuild",
+            "params": {
+              "creator": "{playerAddress}",
+              "structType": "1",
+              "locationType": 1,
+              "locationId": "{firstPlanetId}"
+            }
+          },
+          {
+            "action": "wait",
+            "for": "confirmation"
+          },
+          {
+            "action": "query",
+            "endpoint": "GET /structs/struct/{structId}",
+            "waitFor": "struct.state == 'building'"
+          },
+          {
+            "action": "compute",
+            "type": "proof-of-work",
+            "for": "struct"
+          },
+          {
+            "action": "transaction",
+            "type": "MsgStructBuildComplete",
+            "params": {
+              "creator": "{playerAddress}",
+              "structId": "{structId}",
+              "hash": "{proofOfWorkHash}",
+              "nonce": "{proofOfWorkNonce}"
+            }
+          }
+        ]
+      }
+    ],
+    "errorHandling": {
+      "404": {
+        "action": "log",
+        "retry": false
+      },
+      "500": {
+        "action": "retry",
+        "maxRetries": 3,
+        "backoff": "exponential"
+      },
+      "PLAYER_HALTED": {
+        "action": "wait",
+        "until": "player online"
+      },
+      "INSUFFICIENT_RESOURCES": {
+        "action": "wait",
+        "until": "resources available"
+      }
+    }
+  }
+}
+

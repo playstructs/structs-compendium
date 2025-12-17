@@ -1,0 +1,136 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Decision Tree Schema",
+  "description": "Schema for decision trees and decision-making flows",
+  "type": "object",
+  "structs:category": "visual",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique decision tree identifier"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["decision-tree", "flowchart", "logic-tree"],
+      "description": "Type of decision structure"
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable decision tree title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of what the decision tree represents"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["gameplay", "economics", "technical", "system"],
+      "description": "Category of decision tree"
+    },
+    "nodes": {
+      "type": "array",
+      "description": "Nodes in the decision tree",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique node identifier"
+          },
+          "label": {
+            "type": "string",
+            "description": "Human-readable node label"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["decision", "condition", "action", "outcome", "start", "end"],
+            "description": "Type of node"
+          },
+          "question": {
+            "type": "string",
+            "description": "Question or condition (for decision/condition nodes)"
+          },
+          "action": {
+            "type": "string",
+            "description": "Action ID if node is an action"
+          },
+          "actionReference": {
+            "type": "string",
+            "description": "Reference to action schema"
+          },
+          "outcome": {
+            "type": "string",
+            "description": "Outcome description (for outcome nodes)"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional node metadata"
+          }
+        },
+        "required": ["id", "label", "type"]
+      }
+    },
+    "edges": {
+      "type": "array",
+      "description": "Edges (branches) in the decision tree",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique edge identifier"
+          },
+          "from": {
+            "type": "string",
+            "description": "Source node ID"
+          },
+          "to": {
+            "type": "string",
+            "description": "Target node ID"
+          },
+          "label": {
+            "type": "string",
+            "description": "Edge label (e.g., 'Yes', 'No', 'If true')"
+          },
+          "condition": {
+            "type": "string",
+            "description": "Condition for this branch"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional edge metadata"
+          }
+        },
+        "required": ["id", "from", "to"]
+      }
+    },
+    "rootNode": {
+      "type": "string",
+      "description": "ID of the root/start node"
+    },
+    "relatedSchemas": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "References to related schemas"
+    },
+    "relatedEndpoints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "References to related API endpoints"
+    },
+    "relatedDiagrams": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "References to related diagrams"
+    }
+  },
+  "required": ["id", "type", "title", "nodes", "edges", "rootNode"]
+}
+

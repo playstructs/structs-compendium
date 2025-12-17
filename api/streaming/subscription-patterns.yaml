@@ -1,0 +1,176 @@
+version: "1.0.0"
+lastUpdated: "2025-01-XX"
+description: "Subscription patterns for GRASS/NATS streaming"
+
+connection:
+  natsProtocol:
+    url: "nats://localhost:4222"
+    description: "NATS protocol connection (recommended for server-side)"
+    useCase: "Server-side applications, bots, automated systems"
+  
+  natsWebSocket:
+    url: "ws://localhost:1443"
+    description: "NATS WebSocket connection (for browser/WebSocket clients)"
+    useCase: "Browser applications, WebSocket-only clients"
+    note: "Requires NATS server WebSocket support"
+
+patterns:
+  - name: "subscribe-player-updates"
+    description: "Subscribe to player updates"
+    connection:
+      type: "NATS"
+      url: "nats://localhost:4222"
+    subscription:
+      subject: "structs.player.*"
+      example: "structs.player.0-1.1-11"
+      wildcard: true
+    events:
+      - type: "player_consensus"
+        schema: "event-schemas.json#/definitions/PlayerConsensusEvent"
+      - type: "player_meta"
+        schema: "event-schemas.json#/definitions/PlayerMetaEvent"
+    example:
+      connect: "nats://localhost:4222"
+      subscribe: |
+        {
+          "action": "subscribe",
+          "subject": "structs.player.*"
+        }
+      receive: |
+        {
+          "subject": "structs.player.0-1.1-11",
+          "category": "player_consensus",
+          "id": "1-11",
+          "updated_at": "2025-01-01T00:00:00Z",
+          "data": {
+            "id": "1-11",
+            "guildId": "0-1",
+            "primaryAddress": "cosmos1..."
+          }
+        }
+  
+  - name: "subscribe-guild-updates"
+    description: "Subscribe to guild updates"
+    connection:
+      type: "NATS"
+      url: "nats://localhost:4222"
+    subscription:
+      subject: "structs.guild.*"
+      example: "structs.guild.0-1"
+      wildcard: true
+    events:
+      - type: "guild_consensus"
+        schema: "event-schemas.json#/definitions/GuildConsensusEvent"
+      - type: "guild_meta"
+        schema: "event-schemas.json#/definitions/GuildMetaEvent"
+      - type: "guild_membership"
+        schema: "event-schemas.json#/definitions/GuildMembershipEvent"
+    example:
+      connect: "nats://localhost:4222"
+      subscribe: |
+        {
+          "action": "subscribe",
+          "subject": "structs.guild.0-1"
+        }
+  
+  - name: "subscribe-planet-updates"
+    description: "Subscribe to planet updates"
+    connection:
+      type: "NATS"
+      url: "nats://localhost:4222"
+    subscription:
+      subject: "structs.planet.*"
+      example: "structs.planet.3-1"
+      wildcard: true
+    events:
+      - type: "raid_status"
+        schema: "event-schemas.json#/definitions/PlanetRaidStatusEvent"
+      - type: "fleet_arrive"
+        schema: "event-schemas.json#/definitions/FleetArriveEvent"
+    example:
+      connect: "nats://localhost:4222"
+      subscribe: |
+        {
+          "action": "subscribe",
+          "subject": "structs.planet.3-1"
+        }
+  
+  - name: "subscribe-multiple-entities"
+    description: "Subscribe to multiple entity types"
+    connection:
+      type: "NATS"
+      url: "nats://localhost:4222"
+    subscriptions:
+      - subject: "structs.player.0-1.1-11"
+        description: "Specific player"
+      - subject: "structs.planet.3-1"
+        description: "Specific planet"
+      - subject: "structs.guild.0-1"
+        description: "Specific guild"
+    example:
+      connect: "nats://localhost:4222"
+      subscribe: |
+        [
+          {
+            "action": "subscribe",
+            "subject": "structs.player.0-1.1-11"
+          },
+          {
+            "action": "subscribe",
+            "subject": "structs.planet.3-1"
+          },
+          {
+            "action": "subscribe",
+            "subject": "structs.guild.0-1"
+          }
+        ]
+  
+  - name: "subscribe-global-updates"
+    description: "Subscribe to global game state updates"
+    connection:
+      type: "NATS"
+      url: "nats://localhost:4222"
+    subscription:
+      subject: "structs.global"
+    events:
+      - type: "block"
+        schema: "event-schemas.json#/definitions/BlockEvent"
+    example:
+      connect: "nats://localhost:4222"
+      subscribe: |
+        {
+          "action": "subscribe",
+          "subject": "structs.global"
+        }
+
+bestPractices:
+  - name: "Use wildcards for discovery"
+    description: "Start with wildcard subscriptions to discover available events"
+    example: "structs.player.*"
+  
+  - name: "Narrow to specific subjects"
+    description: "Once you know what you need, subscribe to specific subjects"
+    example: "structs.player.0-1.1-11"
+  
+  - name: "Limit subscriptions"
+    description: "Limit the number of active subscriptions to avoid overwhelming your client"
+    recommendation: "Maximum 10-20 concurrent subscriptions per connection"
+  
+  - name: "Implement reconnection"
+    description: "Implement automatic reconnection with exponential backoff"
+    example:
+      reconnect:
+        enabled: true
+        maxAttempts: 10
+        initialDelay: 1000
+        maxDelay: 60000
+        backoffMultiplier: 2
+  
+  - name: "Validate messages"
+    description: "Validate all incoming messages against schemas"
+    recommendation: "Use JSON Schema validation for all event payloads"
+  
+  - name: "Handle errors gracefully"
+    description: "Implement error handling for connection failures and invalid messages"
+    recommendation: "Log errors, implement retry logic, and handle edge cases"
+

@@ -1,0 +1,64 @@
+version: "1.0.0"
+lastUpdated: "2025-01-XX"
+baseUrl: "http://localhost:1317"
+basePath: "/structs"
+category: "query"
+entity: "Allocation"
+
+endpoints:
+  - id: "allocation-by-id"
+    method: "GET"
+    path: "/structs/allocation/{id}"
+    description: "Get allocation by ID"
+    category: "query"
+    entity: "Allocation"
+    parameters:
+      - name: "id"
+        type: "string"
+        required: true
+        format: "allocation-id"
+        description: "Allocation identifier"
+    response:
+      schema: "schemas/entities/allocation.json"
+      contentType: "application/json"
+  
+  - id: "allocation-list"
+    method: "GET"
+    path: "/structs/allocation"
+    description: "List all allocations"
+    category: "query"
+    entity: "Allocation"
+    pagination: true
+    response:
+      schema: "schemas/entities/allocation.json[]"
+      contentType: "application/json"
+  
+  - id: "allocation-by-source"
+    method: "GET"
+    path: "/structs/allocation_by_source/{sourceId}"
+    description: "Get allocations by source"
+    category: "query"
+    entity: "Allocation"
+    parameters:
+      - name: "sourceId"
+        type: "string"
+        required: true
+        description: "Source identifier"
+    response:
+      schema: "schemas/entities/allocation.json[]"
+      contentType: "application/json"
+  
+  - id: "allocation-by-destination"
+    method: "GET"
+    path: "/structs/allocation_by_destination/{destinationId}"
+    description: "Get allocations by destination"
+    category: "query"
+    entity: "Allocation"
+    parameters:
+      - name: "destinationId"
+        type: "string"
+        required: true
+        description: "Destination identifier"
+    response:
+      schema: "schemas/entities/allocation.json[]"
+      contentType: "application/json"

@@ -1,0 +1,528 @@
+version: "1.0.0"
+lastUpdated: "2025-01-XX"
+description: "Complete catalog of API error codes for AI agents"
+
+errors:
+  # HTTP Status Code Errors
+  - code: 400
+    name: "BAD_REQUEST"
+    description: "Invalid request format or parameters"
+    category: "client_error"
+    httpStatus: 400
+    endpoints:
+      - "*"
+    response:
+      schema: "schemas/responses.json#/definitions/ErrorResponse"
+      example:
+        error: "Bad request"
+        code: 400
+        details: ["Invalid parameter format"]
+    handling:
+      retry: false
+      action: "Validate request parameters and format"
+      recovery: "Check request body, headers, and parameter types"
+  
+  - code: 404
+    name: "NOT_FOUND"
+    description: "Resource not found"
+    category: "client_error"
+    httpStatus: 404
+    endpoints:
+      - "webapp-player-by-id"
+      - "webapp-planet-by-id"
+      - "webapp-guild-by-id"
+      - "webapp-struct-by-id"
+      - "player-by-id"
+      - "planet-by-id"
+      - "guild-by-id"
+      - "struct-by-id"
+      - "cosmetic-mod-get"
+    response:
+      schema: "schemas/responses.json#/definitions/ErrorResponse"
+      example:
+        error: "Player not found"
+        code: 404
+        details: ["Player ID 1-999 does not exist"]
+    handling:
+      retry: false
+      action: "Verify resource ID and try again"
+      recovery: "Check if resource ID is correct, or query list to find valid IDs"
+  
+  - code: 429
+    name: "RATE_LIMIT_EXCEEDED"
+    description: "Too many requests - rate limit exceeded"
+    category: "rate_limit"
+    httpStatus: 429
+    endpoints:
+      - "*"
+    response:
+      schema: "schemas/responses.json#/definitions/RateLimitErrorResponse"
+      example:
+        error: "Rate limit exceeded"
+        code: 429
+        retry_after: 60
+        limit: 100
+        remaining: 0
+        reset_at: "2025-01-01T00:01:00Z"
+    handling:
+      retry: true
+      retry_after: "response.retry_after"
+      action: "Wait for retry_after seconds before retrying"
+      recovery: "Implement rate limiting: reduce request frequency, use exponential backoff, respect Retry-After header"
+  
+  - code: 500
+    name: "INTERNAL_SERVER_ERROR"
+    description: "Internal server error"
+    category: "server_error"
+    httpStatus: 500
+    endpoints:
+      - "*"
+    response:
+      schema: "schemas/responses.json#/definitions/ErrorResponse"
+      example:
+        error: "Internal server error"
+        code: 500
+        details: ["An unexpected error occurred"]
+        request_id: "req_1234567890"
+    handling:
+      retry: true
+      retry_strategy: "exponential_backoff"
+      initial_delay: 1000
+      max_delay: 60000
+      max_retries: 5
+      action: "Retry with exponential backoff"
+      recovery: "If error persists, report issue with request_id"
+  
+  - code: 503
+    name: "SERVICE_UNAVAILABLE"
+    description: "Service temporarily unavailable"
+    category: "server_error"
+    httpStatus: 503
+    endpoints:
+      - "*"
+    response:
+      schema: "schemas/responses.json#/definitions/ErrorResponse"
+      example:
+        error: "Service unavailable"
+        code: 503
+        details: ["Service is temporarily unavailable"]
+        retry_after: 30
+    handling:
+      retry: true
+      retry_after: "response.retry_after"
+      max_retries: 10
+      action: "Wait for retry_after seconds, then retry"
+      recovery: "Service may be under maintenance or overloaded"
+  
+  # Consensus Network Error Codes
+  - code: 0
+    name: "SUCCESS"
+    description: "Operation successful"
+    category: "success"
+    httpStatus: 200
+    endpoints:
+      - "*"
+    response:
+      schema: "schemas/responses.json#/definitions/SuccessResponse"
+    handling:
+      retry: false
+      action: "Continue processing"
+  
+  - code: 1
+    name: "GENERAL_ERROR"
+    description: "General error occurred"
+    category: "error"
+    httpStatus: 200
+    endpoints:
+      - "*"
+    response:
+      schema: "schemas/errors.json#/errorCodes/1"
+      example:
+        code: 1
+        message: "codespace structs code 1: general error"
+        details: []
+    handling:
+      retry: true
+      retry_strategy: "exponential_backoff"
+      max_retries: 3
+      action: "Log and retry with backoff"
+  
+  - code: 2
+    name: "INSUFFICIENT_FUNDS"
+    description: "Insufficient funds for transaction"
+    category: "error"
+    httpStatus: 200
+    endpoints:
+      - "submit-transaction"
+    response:
+      schema: "schemas/errors.json#/errorCodes/2"
+      example:
+        code: 2
+        message: "codespace structs code 2: insufficient funds"
+        details: []
+    handling:
+      retry: false
+      action: "Wait for resources"
+      recovery: "Check player inventory, wait for resources to accumulate"
+  
+  - code: 3
+    name: "INVALID_SIGNATURE"
+    description: "Transaction signature is invalid"
+    category: "error"
+    httpStatus: 200
+    endpoints:
+      - "submit-transaction"
+    response:
+      schema: "schemas/errors.json#/errorCodes/3"
+      example:
+        code: 3
+        message: "codespace structs code 3: invalid signature"
+        details: []
+    handling:
+      retry: true
+      action: "Re-sign transaction"
+      recovery: "Verify signature generation, re-sign with correct private key"
+  
+  - code: 4
+    name: "INSUFFICIENT_GAS"
+    description: "Insufficient gas for transaction"
+    category: "error"
+    httpStatus: 200
+    endpoints:
+      - "submit-transaction"
+    response:
+      schema: "schemas/errors.json#/errorCodes/4"
+      example:
+        code: 4
+        message: "codespace structs code 4: insufficient gas"
+        details: []
+    handling:
+      retry: true
+      action: "Increase gas limit"
+      recovery: "Estimate gas requirements, increase gas limit in transaction"
+  
+  - code: 5
+    name: "INVALID_MESSAGE"
+    description: "Message format is invalid"
+    category: "error"
+    httpStatus: 200
+    endpoints:
+      - "submit-transaction"
+    response:
+      schema: "schemas/errors.json#/errorCodes/5"
+      example:
+        code: 5
+        message: "codespace structs code 5: invalid message"
+        details: []
+    handling:
+      retry: false
+      action: "Validate message format"
+      recovery: "Check message structure against schema, verify all required fields"
+  
+  - code: 6
+    name: "PLAYER_HALTED"
+    description: "Player is halted (offline)"
+    category: "error"
+    httpStatus: 200
+    endpoints:
+      - "submit-transaction"
+    response:
+      schema: "schemas/errors.json#/errorCodes/6"
+      example:
+        code: 6
+        message: "codespace structs code 6: player halted"
+        details: []
+    handling:
+      retry: false
+      action: "Wait for player online"
+      recovery: "Check player status, wait for player to come online"
+  
+  - code: 7
+    name: "INSUFFICIENT_CHARGE"
+    description: "Insufficient charge for operation"
+    category: "error"
+    httpStatus: 200
+    endpoints:
+      - "submit-transaction"
+    response:
+      schema: "schemas/errors.json#/errorCodes/7"
+      example:
+        code: 7
+        message: "codespace structs code 7: insufficient charge"
+        details: []
+    handling:
+      retry: false
+      action: "Wait for charge to accumulate"
+      recovery: "Check charge levels, wait for charge to regenerate"
+  
+  - code: 8
+    name: "INVALID_LOCATION"
+    description: "Invalid location specified"
+    category: "error"
+    httpStatus: 200
+    endpoints:
+      - "submit-transaction"
+    response:
+      schema: "schemas/errors.json#/errorCodes/8"
+      example:
+        code: 8
+        message: "codespace structs code 8: invalid location"
+        details: []
+    handling:
+      retry: false
+      action: "Validate location"
+      recovery: "Check location format and validity"
+  
+  - code: 9
+    name: "INVALID_TARGET"
+    description: "Invalid target specified"
+    category: "error"
+    httpStatus: 200
+    endpoints:
+      - "submit-transaction"
+    response:
+      schema: "schemas/errors.json#/errorCodes/9"
+      example:
+        code: 9
+        message: "codespace structs code 9: invalid target"
+        details: []
+    handling:
+      retry: false
+      action: "Validate target"
+      recovery: "Check target format and validity"
+  
+  # Consensus Network - Object Not Found
+  - code: 1900
+    name: "OBJECT_NOT_FOUND"
+    description: "Object not found (Consensus Network specific)"
+    category: "error"
+    httpStatus: 200
+    endpoints:
+      - "player-by-id"
+      - "planet-by-id"
+      - "guild-by-id"
+      - "struct-by-id"
+    response:
+      schema: "schemas/responses.json#/definitions/ErrorResponse"
+      example:
+        code: 2
+        message: "codespace structs code 1900: object not found"
+        details: []
+    handling:
+      retry: false
+      action: "Verify resource ID"
+      recovery: "Note: Consensus Network returns 200 with error code, not 404. Check response.code field."
+  
+  # Network Errors
+  - code: "timeout"
+    name: "REQUEST_TIMEOUT"
+    description: "Request timeout"
+    category: "network_error"
+    httpStatus: null
+    endpoints:
+      - "*"
+    response:
+      schema: "schemas/responses.json#/definitions/ErrorResponse"
+      example:
+        error: "Request timeout"
+        code: "timeout"
+        details: ["Request exceeded timeout duration"]
+    handling:
+      retry: true
+      retry_strategy: "exponential_backoff"
+      max_retries: 3
+      action: "Retry with exponential backoff"
+      recovery: "Increase timeout duration or reduce request complexity"
+  
+  - code: "network"
+    name: "NETWORK_ERROR"
+    description: "Network connection error"
+    category: "network_error"
+    httpStatus: null
+    endpoints:
+      - "*"
+    response:
+      schema: "schemas/responses.json#/definitions/ErrorResponse"
+      example:
+        error: "Network error"
+        code: "network"
+        details: ["Failed to connect to server"]
+    handling:
+      retry: true
+      retry_strategy: "exponential_backoff"
+      max_retries: 5
+      action: "Retry with exponential backoff"
+      recovery: "Check network connectivity, verify server is running"
+  
+  # Cosmetic Mod Error Codes
+  - code: "COSMETIC_MOD_NOT_FOUND"
+    name: "COSMETIC_MOD_NOT_FOUND"
+    description: "Cosmetic mod not found"
+    category: "client_error"
+    httpStatus: 404
+    endpoints:
+      - "cosmetic-mod-get"
+      - "cosmetic-mod-uninstall"
+      - "cosmetic-mod-activate"
+      - "cosmetic-mod-deactivate"
+    response:
+      schema: "schemas/responses.json#/definitions/ErrorResponse"
+      example:
+        error: "Cosmetic mod not found"
+        code: 404
+        details: ["Mod 'guild-alpha-miner-v1' not found"]
+    handling:
+      retry: false
+      action: "Verify mod ID and check installed mods"
+      recovery: "List installed mods to find correct mod ID"
+  
+  - code: "COSMETIC_MOD_INVALID"
+    name: "COSMETIC_MOD_INVALID"
+    description: "Cosmetic mod validation failed"
+    category: "client_error"
+    httpStatus: 400
+    endpoints:
+      - "cosmetic-mod-install"
+      - "cosmetic-mod-validate"
+    response:
+      schema: "schemas/responses.json#/definitions/CosmeticModValidateResponse"
+      example:
+        valid: false
+        errors: [
+          "Invalid setHash format: must be 64-character hexadecimal string (SHA-256)",
+          "Missing required field: manifest.version"
+        ]
+        warnings: []
+    handling:
+      retry: false
+      action: "Fix mod file and retry"
+      recovery: "Check validation errors, fix mod manifest and structure, then retry"
+  
+  - code: "COSMETIC_MOD_INSTALL_FAILED"
+    name: "COSMETIC_MOD_INSTALL_FAILED"
+    description: "Cosmetic mod installation failed"
+    category: "server_error"
+    httpStatus: 500
+    endpoints:
+      - "cosmetic-mod-install"
+    response:
+      schema: "schemas/responses.json#/definitions/ErrorResponse"
+      example:
+        error: "Mod installation failed"
+        code: 500
+        details: ["Failed to extract mod file", "Disk space insufficient"]
+    handling:
+      retry: true
+      retry_strategy: "exponential_backoff"
+      max_retries: 3
+      action: "Retry installation after checking disk space"
+      recovery: "Check disk space, verify mod file integrity, then retry"
+  
+  - code: "COSMETIC_MOD_CONFLICT"
+    name: "COSMETIC_MOD_CONFLICT"
+    description: "Cosmetic mod conflicts with existing mod"
+    category: "client_error"
+    httpStatus: 409
+    endpoints:
+      - "cosmetic-mod-install"
+    response:
+      schema: "schemas/responses.json#/definitions/ErrorResponse"
+      example:
+        error: "Mod conflict"
+        code: 409
+        details: [
+          "Mod 'guild-alpha-miner-v1' version 1.0.0 already installed",
+          "Use uninstall endpoint to remove existing mod first"
+        ]
+    handling:
+      retry: false
+      action: "Uninstall existing mod or use different mod ID"
+      recovery: "Uninstall conflicting mod first, or use different mod ID/version"
+  
+  - code: "COSMETIC_MOD_UNSUPPORTED_VERSION"
+    name: "COSMETIC_MOD_UNSUPPORTED_VERSION"
+    description: "Cosmetic mod version incompatible with game version"
+    category: "client_error"
+    httpStatus: 400
+    endpoints:
+      - "cosmetic-mod-install"
+      - "cosmetic-mod-validate"
+    response:
+      schema: "schemas/responses.json#/definitions/ErrorResponse"
+      example:
+        error: "Unsupported mod version"
+        code: 400
+        details: [
+          "Mod requires game version 1.0.0",
+          "Current game version: 0.9.0"
+        ]
+    handling:
+      retry: false
+      action: "Update game or use compatible mod version"
+      recovery: "Check mod compatibility, update game or find compatible mod version"
+  
+  - code: "COSMETIC_STRUCT_TYPE_NOT_FOUND"
+    name: "COSMETIC_STRUCT_TYPE_NOT_FOUND"
+    description: "Struct type referenced in mod not found in game"
+    category: "client_error"
+    httpStatus: 400
+    endpoints:
+      - "cosmetic-mod-install"
+      - "cosmetic-mod-validate"
+    response:
+      schema: "schemas/responses.json#/definitions/ErrorResponse"
+      example:
+        error: "Struct type not found"
+        code: 400
+        details: [
+          "Struct type 'invalid-type' referenced in mod does not exist",
+          "Mod: guild-alpha-miner-v1"
+        ]
+    handling:
+      retry: false
+      action: "Fix mod to reference valid struct types"
+      recovery: "Verify struct type IDs in mod match game struct types, update mod manifest"
+
+categories:
+  success:
+    description: "Successful operations"
+    codes: [0, 200]
+  
+  client_error:
+    description: "Client-side errors (not retryable)"
+    codes: [400, 404, 5, 6, 7, 8, 9, 1900, "COSMETIC_MOD_NOT_FOUND", "COSMETIC_MOD_INVALID", "COSMETIC_MOD_CONFLICT", "COSMETIC_MOD_UNSUPPORTED_VERSION", "COSMETIC_STRUCT_TYPE_NOT_FOUND"]
+  
+  server_error:
+    description: "Server-side errors (retryable)"
+    codes: [500, 503, "COSMETIC_MOD_INSTALL_FAILED"]
+  
+  rate_limit:
+    description: "Rate limiting errors (retryable with delay)"
+    codes: [429]
+  
+  network_error:
+    description: "Network-related errors (retryable)"
+    codes: ["timeout", "network"]
+  
+  error:
+    description: "Game-specific errors"
+    codes: [1, 2, 3, 4]
+
+retryStrategies:
+  exponential_backoff:
+    description: "Exponential backoff retry strategy"
+    initialDelay: 1000
+    maxDelay: 60000
+    backoffMultiplier: 2
+    maxRetries: 5
+  
+  fixed_delay:
+    description: "Fixed delay retry strategy (for rate limits)"
+    delay: 5000
+    maxRetries: 3
+  
+  respect_retry_after:
+    description: "Respect Retry-After header"
+    useHeader: true
+    maxRetries: 10
+

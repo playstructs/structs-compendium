@@ -1,0 +1,199 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "structs:workflow": "install-and-use-cosmetic-mod",
+  "description": "Install a cosmetic mod and use it to display struct types with custom cosmetics",
+  "category": "modding",
+  "prerequisites": [
+    "mod_file_path",
+    "guild_id (optional)"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "endpoint": "cosmetic-mod-validate",
+      "method": "POST",
+      "url": "http://localhost:8080/api/cosmetic-mods/validate",
+      "description": "Validate mod file before installation",
+      "request": {
+        "body": {
+          "file": "{{mod_file_path}}"
+        },
+        "headers": {
+          "Content-Type": "multipart/form-data"
+        }
+      },
+      "extract": {
+        "valid": "response.body.valid",
+        "mod_id": "response.body.modId",
+        "version": "response.body.version",
+        "errors": "response.body.errors",
+        "warnings": "response.body.warnings"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "schema": "schemas/responses.json#/definitions/CosmeticModValidateResponse"
+      },
+      "errorHandling": {
+        "400": "Invalid mod file - check errors",
+        "500": "Server error - retry with exponential backoff"
+      },
+      "condition": "If valid is false, stop workflow and report errors"
+    },
+    {
+      "step": 2,
+      "endpoint": "cosmetic-mod-install",
+      "method": "POST",
+      "url": "http://localhost:8080/api/cosmetic-mods/install",
+      "description": "Install the validated mod",
+      "request": {
+        "body": {
+          "file": "{{mod_file_path}}",
+          "validate": true,
+          "activate": true
+        },
+        "headers": {
+          "Content-Type": "multipart/form-data"
+        }
+      },
+      "extract": {
+        "status": "response.body.status",
+        "type": "response.body.type",
+        "set_hash": "response.body.setHash",
+        "skin_hash": "response.body.skinHash",
+        "storage_path": "response.body.storagePath",
+        "activated": "response.body.activated"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "schema": "schemas/responses.json#/definitions/CosmeticModInstallResponse"
+      },
+      "errorHandling": {
+        "400": "Installation failed - check mod file",
+        "409": "Mod conflict - mod may already be installed",
+        "500": "Server error - retry with exponential backoff"
+      }
+    },
+    {
+      "step": 3,
+      "endpoint": "cosmetic-set-get",
+      "method": "GET",
+      "url": "http://localhost:8080/api/cosmetic-sets/{{step2.extract.set_hash}}",
+      "description": "Verify set is installed and active (if type is 'set')",
+      "condition": "Only execute if step2.extract.type is 'set'",
+      "extract": {
+        "set_hash": "response.body.setHash",
+        "active": "response.body.active",
+        "classes": "response.body.skins[*].class",
+        "languages": "response.body.languages"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "schema": "schemas/responses.json#/definitions/CosmeticSetResponse"
+      }
+    },
+    {
+      "step": 4,
+      "endpoint": "struct-type-by-id",
+      "method": "GET",
+      "url": "http://localhost:1317/structs/struct_type/1-11",
+      "description": "Get base struct type data from consensus network",
+      "extract": {
+        "struct_type_id": "response.body.StructType.id",
+        "struct_type_class": "response.body.StructType.class",
+        "base_name": "response.body.StructType.defaultCosmeticName"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "schema": "schemas/entities.json#/definitions/StructType"
+      }
+    },
+    {
+      "step": 5,
+      "endpoint": "cosmetic-class",
+      "method": "GET",
+      "url": "http://localhost:8080/api/cosmetic/class/{{step4.extract.struct_type_class}}?language=en&guildId={{guild_id}}",
+      "description": "Get cosmetic skin overrides for struct type class",
+      "extract": {
+        "class": "response.body.class",
+        "skin_hash": "response.body.skinHash",
+        "cosmetic_name": "response.body.name",
+        "cosmetic_lore": "response.body.lore",
+        "weapons": "response.body.weapons",
+        "abilities": "response.body.abilities",
+        "animations": "response.body.animations",
+        "icon": "response.body.icon",
+        "skin_source": "response.body.skinSource"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "schema": "schemas/responses.json#/definitions/StructTypeCosmeticResponse"
+      }
+    },
+    {
+      "step": 6,
+      "endpoint": "struct-type-with-cosmetics",
+      "method": "GET",
+      "url": "http://localhost:8080/api/struct-type/{{step4.extract.struct_type_id}}/full?class={{step4.extract.struct_type_class}}&language=en&guildId={{guild_id}}",
+      "description": "Get complete struct type with cosmetics merged (alternative to steps 4-5)",
+      "note": "This is an alternative approach - use either steps 4-5 OR step 6, not both. The class parameter is optional but recommended for faster cosmetic lookup.",
+      "extract": {
+        "struct_type": "response.body.structType",
+        "cosmetic": "response.body.cosmetic",
+        "merged": "response.body.merged"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "schema": "schemas/responses.json#/definitions/StructTypeFullResponse"
+      }
+    }
+  ],
+  "result": {
+    "cosmetic": {
+      "type": "{{step2.extract.type}}",
+      "set_hash": "{{step2.extract.set_hash}}",
+      "skin_hash": "{{step2.extract.skin_hash}}",
+      "storage_path": "{{step2.extract.storage_path}}",
+      "active": "{{step3.extract.active}}",
+      "classes": "{{step3.extract.classes}}",
+      "languages": "{{step3.extract.languages}}"
+    },
+    "struct_type": {
+      "id": "{{step4.extract.struct_type_id}}",
+      "class": "{{step4.extract.struct_type_class}}",
+      "base_name": "{{step4.extract.base_name}}",
+      "cosmetic_name": "{{step5.extract.cosmetic_name}}",
+      "cosmetic_lore": "{{step5.extract.cosmetic_lore}}",
+      "weapons": "{{step5.extract.weapons}}",
+      "abilities": "{{step5.extract.abilities}}",
+      "animations": "{{step5.extract.animations}}",
+      "icon": "{{step5.extract.icon}}",
+      "skin_hash": "{{step5.extract.skin_hash}}",
+      "skin_source": "{{step5.extract.skin_source}}"
+    }
+  },
+  "errorHandling": {
+    "step1": {
+      "invalid_mod": "Stop workflow - mod validation failed",
+      "errors": "Report validation errors to user"
+    },
+    "step2": {
+      "409": "Set/skin may already be installed - check existing cosmetics",
+      "500": "Retry installation with exponential backoff"
+    },
+    "step3": {
+      "404": "Set not found - verify setHash",
+      "500": "Retry query with exponential backoff"
+    },
+    "step4": {
+      "404": "Struct type not found - verify struct type ID",
+      "500": "Retry query with exponential backoff"
+    },
+    "step5": {
+      "404": "No cosmetic skin found - skin may not exist for this class",
+      "500": "Retry query with exponential backoff"
+    }
+  },
+  "notes": "This workflow demonstrates installing a cosmetic mod (Phase 1 format) which is converted to Sets/Skins (Phases 2-4) during ingestion. The mod is converted to Sets/Skins with hash-based identification. Steps 4-5 show the manual merge approach using class-based lookup, while step 6 shows the integrated endpoint approach. Use step 6 for simpler integration. Note: The class parameter in step 6 is optional but recommended for faster cosmetic lookup."
+}
+

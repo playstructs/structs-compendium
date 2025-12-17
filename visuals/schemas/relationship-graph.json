@@ -1,0 +1,131 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Relationship Graph Schema",
+  "description": "Schema for relationship graphs showing entity connections and dependencies",
+  "type": "object",
+  "structs:category": "visual",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique graph identifier"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["relationship", "dependency", "hierarchy", "network"],
+      "description": "Type of relationship graph"
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable graph title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of what the graph represents"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["gameplay", "economics", "technical", "system"],
+      "description": "Category of graph"
+    },
+    "entities": {
+      "type": "array",
+      "description": "Entities in the graph",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique entity identifier"
+          },
+          "label": {
+            "type": "string",
+            "description": "Human-readable entity label"
+          },
+          "entityType": {
+            "type": "string",
+            "description": "Entity type (e.g., 'Player', 'Planet', 'Struct')"
+          },
+          "schemaReference": {
+            "type": "string",
+            "description": "Reference to schema definition"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional entity metadata"
+          }
+        },
+        "required": ["id", "label", "entityType"]
+      }
+    },
+    "relationships": {
+      "type": "array",
+      "description": "Relationships between entities",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique relationship identifier"
+          },
+          "from": {
+            "type": "string",
+            "description": "Source entity ID"
+          },
+          "to": {
+            "type": "string",
+            "description": "Target entity ID"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["owns", "contains", "dependsOn", "requires", "produces", "consumes", "memberOf", "locatedOn", "typeOf"],
+            "description": "Type of relationship"
+          },
+          "label": {
+            "type": "string",
+            "description": "Human-readable relationship label"
+          },
+          "direction": {
+            "type": "string",
+            "enum": ["directed", "undirected", "bidirectional"],
+            "default": "directed",
+            "description": "Relationship direction"
+          },
+          "cardinality": {
+            "type": "string",
+            "enum": ["one-to-one", "one-to-many", "many-to-one", "many-to-many"],
+            "description": "Relationship cardinality"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional relationship metadata"
+          }
+        },
+        "required": ["id", "from", "to", "type"]
+      }
+    },
+    "relatedSchemas": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "References to related schemas"
+    },
+    "relatedEndpoints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "References to related API endpoints"
+    },
+    "relatedDiagrams": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "References to related diagrams"
+    }
+  },
+  "required": ["id", "type", "title", "entities", "relationships"]
+}
+

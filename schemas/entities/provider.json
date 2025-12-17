@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Provider Entity Schema",
+  "description": "Provider entity definition - extracted from game-state.json for context window optimization. See schemas/formats.json for format specifications.",
+  "type": "object",
+  "structs:entity": "Provider",
+  "structs:endpoint": "/structs/provider/{id}",
+  "structs:category": "economic",
+  "properties": {
+    "id": {
+      "type": "string",
+      "structs:format": "entity-id",
+      "pattern": "^10-[0-9]+$",
+      "description": "Unique provider identifier in format 'type-index' (e.g., '10-1' for provider type 10, index 1). Type 10 = Provider."
+    },
+    "ownerId": {
+      "type": "string",
+      "structs:format": "entity-id",
+      "pattern": "^1-[0-9]+$",
+      "structs:relationship": "Player",
+      "description": "Player who owns this provider. Format: 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+    },
+    "gridAttributes": {
+      "type": "object",
+      "description": "Grid position and attributes",
+      "additionalProperties": true
+    }
+  },
+  "required": ["id", "ownerId"],
+  "structs:relationships": {
+    "owner": "schemas/entities/player.json"
+  },
+  "structs:verification": {
+    "verified": true,
+    "verifiedBy": "GameCodeAnalyst",
+    "verifiedDate": "2025-01-XX",
+    "verificationMethod": "code-analysis",
+    "confidence": "high",
+    "note": "API response schema. Missing many fields from database (substationId, rateAmount, rateDenom, accessPolicy, capacityMinimum, capacityMaximum, durationMinimum, durationMaximum, cancellationPenalties) - these may be in gridAttributes or separate queries. For code-based field definitions, see schemas/entities.json#/definitions/Provider",
+    "codeReference": "x/structs/types/provider.pb.go, x/structs/keeper/provider_cache.go",
+    "databaseReference": "structs.provider table (columns: id, substation_id, rate_amount, rate_denom, access_policy, capacity_minimum, capacity_maximum, duration_minimum, duration_maximum, provider_cancellation_penalty, consumer_cancellation_penalty)",
+    "verifiedFields": ["id", "ownerId"],
+    "missingFields": ["substationId", "rateAmount", "rateDenom", "accessPolicy", "capacityMinimum", "capacityMaximum", "durationMinimum", "durationMaximum", "providerCancellationPenalty", "consumerCancellationPenalty"]
+  }
+}
+

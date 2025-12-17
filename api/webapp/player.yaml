@@ -1,0 +1,150 @@
+# Webapp Player API Endpoints
+
+**Version**: 1.0.0  
+**Category**: webapp  
+**Entity**: Player  
+**Base URL**: ${webappBaseUrl} (default: http://localhost:8080)
+
+---
+
+## Endpoints
+
+endpoints:
+  - id: "webapp-player-by-id"
+    method: "GET"
+    path: "/api/player/{player_id}"
+    description: "Get player information from web application"
+    category: "webapp"
+    entity: "Player"
+    baseUrl: "${webappBaseUrl}"
+    parameters:
+      - name: "player_id"
+        type: "string"
+        required: true
+        format: "entity-id"
+        pattern: "^1-[0-9]+$"
+        description: "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+    response:
+      schema: "schemas/responses.json#/definitions/WebappPlayerResponse"
+      contentType: "application/json"
+    example:
+      request: "GET http://localhost:8080/api/player/1-11"
+      response: |
+        {
+          "player": {
+            "id": "1-11",
+            "username": "PlayerName",
+            "address": "cosmos1..."
+          },
+          "guild": {
+            "id": "2-1",
+            "name": "GuildName"
+          },
+          "stats": {
+            "total_ore": 1000,
+            "planets_completed": 5
+          }
+        }
+
+  - id: "webapp-player-action-last-block"
+    method: "GET"
+    path: "/api/player/{player_id}/action/last/block/height"
+    description: "Get last action block height for player"
+    category: "webapp"
+    entity: "Player"
+    baseUrl: "${webappBaseUrl}"
+    parameters:
+      - name: "player_id"
+        type: "string"
+        required: true
+        format: "player-id"
+        description: "Player identifier"
+    response:
+      schema: "schemas/responses.json#/definitions/BlockHeightResponse"
+      contentType: "application/json"
+    example:
+      request: "GET http://localhost:8080/api/player/1-11/action/last/block/height"
+      response: |
+        {
+          "height": 12345
+        }
+
+  - id: "webapp-player-raid-search"
+    method: "GET"
+    path: "/api/player/raid/search"
+    description: "Search player raids"
+    category: "webapp"
+    entity: "Player"
+
+  - id: "webapp-player-username"
+    method: "PUT"
+    path: "/api/player/username"
+    description: "Update player username"
+    category: "webapp"
+    entity: "Player"
+    authentication: "required"
+
+  - id: "webapp-player-transfer-search"
+    method: "GET"
+    path: "/api/player/transfer/search"
+    description: "Search player transfers"
+    category: "webapp"
+    entity: "Player"
+
+  - id: "webapp-player-ore-stats"
+    method: "GET"
+    path: "/api/player/{player_id}/ore/stats"
+    description: "Get player ore statistics"
+    category: "webapp"
+    entity: "Player"
+    baseUrl: "${webappBaseUrl}"
+    parameters:
+      - name: "player_id"
+        type: "string"
+        required: true
+        format: "player-id"
+        description: "Player identifier"
+    response:
+      schema: "schemas/responses.json#/definitions/OreStatsResponse"
+      contentType: "application/json"
+    example:
+      request: "GET http://localhost:8080/api/player/1-11/ore/stats"
+      response: |
+        {
+          "player_id": "1-11",
+          "total_ore": 1000,
+          "ore_by_type": {
+            "iron": 500,
+            "copper": 300,
+            "silver": 200
+          }
+        }
+
+  - id: "webapp-player-planet-completed"
+    method: "GET"
+    path: "/api/player/{player_id}/planet/completed"
+    description: "Get completed planets for player"
+    category: "webapp"
+    entity: "Player"
+    parameters:
+      - name: "player_id"
+        type: "string"
+        required: true
+        format: "player-id"
+
+  - id: "webapp-player-raid-launched"
+    method: "GET"
+    path: "/api/player/{player_id}/raid/launched"
+    description: "Get launched raids for player"
+    category: "webapp"
+    entity: "Player"
+    parameters:
+      - name: "player_id"
+        type: "string"
+        required: true
+        format: "player-id"
+
+---
+
+*Last Updated: January 2025*
+

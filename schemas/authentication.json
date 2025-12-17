@@ -1,0 +1,453 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Authentication Data Structures",
+  "description": "Authentication schemas for webapp, consensus network, and streaming services",
+  "type": "object",
+  "structs:category": "authentication",
+  "definitions": {
+    "WebappLoginRequest": {
+      "type": "object",
+      "description": "Webapp login request",
+      "structs:endpoint": "/api/auth/login",
+      "structs:method": "POST",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "Player username"
+        },
+        "password": {
+          "type": "string",
+          "description": "Player password"
+        }
+      },
+      "required": ["username", "password"]
+    },
+    "WebappLoginResponse": {
+      "type": "object",
+      "description": "Webapp login response",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "Login success status"
+        },
+        "message": {
+          "type": "string",
+          "description": "Response message"
+        }
+      },
+      "required": ["success"]
+    },
+    "WebappSession": {
+      "type": "object",
+      "description": "Webapp session data",
+      "properties": {
+        "cookie": {
+          "type": "string",
+          "description": "Session cookie (PHPSESSID)"
+        },
+        "expires": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Session expiration time"
+        },
+        "lastUsed": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last session usage time"
+        }
+      },
+      "required": ["cookie"]
+    },
+    "ConsensusAccount": {
+      "type": "object",
+      "description": "Consensus network account information",
+      "properties": {
+        "address": {
+          "type": "string",
+          "format": "blockchain-address",
+          "description": "Account address"
+        },
+        "pub_key": {
+          "type": "object",
+          "description": "Public key"
+        },
+        "account_number": {
+          "type": "string",
+          "description": "Account number"
+        },
+        "sequence": {
+          "type": "string",
+          "description": "Account sequence (nonce)"
+        }
+      },
+      "required": ["address", "account_number", "sequence"]
+    },
+    "TransactionSigner": {
+      "type": "object",
+      "description": "Transaction signer information",
+      "properties": {
+        "address": {
+          "type": "string",
+          "format": "blockchain-address",
+          "description": "Signer address"
+        },
+        "privateKey": {
+          "type": "string",
+          "description": "Private key (never expose in production)",
+          "structs:sensitive": true
+        },
+        "publicKey": {
+          "type": "string",
+          "description": "Public key"
+        },
+        "sequence": {
+          "type": "string",
+          "description": "Current sequence number"
+        }
+      },
+      "required": ["address"]
+    },
+    "SignedTransaction": {
+      "type": "object",
+      "description": "Signed transaction ready for submission",
+      "properties": {
+        "body": {
+          "type": "object",
+          "description": "Transaction body",
+          "properties": {
+            "messages": {
+              "type": "array",
+              "description": "Transaction messages"
+            },
+            "memo": {
+              "type": "string",
+              "description": "Transaction memo"
+            }
+          },
+          "required": ["messages"]
+        },
+        "auth_info": {
+          "type": "object",
+          "description": "Authentication information",
+          "properties": {
+            "signer_infos": {
+              "type": "array",
+              "description": "Signer information"
+            },
+            "fee": {
+              "type": "object",
+              "description": "Transaction fee",
+              "properties": {
+                "amount": {
+                  "type": "array",
+                  "description": "Fee amount"
+                },
+                "gas_limit": {
+                  "type": "string",
+                  "description": "Gas limit"
+                }
+              }
+            }
+          },
+          "required": ["signer_infos", "fee"]
+        },
+        "signatures": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Transaction signatures"
+        }
+      },
+      "required": ["body", "auth_info", "signatures"]
+    },
+    "NATSConnection": {
+      "type": "object",
+      "description": "NATS connection configuration",
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "NATS server URL",
+          "enum": ["nats://localhost:4222", "ws://localhost:1443"]
+        },
+        "protocol": {
+          "type": "string",
+          "enum": ["NATS"],
+          "default": "NATS"
+        },
+        "transport": {
+          "type": "string",
+          "enum": ["tcp", "WebSocket"],
+          "description": "Transport protocol"
+        },
+        "authentication": {
+          "type": "object",
+          "description": "NATS authentication (optional)",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["token", "username_password"],
+              "description": "Authentication type"
+            },
+            "token": {
+              "type": "string",
+              "description": "NATS token (if type is token)"
+            },
+            "username": {
+              "type": "string",
+              "description": "NATS username (if type is username_password)"
+            },
+            "password": {
+              "type": "string",
+              "description": "NATS password (if type is username_password)",
+              "structs:sensitive": true
+            }
+          }
+        }
+      },
+      "required": ["url", "protocol"]
+    },
+    "AuthenticationConfig": {
+      "type": "object",
+      "description": "Complete authentication configuration",
+      "properties": {
+        "webapp": {
+          "type": "object",
+          "properties": {
+            "baseURL": {
+              "type": "string",
+              "description": "Webapp base URL"
+            },
+            "username": {
+              "type": "string",
+              "description": "Webapp username",
+              "structs:sensitive": false
+            },
+            "password": {
+              "type": "string",
+              "description": "Webapp password",
+              "structs:sensitive": true
+            },
+            "session": {
+              "$ref": "#/definitions/WebappSession"
+            }
+          }
+        },
+        "consensus": {
+          "type": "object",
+          "properties": {
+            "rpcURL": {
+              "type": "string",
+              "description": "RPC URL"
+            },
+            "apiURL": {
+              "type": "string",
+              "description": "API URL"
+            },
+            "signer": {
+              "$ref": "#/definitions/TransactionSigner"
+            }
+          }
+        },
+        "streaming": {
+          "$ref": "#/definitions/NATSConnection"
+        }
+      }
+    }
+  },
+  "authenticationFlows": {
+    "webappLogin": {
+      "id": "webapp-login",
+      "name": "Webapp Login Flow",
+      "status": "[Needs Verification]",
+      "description": "Session-based authentication for webapp API",
+      "steps": [
+        {
+          "step": 1,
+          "action": "POST /api/auth/login",
+          "request": {
+            "$ref": "#/definitions/WebappLoginRequest"
+          },
+          "response": {
+            "$ref": "#/definitions/WebappLoginResponse"
+          },
+          "store": "session"
+        },
+        {
+          "step": 2,
+          "action": "Use session cookie in subsequent requests",
+          "headers": {
+            "Cookie": "{{session.cookie}}"
+          }
+        }
+      ],
+      "errorHandling": {
+        "401": "Session expired, re-authenticate",
+        "403": "Invalid credentials or insufficient permissions"
+      }
+    },
+    "consensusTransaction": {
+      "id": "consensus-transaction",
+      "name": "Consensus Transaction Flow",
+      "status": "[Implemented]",
+      "description": "Transaction signing for consensus network",
+      "steps": [
+        {
+          "step": 1,
+          "action": "GET /cosmos/auth/v1beta1/accounts/{address}",
+          "store": "account",
+          "description": "Get account information including sequence number"
+        },
+        {
+          "step": 2,
+          "action": "Create transaction with account sequence",
+          "use": "account.sequence",
+          "description": "Include sequence in transaction for replay protection"
+        },
+        {
+          "step": 3,
+          "action": "Sign transaction with private key",
+          "result": "signedTransaction",
+          "description": "Sign transaction using private key (never expose private key)"
+        },
+        {
+          "step": 4,
+          "action": "POST /cosmos/tx/v1beta1/txs",
+          "body": {
+            "$ref": "#/definitions/SignedTransaction"
+          },
+          "description": "Submit signed transaction to network"
+        }
+      ],
+      "errorHandling": {
+        "400": "Invalid transaction format",
+        "401": "Invalid signature",
+        "500": "Network error, retry with backoff"
+      }
+    },
+    "natsConnection": {
+      "id": "nats-connection",
+      "name": "NATS Connection Flow",
+      "status": "[Implemented]",
+      "description": "NATS connection for GRASS streaming (authentication optional)",
+      "steps": [
+        {
+          "step": 1,
+          "action": "Connect to NATS",
+          "config": {
+            "$ref": "#/definitions/NATSConnection"
+          },
+          "description": "Connect to NATS server (authentication optional)"
+        },
+        {
+          "step": 2,
+          "action": "Subscribe to subjects",
+          "subjects": ["structs.player.*", "structs.planet.*"],
+          "description": "Subscribe to GRASS event subjects"
+        },
+        {
+          "step": 3,
+          "action": "Handle messages",
+          "callback": "processMessage",
+          "description": "Process incoming real-time events"
+        }
+      ],
+      "errorHandling": {
+        "connection_failed": "Retry with exponential backoff",
+        "authentication_failed": "Check NATS credentials if authentication enabled"
+      }
+    },
+    "walletSignature": {
+      "id": "wallet-signature",
+      "name": "Wallet Signature Flow",
+      "status": "[Planned]",
+      "description": "Wallet signature authentication (planned feature)",
+      "steps": [
+        {
+          "step": 1,
+          "action": "Request signature from wallet",
+          "message": "Sign message for authentication",
+          "description": "Request wallet to sign authentication message"
+        },
+        {
+          "step": 2,
+          "action": "POST /api/auth/login",
+          "request": {
+            "$ref": "#/definitions/WebappLoginRequest"
+          },
+          "description": "Submit signed message for authentication"
+        },
+        {
+          "step": 3,
+          "action": "Receive authentication token",
+          "store": "token",
+          "description": "Store authentication token for subsequent requests"
+        }
+      ],
+      "note": "This flow is planned but not yet implemented. See roadmap.md for status."
+    },
+    "apiKey": {
+      "id": "api-key",
+      "name": "API Key Authentication",
+      "status": "[Planned]",
+      "description": "API key authentication (planned feature)",
+      "steps": [
+        {
+          "step": 1,
+          "action": "Include API key in request headers",
+          "headers": {
+            "X-API-Key": "{{apiKey}}"
+          },
+          "description": "Include API key in Authorization header"
+        }
+      ],
+      "note": "This flow is planned but not yet implemented. See roadmap.md for status."
+    }
+  },
+  "authenticationStatus": {
+    "webapp": {
+      "status": "[Implemented]",
+      "description": "Session-based authentication for webapp API",
+      "implementation": "PHP Symfony application (structs-webapp). This is the main user-facing API. Authentication is implemented in the PHP Symfony application."
+    },
+    "consensus": {
+      "status": "[Implemented]",
+      "description": "Transaction signing required for all transactions",
+      "implementation": "All transactions must be signed with private key"
+    },
+    "streaming": {
+      "status": "[Implemented]",
+      "description": "NATS authentication is optional",
+      "implementation": "NATS connection works without authentication, authentication optional if configured"
+    },
+    "walletSignature": {
+      "status": "[Planned]",
+      "description": "Wallet signature authentication",
+      "implementation": "Not yet implemented, see roadmap.md"
+    },
+    "apiKey": {
+      "status": "[Planned]",
+      "description": "API key authentication",
+      "implementation": "Not yet implemented, see roadmap.md"
+    },
+    "oauth": {
+      "status": "[Planned]",
+      "description": "OAuth integration",
+      "implementation": "Not yet implemented, see roadmap.md"
+    }
+  },
+  "structs:references": {
+    "authenticationProtocol": "protocols/authentication.md - Complete authentication protocol",
+    "errorHandling": "protocols/error-handling.md - Error handling for authentication",
+    "streamingProtocol": "protocols/streaming.md - NATS connection details",
+    "roadmap": "roadmap.md - Planned authentication features"
+  },
+  "structs:securityNotes": {
+    "privateKeys": "Never expose private keys in code, logs, or documentation",
+    "sessions": "Store sessions securely, handle expiration gracefully",
+    "tokens": "Store API tokens securely if implemented",
+    "https": "Always use HTTPS/WSS in production"
+  }
+}
+

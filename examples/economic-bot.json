@@ -1,0 +1,271 @@
+{
+  "version": "1.0.0",
+  "name": "Economic Bot Example",
+  "description": "Example AI bot implementation for economic operations in Structs",
+  "category": "economic",
+  "bot": {
+    "id": "economic-bot-001",
+    "name": "Economic Bot",
+    "purpose": "Automated resource extraction, refinement, and energy production",
+    "strategy": {
+      "primary": "resource-extraction",
+      "secondary": "energy-production",
+      "riskTolerance": "medium"
+    }
+  },
+  "capabilities": {
+    "mining": {
+      "enabled": true,
+      "structType": "OreExtractor",
+      "action": "MsgStructOreMinerComplete",
+      "structs:deprecated": "MsgOreMining (deprecated - use MsgStructOreMinerComplete)",
+      "requirements": {
+        "buildDraw": 500000,
+        "passiveDraw": 500000,
+        "miningCharge": 20,
+        "miningDifficulty": 14000
+      }
+    },
+    "refining": {
+      "enabled": true,
+      "structType": "OreRefinery",
+      "action": "MsgStructOreRefineryComplete",
+      "structs:deprecated": "MsgOreRefining (deprecated - use MsgStructOreRefineryComplete)",
+      "requirements": {
+        "buildDraw": 500000,
+        "passiveDraw": 500000,
+        "refiningCharge": 20,
+        "refiningDifficulty": 28000
+      }
+    },
+    "energyProduction": {
+      "enabled": true,
+      "options": {
+        "reactor": {
+          "enabled": true,
+          "action": "MsgReactorInfuse",
+          "structs:deprecated": "MsgReactorAllocate (deprecated - use MsgReactorInfuse)",
+          "rate": 1,
+          "risk": "low",
+          "note": "Current implementation is deterministic - conversion is guaranteed"
+        },
+        "fieldGenerator": {
+          "enabled": true,
+          "action": "MsgStructGeneratorInfuse",
+          "structs:deprecated": "MsgGeneratorAllocate (deprecated - use MsgStructGeneratorInfuse)",
+          "rate": 2,
+          "risk": "high",
+          "note": "Design intent mentions risk, but current code is deterministic (verified December 7, 2025)"
+        },
+        "continentalPowerPlant": {
+          "enabled": false,
+          "action": "MsgStructGeneratorInfuse",
+          "structs:deprecated": "MsgGeneratorAllocate (deprecated - use MsgStructGeneratorInfuse)",
+          "rate": 5,
+          "risk": "high",
+          "note": "Design intent mentions risk, but current code is deterministic (verified December 7, 2025)"
+        },
+        "worldEngine": {
+          "enabled": false,
+          "action": "MsgStructGeneratorInfuse",
+          "structs:deprecated": "MsgGeneratorAllocate (deprecated - use MsgStructGeneratorInfuse)",
+          "rate": 10,
+          "risk": "high",
+          "note": "Design intent mentions risk, but current code is deterministic (verified December 7, 2025)"
+        }
+      },
+      "implementationNote": "Code verification (December 7, 2025): Generator conversion is deterministic. No risk calculation implemented in current code."
+    }
+  },
+  "workflow": {
+    "step1": {
+      "action": "Mine Alpha Ore",
+      "type": "MsgStructOreMinerComplete",
+      "request": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgStructOreMinerComplete",
+                "creator": "structs1...",
+                "structId": "1-1",
+                "hash": "proof-of-work-hash",
+                "nonce": "proof-of-work-nonce"
+              }
+            ]
+          }
+        }
+      },
+      "expectedResult": {
+        "oreExtracted": "number",
+        "security": "stealable",
+        "nextStep": "refine-immediately"
+      }
+    },
+    "step2": {
+      "action": "Refine to Alpha Matter",
+      "type": "MsgStructOreRefineryComplete",
+      "request": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgStructOreRefineryComplete",
+                "creator": "structs1...",
+                "structId": "1-1",
+                "hash": "proof-of-work-hash",
+                "nonce": "proof-of-work-nonce"
+              }
+            ]
+          }
+        }
+      },
+      "expectedResult": {
+        "alphaMatterCreated": "number",
+        "security": "non-stealable",
+        "nextStep": "produce-energy"
+      }
+    },
+    "step3": {
+      "action": "Produce Energy",
+      "type": "MsgReactorInfuse",
+      "structs:deprecated": "MsgReactorAllocate (deprecated - use MsgReactorInfuse)",
+      "decision": {
+        "if": "riskTolerance === 'low'",
+        "then": "use Reactor (rate 1, safe)",
+        "else": "use Generator (rate 2, 5, or 10, risky)"
+      },
+      "request": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgReactorInfuse",
+                "creator": "structs1...",
+                "reactorId": "1-1",
+                "destinationType": 1,
+                "destinationId": "2-1",
+                "alphaMatterAmount": "100000000"
+              }
+            ]
+          }
+        }
+      },
+      "expectedResult": {
+        "energyProduced": "number",
+        "ephemeral": true,
+        "mustConsumeImmediately": true,
+        "nextStep": "consume-energy"
+      }
+    }
+  },
+  "security": {
+    "oreSecurity": {
+      "policy": "refine-immediately",
+      "reason": "Alpha Ore can be stolen, Alpha Matter cannot"
+    },
+    "energyManagement": {
+      "policy": "consume-immediately",
+      "reason": "Energy is ephemeral and cannot be stored"
+    }
+  },
+  "formulas": {
+    "oreToMatter": {
+      "formula": "1 gram Alpha Ore = 1 gram Alpha Matter",
+      "rate": 1
+    },
+    "matterToEnergy": {
+      "reactor": {
+        "formula": "Energy (kW) = Alpha Matter (grams) × 1",
+        "rate": 1
+      },
+      "fieldGenerator": {
+        "formula": "Energy (kW) = Alpha Matter (grams) × 2",
+        "rate": 2
+      },
+      "continentalPowerPlant": {
+        "formula": "Energy (kW) = Alpha Matter (grams) × 5",
+        "rate": 5
+      },
+      "worldEngine": {
+        "formula": "Energy (kW) = Alpha Matter (grams) × 10",
+        "rate": 10
+      }
+    }
+  },
+  "examples": {
+    "completeFlow": {
+      "scenario": "Mine 100 grams ore, refine to matter, produce energy",
+      "steps": [
+        {
+          "step": 1,
+          "action": "MsgStructOreMinerComplete",
+          "structs:deprecated": "MsgOreMining (deprecated - use MsgStructOreMinerComplete)",
+          "input": "Planet with ore",
+          "output": "100 grams Alpha Ore (stealable)"
+        },
+        {
+          "step": 2,
+          "action": "MsgStructOreRefineryComplete",
+          "structs:deprecated": "MsgOreRefining (deprecated - use MsgStructOreRefineryComplete)",
+          "input": "100 grams Alpha Ore",
+          "output": "100 grams Alpha Matter (non-stealable)"
+        },
+        {
+          "step": 3,
+          "action": "MsgReactorInfuse",
+          "structs:deprecated": "MsgReactorAllocate (deprecated - use MsgReactorInfuse)",
+          "input": "100 grams Alpha Matter",
+          "output": "100 kW Energy (ephemeral, must consume immediately)"
+        }
+      ]
+    },
+    "generatorFlow": {
+      "scenario": "Use Field Generator for higher efficiency",
+      "steps": [
+        {
+          "step": 1,
+          "action": "MsgStructOreMinerComplete",
+          "structs:deprecated": "MsgOreMining (deprecated - use MsgStructOreMinerComplete)",
+          "input": "Planet with ore",
+          "output": "100 grams Alpha Ore (stealable)"
+        },
+        {
+          "step": 2,
+          "action": "MsgStructOreRefineryComplete",
+          "structs:deprecated": "MsgOreRefining (deprecated - use MsgStructOreRefineryComplete)",
+          "input": "100 grams Alpha Ore",
+          "output": "100 grams Alpha Matter (non-stealable)"
+        },
+        {
+          "step": 3,
+          "action": "MsgStructGeneratorInfuse",
+          "structs:deprecated": "MsgGeneratorAllocate (deprecated - use MsgStructGeneratorInfuse)",
+          "input": "100 grams Alpha Matter",
+          "generatorType": "fieldGenerator",
+          "output": "200 kW Energy (ephemeral, must consume immediately)",
+          "note": "2x efficiency but higher risk"
+        }
+      ]
+    }
+  },
+  "errorHandling": {
+    "insufficientAlphaMatter": {
+      "action": "mine-more-ore",
+      "then": "refine-to-matter"
+    },
+    "insufficientEnergy": {
+      "action": "produce-more-energy",
+      "from": "alpha-matter"
+    },
+    "oreStolen": {
+      "action": "refine-immediately-next-time",
+      "prevention": "refine-ore-as-soon-as-mined"
+    },
+    "energyExpired": {
+      "action": "consume-immediately-next-time",
+      "prevention": "have-consumption-ready-before-production"
+    }
+  }
+}
+

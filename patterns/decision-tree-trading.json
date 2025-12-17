@@ -1,0 +1,287 @@
+{
+  "version": "1.0.0",
+  "id": "trading-decision",
+  "name": "Trading Decision Tree",
+  "description": "Decision tree for trading Alpha Matter and Energy on the marketplace",
+  "category": "economic",
+  "priority": "high",
+  "root": {
+    "id": "start",
+    "question": "Do you want to trade?",
+    "type": "boolean",
+    "true": {
+      "id": "resource-type",
+      "question": "What resource do you want to trade?",
+      "type": "choice",
+      "options": [
+        {
+          "value": "alpha-matter",
+          "label": "Alpha Matter",
+          "result": {
+            "id": "alpha-matter-action",
+            "question": "What do you want to do with Alpha Matter?",
+            "type": "choice",
+            "options": [
+              {
+                "value": "sell",
+                "label": "Sell Alpha Matter",
+                "result": {
+                  "id": "sell-alpha-matter",
+                  "question": "Why do you want to sell?",
+                  "type": "choice",
+                  "options": [
+                    {
+                      "value": "need-energy",
+                      "label": "Need Energy",
+                      "result": {
+                        "recommendation": "Trade Alpha Matter for Energy",
+                        "reason": "Convert Alpha Matter to Energy through marketplace",
+                        "action": "MsgTradeAlphaMatter or buy Energy directly",
+                        "nextStep": "Query energy market, compare prices"
+                      }
+                    },
+                    {
+                      "value": "excess",
+                      "label": "Have Excess Alpha Matter",
+                      "result": {
+                        "id": "check-price",
+                        "question": "Is market price favorable?",
+                        "type": "boolean",
+                        "true": {
+                          "recommendation": "Sell Alpha Matter",
+                          "reason": "Price is good, sell excess",
+                          "action": "MsgTradeAlphaMatter or MsgPlaceMarketOrder",
+                          "nextStep": "Execute sell trade"
+                        },
+                        "false": {
+                          "recommendation": "Hold Alpha Matter",
+                          "reason": "Price not favorable, wait for better conditions",
+                          "nextStep": "Monitor market, wait for price improvement"
+                        }
+                      }
+                    },
+                    {
+                      "value": "market-opportunity",
+                      "label": "Market Opportunity",
+                      "result": {
+                        "recommendation": "Sell Alpha Matter",
+                        "reason": "Market conditions are favorable",
+                        "action": "MsgTradeAlphaMatter or MsgPlaceMarketOrder",
+                        "nextStep": "Execute sell trade at favorable price"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "value": "buy",
+                "label": "Buy Alpha Matter",
+                "result": {
+                  "id": "buy-alpha-matter",
+                  "question": "Why do you need Alpha Matter?",
+                  "type": "choice",
+                  "options": [
+                    {
+                      "value": "energy-production",
+                      "label": "For Energy Production",
+                      "result": {
+                        "id": "compare-options",
+                        "question": "Compare: Buy Alpha Matter vs Produce Energy Directly",
+                        "type": "analysis",
+                        "options": [
+                          {
+                            "option": "Buy Alpha Matter, then produce energy",
+                            "cost": "Market price + production cost",
+                            "time": "Two steps"
+                          },
+                          {
+                            "option": "Buy Energy directly",
+                            "cost": "Energy market price",
+                            "time": "One step"
+                          }
+                        ],
+                        "recommendation": "Compare costs and choose cheaper option",
+                        "nextStep": "Query both markets, compare prices"
+                      }
+                    },
+                    {
+                      "value": "guild-collateral",
+                      "label": "For Guild Token Collateral",
+                      "result": {
+                        "recommendation": "Buy Alpha Matter",
+                        "reason": "Need Alpha Matter for guild token collateral",
+                        "action": "MsgTradeAlphaMatter or MsgPlaceMarketOrder",
+                        "nextStep": "Execute buy trade"
+                      }
+                    },
+                    {
+                      "value": "reserve",
+                      "label": "Build Reserve",
+                      "result": {
+                        "id": "check-price-reserve",
+                        "question": "Is market price favorable?",
+                        "type": "boolean",
+                        "true": {
+                          "recommendation": "Buy Alpha Matter",
+                          "reason": "Price is good, build reserve",
+                          "action": "MsgTradeAlphaMatter or MsgPlaceMarketOrder",
+                          "nextStep": "Execute buy trade"
+                        },
+                        "false": {
+                          "recommendation": "Wait",
+                          "reason": "Price not favorable, wait for better conditions",
+                          "nextStep": "Monitor market, wait for price improvement"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "value": "energy",
+          "label": "Energy",
+          "result": {
+            "id": "energy-action",
+            "question": "What do you want to do with Energy?",
+            "type": "choice",
+            "options": [
+              {
+                "value": "buy",
+                "label": "Buy Energy",
+                "result": {
+                  "id": "buy-energy",
+                  "question": "How do you want to buy Energy?",
+                  "type": "choice",
+                  "options": [
+                    {
+                      "value": "marketplace",
+                      "label": "Marketplace (Immediate)",
+                      "result": {
+                        "recommendation": "Buy Energy from Marketplace",
+                        "reason": "Immediate energy purchase",
+                        "action": "MsgTradeEnergy",
+                        "warning": "Energy is ephemeral - must consume immediately",
+                        "nextStep": "Have consumption ready before buying"
+                      }
+                    },
+                    {
+                      "value": "agreement",
+                      "label": "Automated Agreement (Long-term)",
+                      "result": {
+                        "recommendation": "Set up Energy Agreement",
+                        "reason": "Long-term consistent supply",
+                        "action": "MsgAgreementOpen",
+                        "structs:deprecated": "MsgAgreementCreate (deprecated - use MsgAgreementOpen)",
+                        "benefits": ["Automatic execution", "Penalty protection", "Persistent supply"],
+                        "nextStep": "Find provider, create agreement"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "value": "sell",
+                "label": "Sell Energy",
+                "result": {
+                  "id": "sell-energy",
+                  "question": "Do you have excess energy production?",
+                  "type": "boolean",
+                  "true": {
+                    "id": "energy-sell-method",
+                    "question": "How do you want to sell Energy?",
+                    "type": "choice",
+                    "options": [
+                      {
+                        "value": "marketplace",
+                        "label": "Marketplace (Immediate)",
+                        "result": {
+                          "recommendation": "Sell Energy on Marketplace",
+                          "reason": "Immediate sale",
+                          "action": "MsgTradeEnergy",
+                          "warning": "Energy is ephemeral - sell quickly",
+                          "nextStep": "Execute sell trade immediately"
+                        }
+                      },
+                      {
+                        "value": "agreement",
+                        "label": "Automated Agreement (Long-term)",
+                        "result": {
+                          "recommendation": "Set up Energy Agreement as Provider",
+                          "reason": "Consistent revenue stream",
+                          "action": "MsgProviderCreate, then MsgAgreementCreate",
+                          "benefits": ["Automatic execution", "Penalty protection", "Persistent revenue"],
+                          "nextStep": "Create provider, set up agreements"
+                        }
+                      }
+                    ]
+                  },
+                  "false": {
+                    "recommendation": "Don't sell Energy",
+                    "reason": "No excess energy to sell",
+                    "nextStep": "Focus on energy production first"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "false": {
+      "id": "no-trading",
+      "recommendation": "No trading needed",
+      "reason": "You don't need to trade right now"
+    }
+  },
+  "tradingStrategies": {
+    "buyLowSellHigh": {
+      "description": "Buy when prices are low, sell when prices are high",
+      "strategy": {
+        "monitorPrices": true,
+        "identifyTrends": true,
+        "timePurchases": "low prices",
+        "timeSales": "high prices"
+      }
+    },
+    "marketTiming": {
+      "description": "Time trades based on market cycles",
+      "phases": {
+        "expansion": "High demand, rising prices - sell",
+        "consolidation": "Balanced market, stable prices - trade normally",
+        "conflict": "Price volatility - buy if supply available",
+        "recovery": "Market normalization - buy low"
+      }
+    }
+  },
+  "bestPractices": {
+    "monitorMarket": {
+      "priority": "high",
+      "reason": "Market prices fluctuate based on supply and demand",
+      "action": "Track prices over time to identify trends"
+    },
+    "timeTrades": {
+      "priority": "high",
+      "reason": "Market timing affects profitability",
+      "action": "Buy during low-demand periods, sell during high-demand periods"
+    },
+    "energyImmediate": {
+      "priority": "critical",
+      "reason": "Energy is ephemeral and must be consumed immediately",
+      "action": "Have consumption ready before trading energy"
+    }
+  },
+  "warnings": {
+    "energyEphemeral": {
+      "message": "Energy is ephemeral - must be consumed immediately",
+      "action": "Have consumption ready before buying energy"
+    },
+    "alphaMatterSecure": {
+      "message": "Alpha Matter cannot be stolen - safe to trade",
+      "action": "Trade Alpha Matter without security concerns"
+    }
+  }
+}
+

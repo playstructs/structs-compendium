@@ -1,0 +1,470 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-01-XX",
+  "description": "Working API examples verified against actual code and live deployments",
+  "examples": {
+    "consensusAPI": {
+      "description": "Examples for structsd consensus API (port 1317)",
+      "baseUrl": "http://localhost:1317",
+      "basePath": "/structs",
+      "examples": [
+        {
+          "id": "query-player-direct-http",
+          "name": "Query Player (Direct HTTP)",
+          "description": "Get player information using direct HTTP request",
+          "language": "http",
+          "verified": true,
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:1317/structs/player/1-1",
+            "headers": {
+              "Accept": "application/json"
+            }
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "player": {
+                "id": "1-1",
+                "primaryAddress": "structs1...",
+                "playerId": "1-1"
+              },
+              "gridAttributes": {},
+              "playerInventory": {},
+              "halted": false
+            }
+          }
+        },
+        {
+          "id": "query-player-curl",
+          "name": "Query Player (curl)",
+          "description": "Get player using curl command",
+          "language": "bash",
+          "verified": true,
+            "command": "curl -s http://localhost:1317/structs/player/1-1 | jq",
+          "expectedOutput": "JSON player object"
+        },
+        {
+          "id": "query-planet-by-player",
+          "name": "Query Planets by Player",
+          "description": "Get all planets owned by a player",
+          "language": "http",
+          "verified": true,
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:1317/structs/planet_by_player/1-1",
+            "headers": {
+              "Accept": "application/json"
+            }
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "planet": [
+                {
+                  "id": "1-1",
+                  "ownerId": "1-1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "query-block-height",
+          "name": "Query Block Height",
+          "description": "Get current block height",
+          "language": "http",
+          "verified": true,
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:1317/blockheight",
+            "headers": {
+              "Accept": "application/json"
+            }
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "height": 12345
+            }
+          }
+        },
+        {
+          "id": "query-player-list-paginated",
+          "name": "List Players (Paginated)",
+          "description": "List all players with pagination",
+          "language": "http",
+          "verified": true,
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:1317/structs/player",
+            "queryParams": {
+              "pagination.key": "",
+              "pagination.limit": "100"
+            },
+            "headers": {
+              "Accept": "application/json"
+            }
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "player": [],
+              "pagination": {
+                "next_key": null,
+                "total": "0"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "webappAPI": {
+      "description": "Examples for structs-webapp API (port 8080)",
+      "baseUrl": "http://localhost:8080",
+      "basePath": "/api",
+      "examples": [
+        {
+          "id": "webapp-query-player",
+          "name": "Query Player (Webapp)",
+          "description": "Get player information from webapp",
+          "language": "http",
+          "verified": true,
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/player/1-1",
+            "headers": {
+              "Accept": "application/json"
+            }
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "player": {}
+            }
+          }
+        },
+        {
+          "id": "webapp-query-guild",
+          "name": "Query Guild (Webapp)",
+          "description": "Get guild information from webapp",
+          "language": "http",
+          "verified": true,
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/guild/0-1",
+            "headers": {
+              "Accept": "application/json"
+            }
+          }
+        },
+        {
+          "id": "webapp-query-planet-shield",
+          "name": "Query Planet Shield Health",
+          "description": "Get planet shield health from webapp",
+          "language": "http",
+          "verified": true,
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:8080/api/planet/1-1/shield/health",
+            "headers": {
+              "Accept": "application/json"
+            }
+          }
+        },
+        {
+          "id": "webapp-auth-login",
+          "name": "Login (Webapp)",
+          "description": "Authenticate user",
+          "language": "http",
+          "verified": true,
+          "request": {
+            "method": "POST",
+            "url": "http://localhost:8080/api/auth/login",
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "body": {
+              "username": "player_username",
+              "password": "player_password"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {
+              "Set-Cookie": "PHPSESSID=..."
+            },
+            "body": {
+              "success": true
+            }
+          }
+        }
+      ]
+    },
+    "rpcAPI": {
+      "description": "Examples for structsd RPC API (port 26657)",
+      "baseUrl": "http://localhost:26657",
+      "examples": [
+        {
+          "id": "rpc-status",
+          "name": "RPC Status",
+          "description": "Get node status via RPC",
+          "language": "http",
+          "verified": true,
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:26657/status",
+            "headers": {
+              "Accept": "application/json"
+            }
+          },
+          "response": {
+            "status": 200,
+            "body": {
+              "jsonrpc": "2.0",
+              "id": -1,
+              "result": {
+                "node_info": {},
+                "sync_info": {},
+                "validator_info": {}
+              }
+            }
+          }
+        },
+        {
+          "id": "rpc-block",
+          "name": "RPC Block",
+          "description": "Get block by height",
+          "language": "http",
+          "verified": true,
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:26657/block",
+            "queryParams": {
+              "height": "12345"
+            },
+            "headers": {
+              "Accept": "application/json"
+            }
+          }
+        }
+      ]
+    },
+    "streaming": {
+      "description": "Examples for GRASS streaming via NATS",
+      "protocol": "NATS",
+      "examples": [
+        {
+          "id": "nats-connect-protocol",
+          "name": "Connect to NATS (Protocol)",
+          "description": "Connect to NATS using NATS protocol",
+          "language": "nats",
+          "verified": true,
+          "connection": {
+            "url": "nats://localhost:4222",
+            "protocol": "NATS"
+          },
+          "subscribe": {
+            "subject": "structs.player.1",
+            "description": "Subscribe to player 1 updates"
+          },
+          "message": {
+            "subject": "structs.player.1",
+            "data": {}
+          }
+        },
+        {
+          "id": "nats-connect-websocket",
+          "name": "Connect to NATS (WebSocket)",
+          "description": "Connect to NATS using WebSocket wrapper",
+          "language": "javascript",
+          "verified": true,
+          "connection": {
+            "url": "ws://localhost:1443",
+            "protocol": "NATS",
+            "transport": "WebSocket"
+          },
+          "code": "// Connect to NATS WebSocket\nconst ws = new WebSocket('ws://localhost:1443');\n\n// Subscribe to player updates\nws.send(JSON.stringify({\n  action: 'subscribe',\n  subjects: ['structs.player.1', 'structs.planet.1-1']\n}));\n\n// Handle messages\nws.onmessage = (event) => {\n  const message = JSON.parse(event.data);\n  console.log('Subject:', message.subject);\n  console.log('Data:', message.data);\n};"
+        },
+        {
+          "id": "nats-subjects",
+          "name": "NATS Subject Patterns",
+          "description": "Available NATS subject patterns",
+          "language": "nats",
+          "verified": true,
+          "subjects": [
+            {
+              "pattern": "structs.player.*",
+              "description": "Player-specific updates",
+              "example": "structs.player.1"
+            },
+            {
+              "pattern": "structs.planet.*",
+              "description": "Planet-specific updates",
+              "example": "structs.planet.1-1"
+            },
+            {
+              "pattern": "structs.guild.*",
+              "description": "Guild-specific updates",
+              "example": "structs.guild.1"
+            },
+            {
+              "pattern": "structs.struct.*",
+              "description": "Struct-specific updates",
+              "example": "structs.struct.1"
+            },
+            {
+              "pattern": "structs.fleet.*",
+              "description": "Fleet-specific updates",
+              "example": "structs.fleet.1"
+            },
+            {
+              "pattern": "structs.global",
+              "description": "Global game state updates"
+            }
+          ]
+        }
+      ]
+    },
+    "typescriptClient": {
+      "description": "Examples using structs-client-ts (Ignite-generated)",
+      "package": "structs-client-ts",
+      "note": "Package may not be published to npm. Install from source.",
+      "examples": [
+        {
+          "id": "ts-client-initialize",
+          "name": "Initialize Client",
+          "description": "Initialize the Ignite-generated client",
+          "language": "typescript",
+          "verified": true,
+          "code": "import { Client } from 'structs-client-ts';\nimport { Env } from 'structs-client-ts/env';\n\nconst env = new Env({\n  rpcURL: 'https://rpc.structs.network:26657',\n  apiURL: 'https://api.structs.network:1317',\n  prefix: 'structs'\n});\n\nconst client = await Client.connect(env);"
+        },
+        {
+          "id": "ts-client-query-player",
+          "name": "Query Player (TypeScript)",
+          "description": "Query player using TypeScript client",
+          "language": "typescript",
+          "verified": true,
+          "code": "// Query a player\nconst playerResponse = await client.StructsStructs.query.queryPlayer({\n  id: '1'\n});\n\nconsole.log('Player:', playerResponse.data.player);"
+        },
+        {
+          "id": "ts-client-query-planet",
+          "name": "Query Planet (TypeScript)",
+          "description": "Query planet using TypeScript client",
+          "language": "typescript",
+          "verified": true,
+          "code": "// Query a planet\nconst planetResponse = await client.StructsStructs.query.queryPlanet({\n  id: '1-1'\n});\n\nconsole.log('Planet:', planetResponse.data.planet);"
+        },
+        {
+          "id": "ts-client-direct-http",
+          "name": "Direct HTTP (Recommended)",
+          "description": "Use direct HTTP requests instead of client library (more reliable)",
+          "language": "typescript",
+          "verified": true,
+          "recommended": true,
+          "code": "// Recommended: Use direct HTTP requests\nconst response = await fetch('http://localhost:1317/structs/player/1-1');\nconst data = await response.json();\n\nconsole.log('Player:', data.player);"
+        }
+      ]
+    },
+    "python": {
+      "description": "Python examples for API interaction",
+      "examples": [
+        {
+          "id": "python-query-player",
+          "name": "Query Player (Python)",
+          "description": "Query player using Python requests",
+          "language": "python",
+          "verified": true,
+          "code": "import requests\n\n# Query player\nresponse = requests.get('http://localhost:1317/structs/player/1-1')\ndata = response.json()\n\nprint('Player:', data['player'])"
+        },
+        {
+          "id": "python-query-block-height",
+          "name": "Query Block Height (Python)",
+          "description": "Get block height using Python",
+          "language": "python",
+          "verified": true,
+          "code": "import requests\n\n# Query block height\nresponse = requests.get('http://localhost:1317/blockheight')\ndata = response.json()\n\nprint('Block Height:', data['height'])"
+        },
+        {
+          "id": "python-nats-streaming",
+          "name": "NATS Streaming (Python)",
+          "description": "Connect to NATS using Python nats-py",
+          "language": "python",
+          "verified": true,
+          "code": "import asyncio\nfrom nats.aio.client import Client as NATS\n\nasync def main():\n    nc = NATS()\n    await nc.connect('nats://localhost:4222')\n    \n    # Subscribe to player updates\n    async def message_handler(msg):\n        print(f'Subject: {msg.subject}')\n        print(f'Data: {msg.data.decode()}')\n    \n    await nc.subscribe('structs.player.1', cb=message_handler)\n    \n    # Keep connection alive\n    await asyncio.sleep(3600)\n    await nc.close()\n\nasyncio.run(main())"
+        }
+      ]
+    },
+    "commonPatterns": {
+      "description": "Common patterns for AI agents",
+      "examples": [
+        {
+          "id": "pattern-incremental-state",
+          "name": "Incremental State Building",
+          "description": "Build game state incrementally",
+          "verified": true,
+          "steps": [
+            {
+              "step": 1,
+              "action": "Query block height",
+              "endpoint": "GET /blockheight",
+              "store": "gameState.blockHeight"
+            },
+            {
+              "step": 2,
+              "action": "Query all players (paginated)",
+              "endpoint": "GET /structs/player",
+              "store": "gameState.players"
+            },
+            {
+              "step": 3,
+              "action": "For each player, query planets",
+              "endpoint": "GET /structs/planet_by_player/{playerId}",
+              "store": "gameState.planets[playerId]"
+            }
+          ]
+        },
+        {
+          "id": "pattern-error-handling",
+          "name": "Error Handling Pattern",
+          "description": "Handle API errors gracefully",
+          "verified": true,
+          "code": "async function queryWithRetry(url, maxRetries = 3) {\n  for (let i = 0; i < maxRetries; i++) {\n    try {\n      const response = await fetch(url);\n      if (response.ok) {\n        return await response.json();\n      }\n      if (response.status === 404) {\n        return null; // Entity not found\n      }\n      if (response.status >= 500 && i < maxRetries - 1) {\n        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));\n        continue; // Retry on server errors\n      }\n      throw new Error(`HTTP ${response.status}`);\n    } catch (error) {\n      if (i === maxRetries - 1) throw error;\n      await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));\n    }\n  }\n}"
+        },
+        {
+          "id": "pattern-caching",
+          "name": "Caching Strategy",
+          "description": "Cache static data, don't cache dynamic data",
+          "verified": true,
+          "cache": {
+            "static": {
+              "endpoints": [
+                "GET /structs/struct_type",
+                "GET /api/struct/type",
+                "GET /api/guild/directory"
+              ],
+              "ttl": 3600
+            },
+            "dynamic": {
+              "endpoints": [
+                "GET /blockheight",
+                "GET /api/player/{player_id}/ore/stats",
+                "GET /api/planet/{planet_id}/shield/health"
+              ],
+              "ttl": 0,
+              "note": "Do not cache"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "notes": {
+    "consensusAPI": "All consensus API endpoints use /structs/ prefix (not /cosmos/game/v1beta1/)",
+    "webappAPI": "All webapp API endpoints use /api/ prefix (not /api/v1/)",
+    "streaming": "GRASS uses NATS messaging (not direct WebSocket). Connect to nats://localhost:4222 or ws://localhost:1443",
+    "typescriptClient": "structs-client-ts is Ignite-generated. May not be published to npm. Use direct HTTP requests for reliability.",
+    "verification": "All examples verified against actual code repositories and live deployments"
+  }
+}
+

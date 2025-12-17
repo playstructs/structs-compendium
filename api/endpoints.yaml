@@ -1,0 +1,1180 @@
+version: "1.0.0"
+lastUpdated: "2025-01-XX"
+baseUrl: "http://localhost:1317"
+basePath: "/structs"
+webappBaseUrl: "http://localhost:8080"
+webappBasePath: "/api"
+rpcBaseUrl: "http://localhost:26657"
+
+endpoints:
+  # Query Endpoints
+  queries:
+    # Player Queries
+    - id: "player-by-id"
+      method: "GET"
+      path: "/structs/player/{id}"
+      description: "Get player by ID"
+      category: "query"
+      entity: "Player"
+      parameters:
+        - name: "id"
+          type: "string"
+          required: true
+          format: "entity-id"
+          pattern: "^1-[0-9]+$"
+          description: "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+      response:
+        schema: "schemas/entities.json#/definitions/Player"
+        contentType: "application/json"
+      example:
+        request: "GET /structs/player/1"
+        response: |
+          {
+            "player": {...},
+            "gridAttributes": {...},
+            "playerInventory": {...},
+            "halted": false
+          }
+    
+    - id: "player-list"
+      method: "GET"
+      path: "/structs/player"
+      description: "List all players"
+      category: "query"
+      entity: "Player"
+      pagination: true
+      parameters:
+        - name: "pagination.key"
+          type: "string"
+          required: false
+          description: "Pagination key"
+        - name: "pagination.limit"
+          type: "integer"
+          required: false
+          description: "Page size"
+      response:
+        schema: "schemas/entities.json#/definitions/Player[]"
+        contentType: "application/json"
+    
+    # Planet Queries
+    - id: "planet-by-id"
+      method: "GET"
+      path: "/structs/planet/{id}"
+      description: "Get planet by ID"
+      category: "query"
+      entity: "Planet"
+      parameters:
+        - name: "id"
+          type: "string"
+          required: true
+          format: "entity-id"
+          pattern: "^2-[0-9]+$"
+          description: "Planet identifier in format 'type-index' (e.g., '2-1' for planet type 2, index 1). Type 2 = Planet."
+      response:
+        schema: "schemas/entities.json#/definitions/Planet"
+        contentType: "application/json"
+    
+    - id: "planet-list"
+      method: "GET"
+      path: "/structs/planet"
+      description: "List all planets"
+      category: "query"
+      entity: "Planet"
+      pagination: true
+    
+    - id: "planet-by-player"
+      method: "GET"
+      path: "/structs/planet_by_player/{playerId}"
+      description: "Get planets owned by player"
+      category: "query"
+      entity: "Planet"
+      parameters:
+        - name: "playerId"
+          type: "string"
+          required: true
+          format: "entity-id"
+          pattern: "^1-[0-9]+$"
+          description: "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+      response:
+        schema: "schemas/entities.json#/definitions/Planet[]"
+        contentType: "application/json"
+    
+    # Struct Queries
+    - id: "struct-by-id"
+      method: "GET"
+      path: "/structs/struct/{id}"
+      description: "Get struct by ID"
+      category: "query"
+      entity: "Struct"
+      parameters:
+        - name: "id"
+          type: "string"
+          required: true
+          format: "entity-id"
+          pattern: "^5-[0-9]+$"
+          description: "Struct identifier in format 'type-index' (e.g., '5-42' for struct type 5, index 42). Type 5 = Struct."
+      response:
+        schema: "schemas/entities.json#/definitions/Struct"
+        contentType: "application/json"
+    
+    - id: "struct-list"
+      method: "GET"
+      path: "/structs/struct"
+      description: "List all structs"
+      category: "query"
+      entity: "Struct"
+      pagination: true
+    
+    # Fleet Queries
+    - id: "fleet-by-id"
+      method: "GET"
+      path: "/structs/fleet/{id}"
+      description: "Get fleet by ID"
+      category: "query"
+      entity: "Fleet"
+      parameters:
+        - name: "id"
+          type: "string"
+          required: true
+          format: "entity-id"
+          pattern: "^9-[0-9]+$"
+          description: "Fleet identifier in format 'type-index' (e.g., '9-11' for fleet type 9, index 11). Type 9 = Fleet."
+      response:
+        schema: "schemas/entities.json#/definitions/Fleet"
+        contentType: "application/json"
+    
+    - id: "fleet-list"
+      method: "GET"
+      path: "/structs/fleet"
+      description: "List all fleets"
+      category: "query"
+      entity: "Fleet"
+      pagination: true
+    
+    - id: "fleet-by-index"
+      method: "GET"
+      path: "/structs/fleet_by_index/{index}"
+      description: "Get fleet by index"
+      category: "query"
+      entity: "Fleet"
+      parameters:
+        - name: "index"
+          type: "integer"
+          required: true
+          description: "Fleet index"
+      response:
+        schema: "schemas/entities.json#/definitions/Fleet"
+        contentType: "application/json"
+    
+    # Guild Queries
+    - id: "guild-by-id"
+      method: "GET"
+      path: "/structs/guild/{id}"
+      description: "Get guild by ID"
+      category: "query"
+      entity: "Guild"
+      parameters:
+        - name: "id"
+          type: "string"
+          required: true
+          format: "entity-id"
+          pattern: "^0-[0-9]+$"
+          description: "Guild identifier in format 'type-index' (e.g., '0-1' for guild type 0, index 1). Type 0 = Guild."
+      response:
+        schema: "schemas/entities.json#/definitions/Guild"
+        contentType: "application/json"
+    
+    - id: "guild-list"
+      method: "GET"
+      path: "/structs/guild"
+      description: "List all guilds"
+      category: "query"
+      entity: "Guild"
+      pagination: true
+    
+    # Reactor Queries
+    - id: "reactor-by-id"
+      method: "GET"
+      path: "/structs/reactor/{id}"
+      description: "Get reactor by ID"
+      category: "query"
+      entity: "Reactor"
+      parameters:
+        - name: "id"
+          type: "string"
+          required: true
+          format: "entity-id"
+          pattern: "^3-[0-9]+$"
+          description: "Reactor identifier in format 'type-index' (e.g., '3-1' for reactor type 3, index 1). Type 3 = Reactor."
+      response:
+        schema: "schemas/entities.json#/definitions/Reactor"
+        contentType: "application/json"
+    
+    - id: "reactor-list"
+      method: "GET"
+      path: "/structs/reactor"
+      description: "List all reactors"
+      category: "query"
+      entity: "Reactor"
+      pagination: true
+    
+    # Substation Queries
+    - id: "substation-by-id"
+      method: "GET"
+      path: "/structs/substation/{id}"
+      description: "Get substation by ID"
+      category: "query"
+      entity: "Substation"
+      parameters:
+        - name: "id"
+          type: "string"
+          required: true
+          format: "entity-id"
+          pattern: "^4-[0-9]+$"
+          description: "Substation identifier in format 'type-index' (e.g., '4-3' for substation type 4, index 3). Type 4 = Substation."
+      response:
+        schema: "schemas/entities.json#/definitions/Substation"
+        contentType: "application/json"
+    
+    - id: "substation-list"
+      method: "GET"
+      path: "/structs/substation"
+      description: "List all substations"
+      category: "query"
+      entity: "Substation"
+      pagination: true
+    
+    # Provider Queries
+    - id: "provider-by-id"
+      method: "GET"
+      path: "/structs/provider/{id}"
+      description: "Get provider by ID"
+      category: "query"
+      entity: "Provider"
+      parameters:
+        - name: "id"
+          type: "string"
+          required: true
+          format: "provider-id"
+          description: "Provider identifier"
+      response:
+        schema: "schemas/entities.json#/definitions/Provider"
+        contentType: "application/json"
+    
+    - id: "provider-list"
+      method: "GET"
+      path: "/structs/provider"
+      description: "List all providers"
+      category: "query"
+      entity: "Provider"
+      pagination: true
+    
+    # Agreement Queries
+    - id: "agreement-by-id"
+      method: "GET"
+      path: "/structs/agreement/{id}"
+      description: "Get agreement by ID"
+      category: "query"
+      entity: "Agreement"
+      parameters:
+        - name: "id"
+          type: "string"
+          required: true
+          format: "agreement-id"
+          description: "Agreement identifier"
+      response:
+        schema: "schemas/entities.json#/definitions/Agreement"
+        contentType: "application/json"
+    
+    - id: "agreement-list"
+      method: "GET"
+      path: "/structs/agreement"
+      description: "List all agreements"
+      category: "query"
+      entity: "Agreement"
+      pagination: true
+    
+    - id: "agreement-by-provider"
+      method: "GET"
+      path: "/structs/agreement_by_provider/{providerId}"
+      description: "Get agreements by provider"
+      category: "query"
+      entity: "Agreement"
+      parameters:
+        - name: "providerId"
+          type: "string"
+          required: true
+          format: "provider-id"
+          description: "Provider identifier"
+      response:
+        schema: "schemas/entities.json#/definitions/Agreement[]"
+        contentType: "application/json"
+    
+    # Allocation Queries
+    - id: "allocation-by-id"
+      method: "GET"
+      path: "/structs/allocation/{id}"
+      description: "Get allocation by ID"
+      category: "query"
+      entity: "Allocation"
+      parameters:
+        - name: "id"
+          type: "string"
+          required: true
+          format: "allocation-id"
+          description: "Allocation identifier"
+      response:
+        schema: "schemas/entities.json#/definitions/Allocation"
+        contentType: "application/json"
+    
+    - id: "allocation-list"
+      method: "GET"
+      path: "/structs/allocation"
+      description: "List all allocations"
+      category: "query"
+      entity: "Allocation"
+      pagination: true
+    
+    - id: "allocation-by-source"
+      method: "GET"
+      path: "/structs/allocation_by_source/{sourceId}"
+      description: "Get allocations by source"
+      category: "query"
+      entity: "Allocation"
+      parameters:
+        - name: "sourceId"
+          type: "string"
+          required: true
+          description: "Source identifier"
+      response:
+        schema: "schemas/entities.json#/definitions/Allocation[]"
+        contentType: "application/json"
+    
+    - id: "allocation-by-destination"
+      method: "GET"
+      path: "/structs/allocation_by_destination/{destinationId}"
+      description: "Get allocations by destination"
+      category: "query"
+      entity: "Allocation"
+      parameters:
+        - name: "destinationId"
+          type: "string"
+          required: true
+          description: "Destination identifier"
+      response:
+        schema: "schemas/entities.json#/definitions/Allocation[]"
+        contentType: "application/json"
+    
+    # Address Queries
+    - id: "address-by-address"
+      method: "GET"
+      path: "/structs/address/{address}"
+      description: "Get address by blockchain address"
+      category: "query"
+      entity: "Address"
+      parameters:
+        - name: "address"
+          type: "string"
+          required: true
+          format: "blockchain-address"
+          description: "Blockchain address"
+      response:
+        schema: "schemas/entities.json#/definitions/Address"
+        contentType: "application/json"
+    
+    - id: "address-list"
+      method: "GET"
+      path: "/structs/address"
+      description: "List all addresses"
+      category: "query"
+      entity: "Address"
+      pagination: true
+    
+    - id: "address-by-player"
+      method: "GET"
+      path: "/structs/address_by_player/{playerId}"
+      description: "Get addresses by player"
+      category: "query"
+      entity: "Address"
+      parameters:
+        - name: "playerId"
+          type: "string"
+          required: true
+          format: "entity-id"
+          pattern: "^1-[0-9]+$"
+          description: "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+      response:
+        schema: "schemas/entities.json#/definitions/Address[]"
+        contentType: "application/json"
+    
+    # Permission Queries
+    - id: "permission-by-id"
+      method: "GET"
+      path: "/structs/permission/{permissionId}"
+      description: "Get permission by ID"
+      category: "query"
+      entity: "Permission"
+      parameters:
+        - name: "permissionId"
+          type: "string"
+          required: true
+          format: "permission-id"
+          description: "Permission identifier"
+      response:
+        schema: "schemas/entities.json#/definitions/Permission"
+        contentType: "application/json"
+    
+    - id: "permission-list"
+      method: "GET"
+      path: "/structs/permission"
+      description: "List all permissions"
+      category: "query"
+      entity: "Permission"
+      pagination: true
+    
+    - id: "permission-by-object"
+      method: "GET"
+      path: "/structs/permission/object/{objectId}"
+      description: "Get permissions by object"
+      category: "query"
+      entity: "Permission"
+      parameters:
+        - name: "objectId"
+          type: "string"
+          required: true
+          description: "Object identifier"
+      response:
+        schema: "schemas/entities.json#/definitions/Permission[]"
+        contentType: "application/json"
+    
+    - id: "permission-by-player"
+      method: "GET"
+      path: "/structs/permission/player/{playerId}"
+      description: "Get permissions by player"
+      category: "query"
+      entity: "Permission"
+      parameters:
+        - name: "playerId"
+          type: "string"
+          required: true
+          format: "entity-id"
+          pattern: "^1-[0-9]+$"
+          description: "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+      response:
+        schema: "schemas/entities.json#/definitions/Permission[]"
+        contentType: "application/json"
+    
+    # Block Height
+    - id: "block-height"
+      method: "GET"
+      path: "/blockheight"
+      description: "Get current block height"
+      category: "query"
+      entity: "BlockHeight"
+      response:
+        schema: "schemas/entities.json#/definitions/BlockHeight"
+        contentType: "application/json"
+      example:
+        request: "GET /blockheight"
+        response: |
+          {
+            "height": 12345
+          }
+    
+    # Parameters
+    - id: "params"
+      method: "GET"
+      path: "/structs/params"
+      description: "Get module parameters"
+      category: "query"
+      entity: "Params"
+      response:
+        schema: "schemas/entities.json#/definitions/Params"
+        contentType: "application/json"
+
+  # Transaction Endpoints
+  transactions:
+    - id: "submit-transaction"
+      method: "POST"
+      path: "/cosmos/tx/v1beta1/txs"
+      description: "Submit a transaction"
+      category: "transaction"
+      contentType: "application/json"
+      authentication: "required"
+      parameters:
+        - name: "body"
+          type: "object"
+          required: true
+          schema: "schemas/actions.json"
+      response:
+        schema: "schemas/responses.json#/definitions/TransactionResponse"
+        contentType: "application/json"
+      example:
+        request: |
+          POST /cosmos/tx/v1beta1/txs
+          {
+            "body": {
+              "messages": [
+                {
+                  "@type": "/structs.structs.MsgStructBuild",
+                  "creator": "structs1...",
+                  "structType": "1",
+                  "locationType": 1,
+                  "locationId": "1-1"
+                }
+              ]
+            }
+          }
+        response: |
+          {
+            "tx_response": {
+              "code": 0,
+              "txhash": "...",
+              "height": 12345
+            }
+          }
+
+  # Web Application API Endpoints (structs-webapp)
+  webapp:
+    # Player Endpoints
+    - id: "webapp-player-by-id"
+      method: "GET"
+      path: "/api/player/{player_id}"
+      description: "Get player information from web application"
+      category: "webapp"
+      entity: "Player"
+      baseUrl: "${webappBaseUrl}"
+      parameters:
+        - name: "player_id"
+          type: "string"
+          required: true
+          format: "entity-id"
+          pattern: "^1-[0-9]+$"
+          description: "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+      response:
+        schema: "schemas/responses.json#/definitions/WebappPlayerResponse"
+        contentType: "application/json"
+      example:
+        request: "GET http://localhost:8080/api/player/1-11"
+        response: |
+          {
+            "player": {
+              "id": "1-11",
+              "username": "PlayerName",
+              "address": "cosmos1..."
+            },
+            "guild": {
+              "id": "2-1",
+              "name": "GuildName"
+            },
+            "stats": {
+              "total_ore": 1000,
+              "planets_completed": 5
+            }
+          }
+    
+    - id: "webapp-player-action-last-block"
+      method: "GET"
+      path: "/api/player/{player_id}/action/last/block/height"
+      description: "Get last action block height for player"
+      category: "webapp"
+      entity: "Player"
+      baseUrl: "${webappBaseUrl}"
+      parameters:
+        - name: "player_id"
+          type: "string"
+          required: true
+          format: "player-id"
+          description: "Player identifier"
+      response:
+        schema: "schemas/responses.json#/definitions/BlockHeightResponse"
+        contentType: "application/json"
+      example:
+        request: "GET http://localhost:8080/api/player/1-11/action/last/block/height"
+        response: |
+          {
+            "height": 12345
+          }
+    
+    - id: "webapp-player-raid-search"
+      method: "GET"
+      path: "/api/player/raid/search"
+      description: "Search player raids"
+      category: "webapp"
+      entity: "Player"
+    
+    - id: "webapp-player-username"
+      method: "PUT"
+      path: "/api/player/username"
+      description: "Update player username"
+      category: "webapp"
+      entity: "Player"
+      authentication: "required"
+    
+    - id: "webapp-player-transfer-search"
+      method: "GET"
+      path: "/api/player/transfer/search"
+      description: "Search player transfers"
+      category: "webapp"
+      entity: "Player"
+    
+    - id: "webapp-player-ore-stats"
+      method: "GET"
+      path: "/api/player/{player_id}/ore/stats"
+      description: "Get player ore statistics"
+      category: "webapp"
+      entity: "Player"
+      baseUrl: "${webappBaseUrl}"
+      parameters:
+        - name: "player_id"
+          type: "string"
+          required: true
+          format: "player-id"
+          description: "Player identifier"
+      response:
+        schema: "schemas/responses.json#/definitions/OreStatsResponse"
+        contentType: "application/json"
+      example:
+        request: "GET http://localhost:8080/api/player/1-11/ore/stats"
+        response: |
+          {
+            "player_id": "1-11",
+            "total_ore": 1000,
+            "ore_by_type": {
+              "iron": 500,
+              "copper": 300,
+              "silver": 200
+            }
+          }
+    
+    - id: "webapp-player-planet-completed"
+      method: "GET"
+      path: "/api/player/{player_id}/planet/completed"
+      description: "Get completed planets for player"
+      category: "webapp"
+      entity: "Player"
+      parameters:
+        - name: "player_id"
+          type: "string"
+          required: true
+          format: "player-id"
+    
+    - id: "webapp-player-raid-launched"
+      method: "GET"
+      path: "/api/player/{player_id}/raid/launched"
+      description: "Get launched raids for player"
+      category: "webapp"
+      entity: "Player"
+      parameters:
+        - name: "player_id"
+          type: "string"
+          required: true
+          format: "player-id"
+    
+    # Planet Endpoints
+    - id: "webapp-planet-by-id"
+      method: "GET"
+      path: "/api/planet/{planet_id}"
+      description: "Get planet information from web application"
+      category: "webapp"
+      entity: "Planet"
+      baseUrl: "${webappBaseUrl}"
+      parameters:
+        - name: "planet_id"
+          type: "string"
+          required: true
+          format: "planet-id"
+          description: "Planet identifier"
+      response:
+        schema: "schemas/entities.json#/definitions/Planet"
+        contentType: "application/json"
+      example:
+        request: "GET http://localhost:8080/api/planet/3-1"
+        response: |
+          {
+            "id": "3-1",
+            "owner_id": "1-11",
+            "max_ore": 5,
+            "space_slots": 4
+          }
+    
+    - id: "webapp-planet-shield-health"
+      method: "GET"
+      path: "/api/planet/{planet_id}/shield/health"
+      description: "Get planet shield health"
+      category: "webapp"
+      entity: "Planet"
+      baseUrl: "${webappBaseUrl}"
+      parameters:
+        - name: "planet_id"
+          type: "string"
+          required: true
+          format: "planet-id"
+          description: "Planet identifier"
+      response:
+        schema: "schemas/responses.json#/definitions/ShieldHealthResponse"
+        contentType: "application/json"
+      example:
+        request: "GET http://localhost:8080/api/planet/3-1/shield/health"
+        response: |
+          {
+            "planet_id": "3-1",
+            "health": 1000,
+            "max_health": 1000
+          }
+    
+    - id: "webapp-planet-shield"
+      method: "GET"
+      path: "/api/planet/{planet_id}/shield"
+      description: "Get planet shield information"
+      category: "webapp"
+      entity: "Planet"
+      parameters:
+        - name: "planet_id"
+          type: "string"
+          required: true
+          format: "planet-id"
+    
+    - id: "webapp-planet-raid-active"
+      method: "GET"
+      path: "/api/planet/{planet_id}/raid/active"
+      description: "Get active raid for planet"
+      category: "webapp"
+      entity: "Planet"
+      parameters:
+        - name: "planet_id"
+          type: "string"
+          required: true
+          format: "planet-id"
+    
+    - id: "webapp-planet-raid-active-fleet"
+      method: "GET"
+      path: "/api/planet/raid/active/fleet/{fleet_id}"
+      description: "Get active raid for fleet"
+      category: "webapp"
+      entity: "Planet"
+      parameters:
+        - name: "fleet_id"
+          type: "string"
+          required: true
+          format: "fleet-id"
+    
+    # Guild Endpoints
+    - id: "webapp-guild-this"
+      method: "GET"
+      path: "/api/guild/this"
+      description: "Get current user's guild"
+      category: "webapp"
+      entity: "Guild"
+      authentication: "required"
+    
+    - id: "webapp-guild-name"
+      method: "GET"
+      path: "/api/guild/name"
+      description: "Get guild name"
+      category: "webapp"
+      entity: "Guild"
+    
+    - id: "webapp-guild-by-id-name"
+      method: "GET"
+      path: "/api/guild/{guild_id}/name"
+      description: "Get guild name by ID"
+      category: "webapp"
+      entity: "Guild"
+      parameters:
+        - name: "guild_id"
+          type: "string"
+          required: true
+          format: "guild-id"
+    
+    - id: "webapp-guild-members-count"
+      method: "GET"
+      path: "/api/guild/{guild_id}/members/count"
+      description: "Get guild member count"
+      category: "webapp"
+      entity: "Guild"
+      parameters:
+        - name: "guild_id"
+          type: "string"
+          required: true
+          format: "guild-id"
+    
+    - id: "webapp-guild-count"
+      method: "GET"
+      path: "/api/guild/count"
+      description: "Get total guild count"
+      category: "webapp"
+      entity: "Guild"
+      baseUrl: "${webappBaseUrl}"
+      response:
+        schema: "schemas/responses.json#/definitions/CountResponse"
+        contentType: "application/json"
+      example:
+        request: "GET http://localhost:8080/api/guild/count"
+        response: |
+          {
+            "count": 42
+          }
+    
+    - id: "webapp-guild-directory"
+      method: "GET"
+      path: "/api/guild/directory"
+      description: "Get guild directory"
+      category: "webapp"
+      entity: "Guild"
+    
+    - id: "webapp-guild-by-id"
+      method: "GET"
+      path: "/api/guild/{guild_id}"
+      description: "Get guild by ID"
+      category: "webapp"
+      entity: "Guild"
+      baseUrl: "${webappBaseUrl}"
+      parameters:
+        - name: "guild_id"
+          type: "string"
+          required: true
+          format: "guild-id"
+          description: "Guild identifier"
+      response:
+        schema: "schemas/entities.json#/definitions/Guild"
+        contentType: "application/json"
+      example:
+        request: "GET http://localhost:8080/api/guild/2-1"
+        response: |
+          {
+            "id": "2-1",
+            "name": "GuildName",
+            "member_count": 10
+          }
+    
+    - id: "webapp-guild-power-stats"
+      method: "GET"
+      path: "/api/guild/{guild_id}/power/stats"
+      description: "Get guild power statistics"
+      category: "webapp"
+      entity: "Guild"
+      parameters:
+        - name: "guild_id"
+          type: "string"
+          required: true
+          format: "guild-id"
+    
+    - id: "webapp-guild-roster"
+      method: "GET"
+      path: "/api/guild/{guild_id}/roster"
+      description: "Get guild roster"
+      category: "webapp"
+      entity: "Guild"
+      parameters:
+        - name: "guild_id"
+          type: "string"
+          required: true
+          format: "guild-id"
+    
+    - id: "webapp-guild-planet-complete-count"
+      method: "GET"
+      path: "/api/guild/{guild_id}/planet/complete/count"
+      description: "Get completed planet count for guild"
+      category: "webapp"
+      entity: "Guild"
+      parameters:
+        - name: "guild_id"
+          type: "string"
+          required: true
+          format: "guild-id"
+    
+    # Auth Endpoints
+    - id: "webapp-auth-signup"
+      method: "POST"
+      path: "/api/auth/signup"
+      description: "Sign up new user"
+      category: "webapp"
+      entity: "Auth"
+      authentication: "none"
+    
+    - id: "webapp-auth-login"
+      method: "POST"
+      path: "/api/auth/login"
+      description: "Login user"
+      category: "webapp"
+      entity: "Auth"
+      authentication: "none"
+    
+    - id: "webapp-auth-logout"
+      method: "GET"
+      path: "/api/auth/logout"
+      description: "Logout user"
+      category: "webapp"
+      entity: "Auth"
+      authentication: "required"
+    
+    # Struct Endpoints
+    - id: "webapp-struct-by-planet"
+      method: "GET"
+      path: "/api/struct/planet/{planet_id}"
+      description: "Get structs on planet"
+      category: "webapp"
+      entity: "Struct"
+      parameters:
+        - name: "planet_id"
+          type: "string"
+          required: true
+          format: "planet-id"
+    
+    - id: "webapp-struct-type"
+      method: "GET"
+      path: "/api/struct/type"
+      description: "Get struct types"
+      category: "webapp"
+      entity: "Struct"
+    
+    - id: "webapp-struct-by-id"
+      method: "GET"
+      path: "/api/struct/{struct_id}"
+      description: "Get struct by ID"
+      category: "webapp"
+      entity: "Struct"
+      parameters:
+        - name: "struct_id"
+          type: "string"
+          required: true
+          format: "struct-id"
+    
+    # Ledger Endpoints
+    - id: "webapp-ledger-player-page"
+      method: "GET"
+      path: "/api/ledger/player/{player_id}/page/{page}"
+      description: "Get ledger page for player"
+      category: "webapp"
+      entity: "Ledger"
+      parameters:
+        - name: "player_id"
+          type: "string"
+          required: true
+          format: "player-id"
+        - name: "page"
+          type: "integer"
+          required: true
+          description: "Page number"
+    
+    - id: "webapp-ledger-player-count"
+      method: "GET"
+      path: "/api/ledger/player/{player_id}/count"
+      description: "Get ledger count for player"
+      category: "webapp"
+      entity: "Ledger"
+      parameters:
+        - name: "player_id"
+          type: "string"
+          required: true
+          format: "player-id"
+    
+    - id: "webapp-ledger-by-tx"
+      method: "GET"
+      path: "/api/ledger/{tx_id}"
+      description: "Get ledger entry by transaction ID"
+      category: "webapp"
+      entity: "Ledger"
+      parameters:
+        - name: "tx_id"
+          type: "string"
+          required: true
+          format: "transaction-hash"
+    
+    # Infusion Endpoints
+    - id: "webapp-infusion-by-player"
+      method: "GET"
+      path: "/api/infusion/player/{player_id}"
+      description: "Get infusions for player"
+      category: "webapp"
+      entity: "Infusion"
+      parameters:
+        - name: "player_id"
+          type: "string"
+          required: true
+          format: "player-id"
+    
+    # Timestamp Endpoint
+    - id: "webapp-timestamp"
+      method: "GET"
+      path: "/api/timestamp"
+      description: "Get current Unix timestamp"
+      category: "webapp"
+      entity: "Timestamp"
+      baseUrl: "${webappBaseUrl}"
+      response:
+        schema: "schemas/responses.json#/definitions/TimestampResponse"
+        contentType: "application/json"
+      example:
+        request: "GET http://localhost:8080/api/timestamp"
+        response: |
+          {
+            "timestamp": 1704067200,
+            "iso": "2024-01-01T00:00:00Z"
+          }
+
+  # RPC Endpoints (structsd)
+  rpc:
+    - id: "rpc-status"
+      method: "GET"
+      path: "/status"
+      description: "Get node status"
+      category: "rpc"
+      baseUrl: "http://localhost:26657"
+      response:
+        schema: "schemas/responses.json#/definitions/RPCStatusResponse"
+        contentType: "application/json"
+    
+    - id: "rpc-block"
+      method: "GET"
+      path: "/block"
+      description: "Get block by height"
+      category: "rpc"
+      parameters:
+        - name: "height"
+          type: "integer"
+          required: false
+          description: "Block height (omit for latest)"
+    
+    - id: "rpc-block-results"
+      method: "GET"
+      path: "/block_results"
+      description: "Get block results"
+      category: "rpc"
+      parameters:
+        - name: "height"
+          type: "integer"
+          required: false
+          description: "Block height"
+    
+    - id: "rpc-commit"
+      method: "GET"
+      path: "/commit"
+      description: "Get commit for block"
+      category: "rpc"
+      parameters:
+        - name: "height"
+          type: "integer"
+          required: false
+          description: "Block height"
+    
+    - id: "rpc-validators"
+      method: "GET"
+      path: "/validators"
+      description: "Get validators"
+      category: "rpc"
+      parameters:
+        - name: "height"
+          type: "integer"
+          required: false
+          description: "Block height"
+
+  # Streaming Endpoints (GRASS via NATS)
+  streaming:
+    - id: "grass-nats-protocol"
+      method: "NATS"
+      path: "nats://localhost:4222"
+      description: "GRASS real-time streaming via NATS protocol"
+      category: "streaming"
+      protocol: "NATS"
+      authentication: "optional"
+      documentation:
+        protocol: "protocols/streaming.md"
+        eventSchemas: "api/streaming/event-schemas.json"
+        eventTypes: "api/streaming/event-types.yaml"
+        subscriptionPatterns: "api/streaming/subscription-patterns.yaml"
+      architecture: |
+        GRASS uses NATS messaging system:
+        1. PostgreSQL NOTIFY events trigger GRASS
+        2. GRASS publishes to NATS subjects
+        3. Clients connect to NATS and subscribe to subjects
+      subjects:
+        - pattern: "structs.player.*"
+          description: "Player-specific updates (wildcard: player ID)"
+          example: "structs.player.0-1.1-11"
+          schema: "api/streaming/event-schemas.json#/definitions/PlayerConsensusEvent"
+        - pattern: "structs.planet.*"
+          description: "Planet-specific updates (wildcard: planet ID)"
+          example: "structs.planet.3-1"
+          schema: "api/streaming/event-schemas.json#/definitions/PlanetRaidStatusEvent"
+        - pattern: "structs.guild.*"
+          description: "Guild-specific updates (wildcard: guild ID)"
+          example: "structs.guild.0-1"
+          schema: "api/streaming/event-schemas.json#/definitions/GuildConsensusEvent"
+        - pattern: "structs.struct.*"
+          description: "Struct-specific updates (wildcard: struct ID)"
+          example: "structs.struct.5-1"
+          schema: "api/streaming/event-schemas.json#/definitions/StructStatusEvent"
+        - pattern: "structs.fleet.*"
+          description: "Fleet-specific updates (wildcard: fleet ID)"
+          example: "structs.fleet.7-1"
+          schema: "api/streaming/event-schemas.json#/definitions/FleetArriveEvent"
+        - pattern: "structs.global"
+          description: "Global game state updates"
+          schema: "api/streaming/event-schemas.json#/definitions/BlockEvent"
+      example:
+        connect: "nats://localhost:4222"
+        subscribe: |
+          {
+            "subject": "structs.player.0-1.1-11",
+            "subject": "structs.planet.3-1"
+          }
+        message: |
+          {
+            "subject": "structs.player.0-1.1-11",
+            "category": "player_consensus",
+            "id": "1-11",
+            "updated_at": "2025-01-01T00:00:00Z",
+            "data": {...}
+          }
+    
+    - id: "grass-nats-websocket"
+      method: "WS"
+      path: "ws://localhost:1443"
+      description: "GRASS real-time streaming via NATS WebSocket"
+      category: "streaming"
+      protocol: "NATS"
+      transport: "WebSocket"
+      authentication: "optional"
+      documentation:
+        protocol: "protocols/streaming.md"
+        eventSchemas: "api/streaming/event-schemas.json"
+        eventTypes: "api/streaming/event-types.yaml"
+        subscriptionPatterns: "api/streaming/subscription-patterns.yaml"
+      note: "NATS WebSocket wrapper for browser compatibility. Requires NATS server WebSocket support."
+      subjects:
+        - pattern: "structs.player.*"
+          description: "Player-specific updates"
+          schema: "api/streaming/event-schemas.json#/definitions/PlayerConsensusEvent"
+        - pattern: "structs.planet.*"
+          description: "Planet-specific updates"
+          schema: "api/streaming/event-schemas.json#/definitions/PlanetRaidStatusEvent"
+        - pattern: "structs.guild.*"
+          description: "Guild-specific updates"
+          schema: "api/streaming/event-schemas.json#/definitions/GuildConsensusEvent"
+        - pattern: "structs.struct.*"
+          description: "Struct-specific updates"
+          schema: "api/streaming/event-schemas.json#/definitions/StructStatusEvent"
+        - pattern: "structs.fleet.*"
+          description: "Fleet-specific updates"
+          schema: "api/streaming/event-schemas.json#/definitions/FleetArriveEvent"
+        - pattern: "structs.global"
+          description: "Global game state updates"
+          schema: "api/streaming/event-schemas.json#/definitions/BlockEvent"
+      example:
+        connect: "ws://localhost:1443"
+        subscribe: |
+          {
+            "action": "subscribe",
+            "subjects": ["structs.player.0-1.1-11", "structs.planet.3-1"]
+          }
+        message: |
+          {
+            "subject": "structs.player.0-1.1-11",
+            "category": "player_consensus",
+            "id": "1-11",
+            "updated_at": "2025-01-01T00:00:00Z",
+            "data": {...}
+          }
+

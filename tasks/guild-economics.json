@@ -1,0 +1,225 @@
+{
+  "version": "1.0.0",
+  "id": "guild-economics",
+  "name": "Guild Economics Task",
+  "description": "Complete workflow for guild token minting, management, and economic coordination",
+  "category": "economic",
+  "priority": "high",
+  "estimatedTime": "20-40 minutes",
+  "prerequisites": {
+    "playerOnline": true,
+    "guildMember": true,
+    "guildPermissions": {
+      "required": ["mintTokens", "manageBank"],
+      "description": "Need permissions to manage guild central bank"
+    },
+    "hasAlphaMatter": {
+      "minimum": 1,
+      "unit": "grams",
+      "description": "Alpha Matter for collateral"
+    }
+  },
+  "security": {
+    "trustBased": true,
+    "technicalSafeguards": false,
+    "minimumCollateral": false,
+    "maxSupply": false,
+    "guildControl": "full",
+    "warning": "Guild tokens are trust-based. Guilds have full control. No technical safeguards against inflation or revocation. Reliance on reputation."
+  },
+  "steps": [
+    {
+      "step": 1,
+      "name": "Establish Guild Central Bank",
+      "description": "Create or access guild central bank for token management",
+      "action": "Query guild central bank",
+      "endpoint": "GET /structs/guild/{guildId}/bank",
+      "result": {
+        "bankExists": true,
+        "canManageTokens": true
+      }
+    },
+    {
+      "step": 2,
+      "name": "Lock Collateral",
+      "description": "Lock Alpha Matter as collateral for guild tokens",
+      "action": "Lock Alpha Matter",
+      "requirements": {
+        "hasAlphaMatter": true,
+        "sufficientAmount": true
+      },
+      "properties": {
+        "collateral": {
+          "type": "number",
+          "unit": "grams",
+          "description": "Amount of Alpha Matter locked"
+        },
+        "locked": true,
+        "lockedFor": "guild-token"
+      },
+      "result": {
+        "collateralLocked": true,
+        "canMintTokens": true
+      }
+    },
+    {
+      "step": 3,
+      "name": "Mint Guild Tokens",
+      "description": "Mint new guild tokens backed by collateral",
+      "action": "Mint tokens",
+      "requirements": {
+        "collateralLocked": true,
+        "guildPermissions": true
+      },
+      "properties": {
+        "tokensIssued": {
+          "type": "number",
+          "description": "Number of tokens to mint"
+        },
+        "collateralRatio": {
+          "type": "number",
+          "formula": "Collateral Ratio = (Locked Alpha Matter / Total Tokens Issued) × 100%",
+          "description": "Collateral backing ratio"
+        }
+      },
+      "result": {
+        "tokensMinted": true,
+        "tokensInCirculation": true,
+        "collateralRatio": "calculated"
+      }
+    },
+    {
+      "step": 4,
+      "name": "Manage Token Supply",
+      "description": "Monitor and manage token supply and collateral",
+      "actions": {
+        "mintMore": {
+          "description": "Mint additional tokens (requires more collateral)",
+          "risk": "Inflation if over-minted"
+        },
+        "addCollateral": {
+          "description": "Add more collateral to improve ratio",
+          "benefit": "Increases token value and trust"
+        },
+        "monitorRatio": {
+          "description": "Monitor collateral ratio",
+          "warning": "Low ratio reduces token value"
+        }
+      }
+    },
+    {
+      "step": 5,
+      "name": "Token Revocation (Optional)",
+      "description": "Revoke and burn tokens (can be used for economic warfare)",
+      "action": "Revoke tokens",
+      "requirements": {
+        "guildPermissions": true,
+        "tokensToRevoke": true
+      },
+      "security": {
+        "guildControl": "full",
+        "canRevoke": true,
+        "enemyTokens": "Can revoke enemy-held tokens",
+        "result": "tokens-burned"
+      },
+      "warning": "Revocation damages reputation. Use carefully.",
+      "result": {
+        "tokensRevoked": true,
+        "tokensBurned": true
+      }
+    }
+  ],
+  "guildTokenProperties": {
+    "collateral": {
+      "type": "number",
+      "unit": "grams Alpha Matter",
+      "description": "Locked Alpha Matter backing tokens"
+    },
+    "tokensIssued": {
+      "type": "number",
+      "description": "Total tokens issued"
+    },
+    "tokensInCirculation": {
+      "type": "number",
+      "description": "Tokens currently in circulation"
+    },
+    "collateralRatio": {
+      "type": "number",
+      "formula": "Collateral Ratio = (Locked Alpha Matter / Total Tokens Issued) × 100%",
+      "description": "Collateral backing ratio"
+    },
+    "trustRating": {
+      "type": "string",
+      "enum": ["high", "medium", "low", "unknown"],
+      "description": "Trust rating based on guild reputation"
+    }
+  },
+  "risks": {
+    "overMinting": {
+      "description": "Minting more tokens than collateral backing",
+      "result": "Inflation, reduced token value",
+      "prevention": "Maintain healthy collateral ratio"
+    },
+    "poorManagement": {
+      "description": "Poor token management damages reputation",
+      "result": "Reduced trust, lower token value",
+      "prevention": "Transparent management, maintain collateral"
+    },
+    "insufficientCollateral": {
+      "description": "Insufficient collateral reduces token value",
+      "result": "Low collateral ratio, reduced trust",
+      "prevention": "Maintain adequate collateral backing"
+    },
+    "revocation": {
+      "description": "Token revocation damages reputation",
+      "result": "Reduced trust, potential token devaluation",
+      "prevention": "Use revocation carefully, maintain reputation"
+    }
+  },
+  "bestPractices": {
+    "maintainCollateral": {
+      "priority": "critical",
+      "reason": "Collateral ratio affects token value and trust",
+      "action": "Maintain healthy collateral ratio (100%+ recommended)"
+    },
+    "transparentManagement": {
+      "priority": "high",
+      "reason": "Transparency builds trust",
+      "action": "Communicate token management decisions to guild members"
+    },
+    "avoidOverMinting": {
+      "priority": "high",
+      "reason": "Over-minting causes inflation",
+      "action": "Only mint tokens backed by adequate collateral"
+    },
+    "protectReputation": {
+      "priority": "high",
+      "reason": "Reputation is critical for trust-based system",
+      "action": "Use revocation carefully, maintain good reputation"
+    }
+  },
+  "commonErrors": {
+    "insufficientCollateral": {
+      "code": "INSUFFICIENT_COLLATERAL",
+      "description": "Not enough Alpha Matter collateral",
+      "solution": "Lock more Alpha Matter as collateral"
+    },
+    "overMinting": {
+      "code": "OVER_MINTING",
+      "description": "Minted more tokens than collateral backing",
+      "solution": "Add more collateral or reduce token supply",
+      "prevention": "Monitor collateral ratio, maintain healthy ratio"
+    },
+    "noPermissions": {
+      "code": "NO_PERMISSIONS",
+      "description": "Insufficient permissions to manage guild tokens",
+      "solution": "Request permissions from guild leadership"
+    }
+  },
+  "nextSteps": {
+    "tradeTokens": "Trade guild tokens on marketplace",
+    "monitorMarket": "Monitor guild token market data",
+    "coordinateEconomics": "Coordinate economic strategies with guild members"
+  }
+}
+

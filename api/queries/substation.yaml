@@ -1,0 +1,35 @@
+version: "1.0.0"
+lastUpdated: "2025-01-XX"
+baseUrl: "http://localhost:1317"
+basePath: "/structs"
+category: "query"
+entity: "Substation"
+
+endpoints:
+  - id: "substation-by-id"
+    method: "GET"
+    path: "/structs/substation/{id}"
+    description: "Get substation by ID"
+    category: "query"
+    entity: "Substation"
+    parameters:
+      - name: "id"
+        type: "string"
+        required: true
+        format: "entity-id"
+        pattern: "^4-[0-9]+$"
+        description: "Substation identifier in format 'type-index' (e.g., '4-3' for substation type 4, index 3). Type 4 = Substation."
+    response:
+      schema: "schemas/entities/substation.json"
+      contentType: "application/json"
+  
+  - id: "substation-list"
+    method: "GET"
+    path: "/structs/substation"
+    description: "List all substations"
+    category: "query"
+    entity: "Substation"
+    pagination: true
+    response:
+      schema: "schemas/entities/substation.json[]"
+      contentType: "application/json"

@@ -1,0 +1,35 @@
+version: "1.0.0"
+lastUpdated: "2025-01-XX"
+baseUrl: "http://localhost:1317"
+basePath: "/structs"
+category: "query"
+entity: "Guild"
+
+endpoints:
+  - id: "guild-by-id"
+    method: "GET"
+    path: "/structs/guild/{id}"
+    description: "Get guild by ID"
+    category: "query"
+    entity: "Guild"
+    parameters:
+      - name: "id"
+        type: "string"
+        required: true
+        format: "entity-id"
+        pattern: "^0-[0-9]+$"
+        description: "Guild identifier in format 'type-index' (e.g., '0-1' for guild type 0, index 1). Type 0 = Guild."
+    response:
+      schema: "schemas/entities/guild.json"
+      contentType: "application/json"
+  
+  - id: "guild-list"
+    method: "GET"
+    path: "/structs/guild"
+    description: "List all guilds"
+    category: "query"
+    entity: "Guild"
+    pagination: true
+    response:
+      schema: "schemas/entities/guild.json[]"
+      contentType: "application/json"

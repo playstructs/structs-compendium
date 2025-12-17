@@ -1,0 +1,157 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Visual Pattern Schema",
+  "description": "Schema for visual patterns and UI patterns",
+  "type": "object",
+  "structs:category": "visual",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique pattern identifier"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["ui-pattern", "layout-pattern", "interaction-pattern", "visual-pattern"],
+      "description": "Type of visual pattern"
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable pattern title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of the pattern"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["gameplay", "economics", "technical", "ui", "navigation"],
+      "description": "Category of pattern"
+    },
+    "components": {
+      "type": "array",
+      "description": "Components in the pattern",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique component identifier"
+          },
+          "label": {
+            "type": "string",
+            "description": "Human-readable component label"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["element", "container", "layout", "interaction"],
+            "description": "Type of component"
+          },
+          "uiElement": {
+            "type": "string",
+            "description": "UI element type (e.g., 'button', 'panel', 'list')"
+          },
+          "location": {
+            "type": "object",
+            "description": "Component location",
+            "properties": {
+              "area": {
+                "type": "string",
+                "enum": ["top", "bottom", "left", "right", "center", "sidebar", "header", "footer"]
+              },
+              "coordinates": {
+                "type": "object",
+                "properties": {
+                  "x": {"type": "number"},
+                  "y": {"type": "number"},
+                  "width": {"type": "number"},
+                  "height": {"type": "number"}
+                }
+              }
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional component metadata"
+          }
+        },
+        "required": ["id", "label", "type"]
+      }
+    },
+    "relationships": {
+      "type": "array",
+      "description": "Relationships between components",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique relationship identifier"
+          },
+          "from": {
+            "type": "string",
+            "description": "Source component ID"
+          },
+          "to": {
+            "type": "string",
+            "description": "Target component ID"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["contains", "triggers", "navigatesTo", "displays", "dependsOn"],
+            "description": "Type of relationship"
+          },
+          "label": {
+            "type": "string",
+            "description": "Relationship label"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional relationship metadata"
+          }
+        },
+        "required": ["id", "from", "to", "type"]
+      }
+    },
+    "usage": {
+      "type": "object",
+      "description": "Usage information",
+      "properties": {
+        "context": {
+          "type": "string",
+          "description": "Context where pattern is used"
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Example use cases"
+        }
+      }
+    },
+    "relatedSchemas": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "References to related schemas"
+    },
+    "relatedEndpoints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "References to related API endpoints"
+    },
+    "relatedDiagrams": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "References to related diagrams"
+    }
+  },
+  "required": ["id", "type", "title", "components"]
+}
+

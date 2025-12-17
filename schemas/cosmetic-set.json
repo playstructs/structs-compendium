@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Cosmetic Set Schema",
+  "description": "Schema for cosmetic sets - collections of struct type skins",
+  "type": "object",
+  "structs:category": "modding",
+  "structs:scope": "guild-customization",
+  "properties": {
+    "setHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "SHA-256 hash of the set manifest (hexadecimal, 64 characters). Generated from the set manifest content to ensure uniqueness without central authority."
+    },
+    "name": {
+      "type": "object",
+      "description": "Set name in multiple languages",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "default": {
+        "en": "Unnamed Set"
+      }
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version (e.g., '1.0.0')"
+    },
+    "author": {
+      "type": "string",
+      "description": "Set author/guild name"
+    },
+    "guildId": {
+      "type": "string",
+      "structs:format": "entity-id",
+      "pattern": "^0-[0-9]+$",
+      "description": "Guild ID this set is for (optional, for guild-specific sets)"
+    },
+    "description": {
+      "type": "object",
+      "description": "Set description in multiple languages",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "skins": {
+      "type": "array",
+      "description": "List of skins included in this set",
+      "items": {
+        "$ref": "#/definitions/SkinReference"
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Set creation timestamp (ISO 8601)"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Set last update timestamp (ISO 8601)"
+    }
+  },
+  "required": ["setHash", "version", "author"],
+  "definitions": {
+    "SkinReference": {
+      "type": "object",
+      "description": "Reference to a skin in the set",
+      "properties": {
+        "skinHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA-256 hash of the skin manifest (hexadecimal, 64 characters). Generated from the skin manifest content."
+        },
+        "class": {
+          "type": "string",
+          "description": "Struct Type class name this skin is for (must match the 'class' field from struct_type table/on-chain). Examples: 'Command Ship', 'Miner', 'Reactor'"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Skin version"
+        }
+      },
+      "required": ["skinHash", "class", "version"]
+    }
+  },
+  "structs:notes": [
+    "A set is a collection of skins",
+    "Set and skin identifiers use SHA-256 hashes (not IDs) to ensure uniqueness without central authority",
+    "setHash is generated from the set manifest content (excluding the hash field itself)",
+    "Skins link to Struct Types using the 'class' field (stored on-chain and in database)",
+    "The 'class' field must match exactly the class name from struct_type table",
+    "Sets can be distributed as complete packages",
+    "Individual skins can also be distributed standalone",
+    "Skins can be mixed and matched from different sets"
+  ]
+}
+

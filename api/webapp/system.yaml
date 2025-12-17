@@ -1,0 +1,34 @@
+# Webapp System API Endpoints
+
+**Version**: 1.0.0  
+**Category**: webapp  
+**Entity**: Timestamp  
+**Base URL**: ${webappBaseUrl} (default: http://localhost:8080)
+
+---
+
+## Endpoints
+
+endpoints:
+  - id: "webapp-timestamp"
+    method: "GET"
+    path: "/api/timestamp"
+    description: "Get current Unix timestamp"
+    category: "webapp"
+    entity: "Timestamp"
+    baseUrl: "${webappBaseUrl}"
+    response:
+      schema: "schemas/responses.json#/definitions/TimestampResponse"
+      contentType: "application/json"
+    example:
+      request: "GET http://localhost:8080/api/timestamp"
+      response: |
+        {
+          "timestamp": 1704067200,
+          "iso": "2024-01-01T00:00:00Z"
+        }
+
+---
+
+*Last Updated: January 2025*
+

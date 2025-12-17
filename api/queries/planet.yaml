@@ -1,0 +1,78 @@
+version: "1.0.0"
+lastUpdated: "2025-01-XX"
+baseUrl: "http://localhost:1317"
+basePath: "/structs"
+category: "query"
+entity: "Planet"
+
+endpoints:
+  - id: "planet-by-id"
+    method: "GET"
+    path: "/structs/planet/{id}"
+    description: "Get planet by ID"
+    category: "query"
+    entity: "Planet"
+    parameters:
+      - name: "id"
+        type: "string"
+        required: true
+        format: "entity-id"
+        pattern: "^2-[0-9]+$"
+        description: "Planet identifier in format 'type-index' (e.g., '2-1' for planet type 2, index 1). Type 2 = Planet."
+    response:
+      schema: "schemas/entities/planet.json"
+      contentType: "application/json"
+    example:
+      request: "GET /structs/planet/2-1"
+      response: |
+        {
+          "Planet": {
+            "id": "2-1",
+            "maxOre": "5",
+            "creator": "structs1...",
+            "owner": "1-11",
+            "space": ["", "", "", ""],
+            "air": ["", "", "", ""],
+            "land": ["", "", "", ""],
+            "water": ["", "", "", ""]
+          },
+          "map": {...}
+        }
+  
+  - id: "planet-list"
+    method: "GET"
+    path: "/structs/planet"
+    description: "List all planets"
+    category: "query"
+    entity: "Planet"
+    pagination: true
+    parameters:
+      - name: "pagination.key"
+        type: "string"
+        required: false
+        description: "Pagination key"
+      - name: "pagination.limit"
+        type: "integer"
+        required: false
+        description: "Page size"
+    response:
+      schema: "schemas/entities/planet.json[]"
+      contentType: "application/json"
+  
+  - id: "planet-by-player"
+    method: "GET"
+    path: "/structs/planet_by_player/{playerId}"
+    description: "Get planets owned by player"
+    category: "query"
+    entity: "Planet"
+    parameters:
+      - name: "playerId"
+        type: "string"
+        required: true
+        format: "entity-id"
+        pattern: "^1-[0-9]+$"
+        description: "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+    response:
+      schema: "schemas/entities/planet.json[]"
+      contentType: "application/json"
+    note: "Players can only own one planet at a time, so this typically returns 0 or 1 planet"

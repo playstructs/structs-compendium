@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Struct Essential Schema",
+  "description": "Minimal struct schema for simple lookups and basic operations. Use this for ID format checks, existence verification, and basic struct queries. For complete struct data, use schemas/entities/struct.json",
+  "type": "object",
+  "structs:category": "core",
+  "structs:minimal": true,
+  "structs:completeSchema": "schemas/entities/struct.json",
+  "properties": {
+    "id": {
+      "type": "string",
+      "structs:format": "entity-id",
+      "pattern": "^5-[0-9]+$",
+      "description": "Struct identifier in format 'type-index' (e.g., '5-42' for struct type 5, index 42)"
+    },
+    "structType": {
+      "type": "integer",
+      "description": "Struct type ID (e.g., 1 = Ore Extractor, 2 = Ore Refinery, etc.)"
+    },
+    "owner": {
+      "type": "string",
+      "structs:format": "entity-id",
+      "pattern": "^1-[0-9]+$",
+      "description": "Player ID who owns this struct, empty string if unowned"
+    },
+    "locationType": {
+      "type": "integer",
+      "description": "Location type (1 = Planet, 2 = Fleet)"
+    },
+    "locationId": {
+      "type": "string",
+      "structs:format": "entity-id",
+      "description": "Location ID (planet ID or fleet ID depending on locationType)"
+    },
+    "slot": {
+      "type": "string",
+      "enum": ["space", "air", "land", "water", ""],
+      "description": "Slot type on planet, empty string if on fleet"
+    }
+  },
+  "required": ["id", "structType"],
+  "structs:useCases": [
+    "Check if struct exists",
+    "Verify struct ID format",
+    "Check struct ownership",
+    "Get basic struct location",
+    "Quick struct lookup"
+  ],
+  "structs:whenToUse": "Use this schema for simple operations that don't require full struct data (attributes, power requirements, build costs, etc.)",
+  "structs:whenNotToUse": "Don't use this schema if you need: struct attributes, power requirements, build costs, struct status, or any detailed struct state"
+}
+

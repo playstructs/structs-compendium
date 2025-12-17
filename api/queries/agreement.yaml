@@ -1,0 +1,50 @@
+version: "1.0.0"
+lastUpdated: "2025-01-XX"
+baseUrl: "http://localhost:1317"
+basePath: "/structs"
+category: "query"
+entity: "Agreement"
+
+endpoints:
+  - id: "agreement-by-id"
+    method: "GET"
+    path: "/structs/agreement/{id}"
+    description: "Get agreement by ID"
+    category: "query"
+    entity: "Agreement"
+    parameters:
+      - name: "id"
+        type: "string"
+        required: true
+        format: "agreement-id"
+        description: "Agreement identifier"
+    response:
+      schema: "schemas/entities/agreement.json"
+      contentType: "application/json"
+  
+  - id: "agreement-list"
+    method: "GET"
+    path: "/structs/agreement"
+    description: "List all agreements"
+    category: "query"
+    entity: "Agreement"
+    pagination: true
+    response:
+      schema: "schemas/entities/agreement.json[]"
+      contentType: "application/json"
+  
+  - id: "agreement-by-provider"
+    method: "GET"
+    path: "/structs/agreement_by_provider/{providerId}"
+    description: "Get agreements by provider"
+    category: "query"
+    entity: "Agreement"
+    parameters:
+      - name: "providerId"
+        type: "string"
+        required: true
+        format: "provider-id"
+        description: "Provider identifier"
+    response:
+      schema: "schemas/entities/agreement.json[]"
+      contentType: "application/json"

@@ -1,0 +1,1097 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Structs Game State Schema",
+  "description": "Complete game state structure for AI agents. See schemas/formats.json for format specifications.",
+  "type": "object",
+  "structs:category": "core",
+  "structs:scope": "global",
+  "properties": {
+    "blockHeight": {
+      "type": "integer",
+      "description": "Current blockchain block height",
+      "structs:endpoint": "/blockheight",
+      "structs:updateFrequency": "per-block"
+    },
+    "players": {
+      "type": "object",
+      "description": "All players in the game",
+      "structs:endpoint": "/structs/player",
+      "structs:entityType": "Player",
+      "structs:schema": "schemas/entities/player.json",
+      "additionalProperties": {
+        "$ref": "entities/player.json"
+      }
+    },
+    "planets": {
+      "type": "object",
+      "description": "All planets in the game",
+      "structs:endpoint": "/structs/planet",
+      "structs:entityType": "Planet",
+      "structs:schema": "schemas/entities/planet.json",
+      "additionalProperties": {
+        "$ref": "entities/planet.json"
+      }
+    },
+    "structs": {
+      "type": "object",
+      "description": "All structs (units) in the game",
+      "structs:endpoint": "/structs/struct",
+      "structs:entityType": "Struct",
+      "structs:schema": "schemas/entities/struct.json",
+      "additionalProperties": {
+        "$ref": "entities/struct.json"
+      }
+    },
+    "fleets": {
+      "type": "object",
+      "description": "All fleets in the game",
+      "structs:endpoint": "/structs/fleet",
+      "structs:entityType": "Fleet",
+      "structs:schema": "schemas/entities/fleet.json",
+      "additionalProperties": {
+        "$ref": "entities/fleet.json"
+      }
+    },
+    "guilds": {
+      "type": "object",
+      "description": "All guilds in the game",
+      "structs:endpoint": "/structs/guild",
+      "structs:entityType": "Guild",
+      "structs:schema": "schemas/entities/guild.json",
+      "additionalProperties": {
+        "$ref": "entities/guild.json"
+      }
+    },
+    "reactors": {
+      "type": "object",
+      "description": "All reactors (energy production)",
+      "structs:endpoint": "/structs/reactor",
+      "structs:entityType": "Reactor",
+      "structs:schema": "schemas/entities/reactor.json",
+      "additionalProperties": {
+        "$ref": "entities/reactor.json"
+      }
+    },
+    "substations": {
+      "type": "object",
+      "description": "All substations (power distribution)",
+      "structs:endpoint": "/structs/substation",
+      "structs:entityType": "Substation",
+      "structs:schema": "schemas/entities/substation.json",
+      "additionalProperties": {
+        "$ref": "entities/substation.json"
+      }
+    },
+    "agreements": {
+      "type": "object",
+      "description": "All energy agreements",
+      "structs:endpoint": "/structs/agreement",
+      "structs:entityType": "Agreement",
+      "structs:schema": "schemas/entities/agreement.json",
+      "additionalProperties": {
+        "$ref": "entities/agreement.json"
+      }
+    },
+    "allocations": {
+      "type": "object",
+      "description": "All energy allocations",
+      "structs:endpoint": "/structs/allocation",
+      "structs:entityType": "Allocation",
+      "structs:schema": "schemas/entities/allocation.json",
+      "additionalProperties": {
+        "$ref": "entities/allocation.json"
+      }
+    },
+    "providers": {
+      "type": "object",
+      "description": "All energy providers",
+      "structs:endpoint": "/structs/provider",
+      "structs:entityType": "Provider",
+      "structs:schema": "schemas/entities/provider.json",
+      "additionalProperties": {
+        "$ref": "entities/provider.json"
+      }
+    },
+    "structTypes": {
+      "type": "object",
+      "description": "All struct type definitions (templates)",
+      "structs:endpoint": "/structs/struct_type",
+      "structs:entityType": "StructType",
+      "structs:schema": "schemas/entities/struct-type.json",
+      "additionalProperties": {
+        "$ref": "entities/struct-type.json"
+      },
+      "structs:note": "StructTypes are static definitions loaded from genesis/config. They define the properties and capabilities of struct types that can be built."
+    }
+  },
+  "required": ["blockHeight"],
+  "definitions": {
+    "Player": {
+      "type": "object",
+      "structs:entity": "Player",
+      "structs:endpoint": "/structs/player/{id}",
+      "description": "Player entity with complete field definitions",
+      "properties": {
+        "Player": {
+          "type": "object",
+          "description": "Player core data",
+          "properties": {
+            "id": {
+              "type": "string",
+              "structs:format": "entity-id",
+              "pattern": "^1-[0-9]+$",
+              "description": "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+            },
+            "index": {
+              "type": "string",
+              "description": "Player index number"
+            },
+            "guildId": {
+              "type": "string",
+              "structs:format": "entity-id",
+              "pattern": "^0-[0-9]+$",
+              "structs:relationship": "Guild",
+              "description": "Guild ID if player is a member, empty string if not. Format: 'type-index' (e.g., '0-1' for guild type 0, index 1). Type 0 = Guild."
+            },
+            "substationId": {
+              "type": "string",
+              "structs:format": "entity-id",
+              "pattern": "^4-[0-9]+$",
+              "structs:relationship": "Substation",
+              "description": "Substation ID if connected, empty string if not. Format: 'type-index' (e.g., '4-3' for substation type 4, index 3). Type 4 = Substation."
+            },
+            "creator": {
+              "type": "string",
+              "structs:format": "blockchain-address",
+              "description": "Blockchain address that created this player"
+            },
+            "primaryAddress": {
+              "type": "string",
+              "structs:format": "blockchain-address",
+              "description": "Primary blockchain address for this player"
+            },
+            "planetId": {
+              "type": "string",
+              "structs:format": "entity-id",
+              "pattern": "^2-[0-9]+$",
+              "structs:relationship": "Planet",
+              "description": "Planet ID if player owns a planet, empty string if not. Format: 'type-index' (e.g., '2-1' for planet type 2, index 1). Type 2 = Planet."
+            },
+            "fleetId": {
+              "type": "string",
+              "structs:format": "entity-id",
+              "pattern": "^9-[0-9]+$",
+              "structs:relationship": "Fleet",
+              "description": "Fleet ID if player owns a fleet, empty string if not. Format: 'type-index' (e.g., '9-11' for fleet type 9, index 11). Type 9 = Fleet."
+            }
+          },
+          "required": ["id", "index", "creator", "primaryAddress"]
+        },
+        "gridAttributes": {
+          "type": "object",
+          "description": "Grid position and resource attributes",
+          "properties": {
+            "ore": {
+              "type": "string",
+              "description": "Current ore amount (string representation of integer)"
+            },
+            "fuel": {
+              "type": "string",
+              "description": "Current fuel amount (string representation of integer)"
+            },
+            "capacity": {
+              "type": "string",
+              "description": "Total capacity (string representation of integer)"
+            },
+            "load": {
+              "type": "string",
+              "description": "Current load (string representation of integer)"
+            },
+            "structsLoad": {
+              "type": "string",
+              "description": "Load from structs (string representation of integer)"
+            },
+            "power": {
+              "type": "string",
+              "description": "Current power/energy (string representation of integer)"
+            },
+            "connectionCapacity": {
+              "type": "string",
+              "description": "Connection capacity (string representation of integer)"
+            },
+            "connectionCount": {
+              "type": "string",
+              "description": "Number of connections (string representation of integer)"
+            },
+            "allocationPointerStart": {
+              "type": "string",
+              "description": "Start of allocation pointer (string representation of integer)"
+            },
+            "allocationPointerEnd": {
+              "type": "string",
+              "description": "End of allocation pointer (string representation of integer)"
+            },
+            "proxyNonce": {
+              "type": "string",
+              "description": "Proxy nonce value (string representation of integer)"
+            },
+            "lastAction": {
+              "type": "string",
+              "description": "Last action timestamp or block (string representation of integer)"
+            },
+            "nonce": {
+              "type": "string",
+              "description": "Nonce value (string representation of integer)"
+            },
+            "ready": {
+              "type": "string",
+              "description": "Ready status (string representation of integer, 0 = not ready, 1 = ready)"
+            },
+            "checkpointBlock": {
+              "type": "string",
+              "description": "Checkpoint block height (string representation of integer)"
+            }
+          }
+        },
+        "playerInventory": {
+          "type": "object",
+          "description": "Player resources and inventory",
+          "properties": {
+            "rocks": {
+              "type": "object",
+              "description": "Rock inventory (struct type IDs to counts)",
+              "additionalProperties": {
+                "type": "string",
+                "description": "Count of this rock type (string representation of integer)"
+              }
+            }
+          }
+        },
+        "halted": {
+          "type": "boolean",
+          "description": "Whether player is halted (cannot perform actions)"
+        }
+      },
+      "required": ["Player"]
+    },
+    "Planet": {
+      "type": "object",
+      "structs:entity": "Planet",
+      "structs:endpoint": "/structs/planet/{id}",
+      "description": "Planet entity with complete field definitions",
+      "properties": {
+        "Planet": {
+          "type": "object",
+          "description": "Planet core data",
+          "properties": {
+            "id": {
+              "type": "string",
+              "structs:format": "entity-id",
+              "pattern": "^2-[0-9]+$",
+              "description": "Planet identifier in format 'type-index' (e.g., '2-1' for planet type 2, index 1). Type 2 = Planet."
+            },
+            "maxOre": {
+              "type": "string",
+              "description": "Maximum ore capacity (string representation of integer, typically '5')"
+            },
+            "creator": {
+              "type": "string",
+              "structs:format": "blockchain-address",
+              "description": "Blockchain address that created this planet"
+            },
+            "owner": {
+              "type": "string",
+              "structs:format": "entity-id",
+              "pattern": "^1-[0-9]+$",
+              "structs:relationship": "Player",
+              "description": "Player ID who owns this planet, empty string if unowned. Format: 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+            },
+            "space": {
+              "type": "array",
+              "description": "Space slot array (4 slots, struct IDs or empty strings)",
+              "items": {
+                "type": "string",
+                "structs:format": "entity-id",
+                "pattern": "^5-[0-9]+$",
+                "description": "Struct identifier in format 'type-index' (e.g., '5-42' for struct type 5, index 42). Type 5 = Struct.",
+                "structs:relationship": "Struct"
+              },
+              "minItems": 4,
+              "maxItems": 4
+            },
+            "air": {
+              "type": "array",
+              "description": "Air slot array (4 slots, struct IDs or empty strings)",
+              "items": {
+                "type": "string",
+                "structs:format": "entity-id",
+                "pattern": "^5-[0-9]+$",
+                "description": "Struct identifier in format 'type-index' (e.g., '5-42' for struct type 5, index 42). Type 5 = Struct.",
+                "structs:relationship": "Struct"
+              },
+              "minItems": 4,
+              "maxItems": 4
+            },
+            "land": {
+              "type": "array",
+              "description": "Land slot array (4 slots, struct IDs or empty strings)",
+              "items": {
+                "type": "string",
+                "structs:format": "entity-id",
+                "pattern": "^5-[0-9]+$",
+                "description": "Struct identifier in format 'type-index' (e.g., '5-42' for struct type 5, index 42). Type 5 = Struct.",
+                "structs:relationship": "Struct"
+              },
+              "minItems": 4,
+              "maxItems": 4
+            },
+            "water": {
+              "type": "array",
+              "description": "Water slot array (4 slots, struct IDs or empty strings)",
+              "items": {
+                "type": "string",
+                "structs:format": "entity-id",
+                "pattern": "^5-[0-9]+$",
+                "description": "Struct identifier in format 'type-index' (e.g., '5-42' for struct type 5, index 42). Type 5 = Struct.",
+                "structs:relationship": "Struct"
+              },
+              "minItems": 4,
+              "maxItems": 4
+            },
+            "spaceSlots": {
+              "type": "string",
+              "description": "Number of space slots (string representation of integer, typically '4')"
+            },
+            "airSlots": {
+              "type": "string",
+              "description": "Number of air slots (string representation of integer, typically '4')"
+            },
+            "landSlots": {
+              "type": "string",
+              "description": "Number of land slots (string representation of integer, typically '4')"
+            },
+            "waterSlots": {
+              "type": "string",
+              "description": "Number of water slots (string representation of integer, typically '4')"
+            },
+            "status": {
+              "type": "string",
+              "enum": ["active", "inactive"],
+              "description": "Planet status"
+            },
+            "locationListStart": {
+              "type": "string",
+              "description": "Start of location list (string representation, typically empty)"
+            },
+            "locationListLast": {
+              "type": "string",
+              "description": "End of location list (string representation, typically empty)"
+            }
+          },
+          "required": ["id", "maxOre", "creator", "owner", "status"]
+        },
+        "gridAttributes": {
+          "type": "object",
+          "description": "Grid position and resource attributes",
+          "properties": {
+            "ore": {
+              "type": "string",
+              "description": "Current ore amount (string representation of integer)"
+            },
+            "fuel": {
+              "type": "string",
+              "description": "Current fuel amount (string representation of integer)"
+            },
+            "capacity": {
+              "type": "string",
+              "description": "Total capacity (string representation of integer)"
+            },
+            "load": {
+              "type": "string",
+              "description": "Current load (string representation of integer)"
+            },
+            "structsLoad": {
+              "type": "string",
+              "description": "Load from structs (string representation of integer)"
+            },
+            "power": {
+              "type": "string",
+              "description": "Current power/energy (string representation of integer)"
+            },
+            "connectionCapacity": {
+              "type": "string",
+              "description": "Connection capacity (string representation of integer)"
+            },
+            "connectionCount": {
+              "type": "string",
+              "description": "Number of connections (string representation of integer)"
+            },
+            "allocationPointerStart": {
+              "type": "string",
+              "description": "Start of allocation pointer (string representation of integer)"
+            },
+            "allocationPointerEnd": {
+              "type": "string",
+              "description": "End of allocation pointer (string representation of integer)"
+            },
+            "proxyNonce": {
+              "type": "string",
+              "description": "Proxy nonce value (string representation of integer)"
+            },
+            "lastAction": {
+              "type": "string",
+              "description": "Last action timestamp or block (string representation of integer)"
+            },
+            "nonce": {
+              "type": "string",
+              "description": "Nonce value (string representation of integer)"
+            },
+            "ready": {
+              "type": "string",
+              "description": "Ready status (string representation of integer, 0 = not ready, 1 = ready)"
+            },
+            "checkpointBlock": {
+              "type": "string",
+              "description": "Checkpoint block height (string representation of integer)"
+            }
+          }
+        },
+        "planetAttributes": {
+          "type": "object",
+          "description": "Planet-specific attributes (varies by planet type and state)",
+          "additionalProperties": true
+        }
+      },
+      "required": ["Planet"]
+    },
+    "Struct": {
+      "type": "object",
+      "structs:entity": "Struct",
+      "structs:endpoint": "/structs/struct/{id}",
+      "properties": {
+        "id": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^5-[0-9]+$",
+          "description": "Struct identifier in format 'type-index' (e.g., '5-42' for struct type 5, index 42). Type 5 = Struct."
+        },
+        "typeId": {
+          "type": "string",
+          "structs:format": "struct-type-id",
+          "structs:relationship": "StructType",
+          "description": "Type of struct"
+        },
+        "ownerId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "structs:relationship": "Player",
+          "description": "Player who owns this struct. Format: 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        },
+        "locationType": {
+          "type": "integer",
+          "description": "Type of location (9 = fleet, etc.)"
+        },
+        "locationId": {
+          "type": "string",
+          "description": "ID of location where struct is located"
+        },
+        "operatingAmbit": {
+          "type": "integer",
+          "description": "Operating range/ambit"
+        },
+        "structAttributes": {
+          "type": "object",
+          "description": "Struct-specific attributes"
+        }
+      },
+      "required": ["id", "typeId", "ownerId"]
+    },
+    "Fleet": {
+      "type": "object",
+      "structs:entity": "Fleet",
+      "structs:endpoint": "/structs/fleet/{id}",
+      "properties": {
+        "id": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^9-[0-9]+$",
+          "description": "Unique fleet identifier in format 'type-index' (e.g., '9-11' for fleet type 9, index 11). Type 9 = Fleet."
+        },
+        "ownerId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "structs:relationship": "Player",
+          "description": "Player who owns this fleet. Format: 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        },
+        "planetId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^2-[0-9]+$",
+          "structs:relationship": "Planet",
+          "description": "Planet ID where fleet is located, empty string if away. Format: 'type-index' (e.g., '2-1' for planet type 2, index 1). Type 2 = Planet."
+        },
+        "slots": {
+          "type": "array",
+          "description": "Struct IDs in this fleet",
+          "items": {
+            "type": "string",
+            "structs:format": "entity-id",
+            "pattern": "^5-[0-9]+$",
+            "description": "Struct identifier in format 'type-index' (e.g., '5-42' for struct type 5, index 42). Type 5 = Struct.",
+            "structs:relationship": "Struct"
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": ["onStation", "away"],
+          "description": "Fleet status: 'onStation' = at planet (can build on planets), 'away' = away from planet (cannot build on planets)"
+        },
+        "canMove": {
+          "type": "boolean",
+          "description": "Whether fleet can move (readiness check). Requires: owner is online, fleet has command struct, command struct is online"
+        }
+      },
+      "required": ["id", "ownerId"]
+    },
+    "Guild": {
+      "type": "object",
+      "structs:entity": "Guild",
+      "structs:endpoint": "/structs/guild/{id}",
+      "description": "Guild entity with complete field definitions",
+      "properties": {
+        "Guild": {
+          "type": "object",
+          "description": "Guild core data",
+          "properties": {
+            "id": {
+              "type": "string",
+              "structs:format": "entity-id",
+              "pattern": "^0-[0-9]+$",
+              "description": "Guild identifier in format 'type-index' (e.g., '0-1' for guild type 0, index 1). Type 0 = Guild."
+            },
+            "index": {
+              "type": "string",
+              "description": "Guild index number"
+            },
+            "endpoint": {
+              "type": "string",
+              "format": "uri",
+              "description": "External endpoint URL for guild communication (e.g., paste.c-net.org link)"
+            },
+            "creator": {
+              "type": "string",
+              "structs:format": "blockchain-address",
+              "description": "Blockchain address that created this guild"
+            },
+            "owner": {
+              "type": "string",
+              "structs:format": "entity-id",
+              "pattern": "^1-[0-9]+$",
+              "structs:relationship": "Player",
+              "description": "Player ID who owns this guild. Format: 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+            },
+            "joinInfusionMinimum": {
+              "type": "string",
+              "description": "Minimum infusion amount required to join (string representation of integer)"
+            },
+            "joinInfusionMinimumBypassByRequest": {
+              "type": "string",
+              "enum": ["open", "closed"],
+              "description": "Whether join minimum can be bypassed by request ('open' or 'closed')"
+            },
+            "joinInfusionMinimumBypassByInvite": {
+              "type": "string",
+              "enum": ["open", "closed"],
+              "description": "Whether join minimum can be bypassed by invite ('open' or 'closed')"
+            },
+            "primaryReactorId": {
+              "type": "string",
+              "structs:format": "entity-id",
+          "pattern": "^3-[0-9]+$",
+          "structs:relationship": "Reactor",
+          "description": "Primary reactor ID for this guild. Format: 'type-index' (e.g., '3-1' for reactor type 3, index 1). Type 3 = Reactor."
+            },
+            "entrySubstationId": {
+              "type": "string",
+              "structs:format": "entity-id",
+              "pattern": "^4-[0-9]+$",
+              "structs:relationship": "Substation",
+              "description": "Entry substation ID for this guild. Format: 'type-index' (e.g., '4-3' for substation type 4, index 3). Type 4 = Substation."
+            }
+          },
+          "required": ["id", "index", "creator", "owner"]
+        }
+      },
+      "required": ["Guild"]
+    },
+    "Reactor": {
+      "type": "object",
+      "structs:entity": "Reactor",
+      "structs:endpoint": "/structs/reactor/{id}",
+      "properties": {
+        "id": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^3-[0-9]+$",
+          "description": "Unique reactor identifier in format 'type-index' (e.g., '3-1' for reactor type 3, index 1). Type 3 = Reactor."
+        },
+        "ownerId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "structs:relationship": "Player",
+          "description": "Player who owns this reactor. Format: 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        },
+        "gridAttributes": {
+          "type": "object",
+          "description": "Grid position and resource attributes",
+          "properties": {
+            "ore": { "type": "string", "description": "Current ore amount (string representation of integer)" },
+            "fuel": { "type": "string", "description": "Current fuel amount (string representation of integer)" },
+            "capacity": { "type": "string", "description": "Total energy capacity (string representation of integer)" },
+            "load": { "type": "string", "description": "Current energy load (string representation of integer)" },
+            "structsLoad": { "type": "string", "description": "Load from structs (string representation of integer)" },
+            "power": { "type": "string", "description": "Current power generation (string representation of integer)" },
+            "connectionCapacity": { "type": "string", "description": "Connection capacity (string representation of integer)" },
+            "connectionCount": { "type": "string", "description": "Number of active connections (string representation of integer)" },
+            "allocationPointerStart": { "type": "string", "description": "Start pointer for allocations (string representation of integer)" },
+            "allocationPointerEnd": { "type": "string", "description": "End pointer for allocations (string representation of integer)" },
+            "proxyNonce": { "type": "string", "description": "Proxy nonce (string representation of integer)" },
+            "lastAction": { "type": "string", "description": "Timestamp of last action (string representation of integer)" },
+            "nonce": { "type": "string", "description": "Nonce for transactions (string representation of integer)" },
+            "ready": { "type": "string", "description": "Ready status (string representation of integer)" },
+            "checkpointBlock": { "type": "string", "description": "Last checkpoint block (string representation of integer)" }
+          },
+          "additionalProperties": true
+        }
+      },
+      "required": ["id", "ownerId"]
+    },
+    "Substation": {
+      "type": "object",
+      "structs:entity": "Substation",
+      "structs:endpoint": "/structs/substation/{id}",
+      "properties": {
+        "id": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^4-[0-9]+$",
+          "description": "Unique substation identifier in format 'type-index' (e.g., '4-3' for substation type 4, index 3). Type 4 = Substation."
+        },
+        "ownerId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "structs:relationship": "Player",
+          "description": "Player who owns this substation. Format: 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        },
+        "gridAttributes": {
+          "type": "object",
+          "description": "Grid position and resource attributes",
+          "properties": {
+            "ore": { "type": "string", "description": "Current ore amount (string representation of integer)" },
+            "fuel": { "type": "string", "description": "Current fuel amount (string representation of integer)" },
+            "capacity": { "type": "string", "description": "Total energy capacity (string representation of integer)" },
+            "load": { "type": "string", "description": "Current energy load (string representation of integer)" },
+            "structsLoad": { "type": "string", "description": "Load from structs (string representation of integer)" },
+            "power": { "type": "string", "description": "Current power generation (string representation of integer)" },
+            "connectionCapacity": { "type": "string", "description": "Connection capacity (string representation of integer)" },
+            "connectionCount": { "type": "string", "description": "Number of active connections (string representation of integer)" },
+            "allocationPointerStart": { "type": "string", "description": "Start pointer for allocations (string representation of integer)" },
+            "allocationPointerEnd": { "type": "string", "description": "End pointer for allocations (string representation of integer)" },
+            "proxyNonce": { "type": "string", "description": "Proxy nonce (string representation of integer)" },
+            "lastAction": { "type": "string", "description": "Timestamp of last action (string representation of integer)" },
+            "nonce": { "type": "string", "description": "Nonce for transactions (string representation of integer)" },
+            "ready": { "type": "string", "description": "Ready status (string representation of integer)" },
+            "checkpointBlock": { "type": "string", "description": "Last checkpoint block (string representation of integer)" }
+          },
+          "additionalProperties": true
+        }
+      },
+      "required": ["id", "ownerId"]
+    },
+    "Agreement": {
+      "type": "object",
+      "structs:entity": "Agreement",
+      "structs:endpoint": "/structs/agreement/{id}",
+      "properties": {
+        "id": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^11-[0-9]+$",
+          "description": "Agreement identifier in format 'type-index' (e.g., '11-1' for agreement type 11, index 1). Type 11 = Agreement."
+        },
+        "providerId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^10-[0-9]+$",
+          "structs:relationship": "Provider",
+          "description": "Energy provider. Format: 'type-index' (e.g., '10-1' for provider type 10, index 1). Type 10 = Provider."
+        }
+      },
+      "required": ["id", "providerId"]
+    },
+    "Allocation": {
+      "type": "object",
+      "structs:entity": "Allocation",
+      "structs:endpoint": "/structs/allocation/{id}",
+      "properties": {
+        "id": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^6-[0-9]+$",
+          "description": "Unique allocation identifier in format 'type-index' (e.g., '6-1' for allocation type 6, index 1). Type 6 = Allocation."
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of allocation (e.g., 'automated', 'manual')"
+        },
+        "sourceObjectId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "description": "Source entity ID (reactor, provider, player, etc.). Can be reactor ID (type 3), provider ID (type 10), or player ID (type 1).",
+          "structs:relationship": ["Reactor", "Provider", "Player"]
+        },
+        "destinationId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "description": "Destination entity ID (player, struct, etc.). Can be player ID (type 1) or struct ID (type 5).",
+          "structs:relationship": ["Player", "Struct"]
+        },
+        "controller": {
+          "type": "string",
+          "structs:format": "blockchain-address",
+          "description": "Controller address for this allocation"
+        },
+        "locked": {
+          "type": "boolean",
+          "description": "Whether this allocation is locked"
+        },
+        "index": {
+          "type": "string",
+          "description": "Allocation index number"
+        },
+        "creator": {
+          "type": "string",
+          "structs:format": "blockchain-address",
+          "description": "Blockchain address that created this allocation"
+        }
+      },
+      "required": ["id", "sourceId", "destinationId"]
+    },
+    "Provider": {
+      "type": "object",
+      "structs:entity": "Provider",
+      "structs:endpoint": "/structs/provider/{id}",
+      "properties": {
+        "id": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^10-[0-9]+$",
+          "description": "Provider identifier in format 'type-index' (e.g., '10-1' for provider type 10, index 1). Type 10 = Provider."
+        },
+        "ownerId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "structs:relationship": "Player",
+          "description": "Player who owns this provider. Format: 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        },
+        "rate": {
+          "type": "object",
+          "description": "Energy rate information"
+        },
+        "policy": {
+          "type": "object",
+          "description": "Provider policy"
+        }
+      },
+      "required": ["id", "ownerId"]
+    },
+    "Address": {
+      "type": "object",
+      "structs:entity": "Address",
+      "structs:endpoint": "/structs/address/{address}",
+      "properties": {
+        "address": {
+          "type": "string",
+          "structs:format": "blockchain-address",
+          "description": "Blockchain address (Cosmos SDK format, e.g., 'structs1...')"
+        },
+        "playerId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "structs:relationship": "Player",
+          "description": "Player ID this address belongs to. Format: 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        },
+        "guildId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^0-[0-9]+$",
+          "structs:relationship": "Guild",
+          "description": "Guild ID if address is associated with a guild. Format: 'type-index' (e.g., '0-1' for guild type 0, index 1). Type 0 = Guild."
+        }
+      },
+      "required": ["address"]
+    },
+    "Permission": {
+      "type": "object",
+      "structs:entity": "Permission",
+      "structs:endpoint": "/structs/permission/{permissionId}",
+      "properties": {
+        "permissionId": {
+          "type": "string",
+          "description": "Permission identifier in format 'objectId@playerId' (e.g., '0-1@1-1' for guild 0-1, player 1-1)"
+        },
+        "value": {
+          "type": "string",
+          "description": "Permission value (numeric string, e.g., '127' for full permissions)"
+        },
+        "objectType": {
+          "type": "string",
+          "description": "Type of object this permission applies to (e.g., 'guild', 'planet', 'struct', 'fleet')"
+        },
+        "objectIndex": {
+          "type": "string",
+          "description": "Object index number"
+        },
+        "objectId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "description": "Object entity ID this permission applies to. Can be guild ID (type 0), planet ID (type 2), struct ID (type 5), or fleet ID (type 9).",
+          "structs:relationship": ["Guild", "Planet", "Struct", "Fleet"]
+        },
+        "playerId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "structs:relationship": "Player",
+          "description": "Player ID this permission is granted to. Format: 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        }
+      },
+      "required": ["permissionId", "value"]
+    },
+    "Infusion": {
+      "type": "object",
+      "structs:entity": "Infusion",
+      "structs:endpoint": "/structs/infusion/{destinationId}/{address}",
+      "properties": {
+        "destinationId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "description": "Destination entity ID (reactor, player, struct, etc.). Can be reactor ID (type 3), player ID (type 1), or struct ID (type 5).",
+          "structs:relationship": ["Reactor", "Player", "Struct"]
+        },
+        "destinationType": {
+          "type": "string",
+          "description": "Type of destination (e.g., 'reactor', 'player', 'struct')"
+        },
+        "address": {
+          "type": "string",
+          "structs:format": "blockchain-address",
+          "description": "Source blockchain address for this infusion"
+        },
+        "playerId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "structs:relationship": "Player",
+          "description": "Player ID associated with this infusion. Format: 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        },
+        "fuel": {
+          "type": "string",
+          "description": "Fuel amount (string representation of integer, in ualpha units)"
+        },
+        "defusing": {
+          "type": "string",
+          "description": "Defusing amount (string representation of integer, in ualpha units)"
+        },
+        "power": {
+          "type": "string",
+          "description": "Power amount (string representation of integer, in milliwatts)"
+        },
+        "ratio": {
+          "type": "string",
+          "description": "Infusion ratio (string representation of numeric value)"
+        },
+        "commission": {
+          "type": "string",
+          "description": "Commission rate (string representation of decimal, e.g., '0.04' for 4%)"
+        }
+      },
+      "required": ["destinationId", "address"]
+    },
+    "StructType": {
+      "type": "object",
+      "structs:entity": "StructType",
+      "structs:endpoint": "/structs/struct_type/{id}",
+      "structs:category": "core",
+      "properties": {
+        "id": {
+          "type": "string",
+          "structs:format": "struct-type-id",
+          "description": "Struct type identifier (integer as string, e.g., '1', '2', '3'). Note: StructType IDs use regular integers, not 'type-index' format."
+        },
+        "type": {
+          "type": "string",
+          "description": "Struct type name (e.g., 'Command Ship', 'Miner', 'Reactor')"
+        },
+        "class": {
+          "type": "string",
+          "description": "Struct class identifier (e.g., 'Command Ship', 'Miner', 'Reactor'). Used for cosmetic mod linking."
+        },
+        "classAbbreviation": {
+          "type": "string",
+          "description": "Abbreviated class name (e.g., 'CMD Ship')"
+        },
+        "defaultCosmeticModelNumber": {
+          "type": "string",
+          "description": "Default cosmetic model number (e.g., 'ST-21')"
+        },
+        "defaultCosmeticName": {
+          "type": "string",
+          "description": "Default cosmetic name (e.g., 'Spearpoint')"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["fleet", "mining", "refining", "power", "combat", "defense", "utility"],
+          "description": "Struct category"
+        },
+        "buildLimit": {
+          "type": "string",
+          "description": "Maximum number of this struct type that can be built (string representation of integer)"
+        },
+        "buildDifficulty": {
+          "type": "string",
+          "description": "Proof-of-work difficulty for building (string representation of integer)"
+        },
+        "buildDraw": {
+          "type": "string",
+          "structs:unit": "milliwatts",
+          "description": "Power draw during building (string representation of integer, in milliwatts)"
+        },
+        "maxHealth": {
+          "type": "string",
+          "description": "Maximum health points (string representation of integer)"
+        },
+        "passiveDraw": {
+          "type": "string",
+          "structs:unit": "milliwatts",
+          "description": "Power draw when active (string representation of integer, in milliwatts)"
+        },
+        "possibleAmbit": {
+          "type": "string",
+          "description": "Possible operating ambit (space/air/land/water) - bitmask (string representation of integer)"
+        },
+        "movable": {
+          "type": "boolean",
+          "description": "Whether struct can be moved"
+        },
+        "slotBound": {
+          "type": "boolean",
+          "description": "Whether struct is bound to a slot (planet/fleet)"
+        },
+        "primaryWeapon": {
+          "type": "string",
+          "description": "Primary weapon type (e.g., 'guidedWeaponry', 'noActiveWeaponry')"
+        },
+        "primaryWeaponControl": {
+          "type": "string",
+          "description": "Primary weapon control type (e.g., 'guided')"
+        },
+        "primaryWeaponCharge": {
+          "type": "string",
+          "description": "Charge cost for primary weapon (string representation of integer)"
+        },
+        "primaryWeaponAmbits": {
+          "type": "string",
+          "description": "Primary weapon operating ambits - bitmask (string representation of integer)"
+        },
+        "primaryWeaponTargets": {
+          "type": "string",
+          "description": "Number of targets primary weapon can hit (string representation of integer)"
+        },
+        "primaryWeaponShots": {
+          "type": "string",
+          "description": "Number of shots primary weapon can fire (string representation of integer)"
+        },
+        "primaryWeaponDamage": {
+          "type": "string",
+          "description": "Primary weapon damage (string representation of integer)"
+        },
+        "primaryWeaponBlockable": {
+          "type": "boolean",
+          "description": "Whether primary weapon damage can be blocked"
+        },
+        "primaryWeaponCounterable": {
+          "type": "boolean",
+          "description": "Whether primary weapon can be countered"
+        },
+        "secondaryWeapon": {
+          "type": "string",
+          "description": "Secondary weapon type (e.g., 'noActiveWeaponry')"
+        },
+        "activateCharge": {
+          "type": "string",
+          "description": "Charge cost to activate struct (string representation of integer)"
+        },
+        "buildCharge": {
+          "type": "string",
+          "description": "Charge cost to build struct (string representation of integer)"
+        },
+        "oreMiningCharge": {
+          "type": "string",
+          "description": "Charge cost for ore mining (string representation of integer, if applicable)"
+        },
+        "oreRefiningCharge": {
+          "type": "string",
+          "description": "Charge cost for ore refining (string representation of integer, if applicable)"
+        },
+        "oreMiningDifficulty": {
+          "type": "string",
+          "description": "Proof-of-work difficulty for ore mining (string representation of integer, if applicable)"
+        },
+        "oreRefiningDifficulty": {
+          "type": "string",
+          "description": "Proof-of-work difficulty for ore refining (string representation of integer, if applicable)"
+        },
+        "generatingRate": {
+          "type": "string",
+          "description": "Energy generation rate for generators (string representation of integer, if applicable)"
+        },
+        "stealthActivateCharge": {
+          "type": "string",
+          "description": "Charge cost to activate stealth (string representation of integer, if applicable)"
+        },
+        "hasStealthSystem": {
+          "type": "boolean",
+          "description": "Whether struct has stealth system capability"
+        }
+      },
+      "required": ["id", "type", "class", "category"],
+      "structs:relationships": {
+        "instances": ["schemas/entities/struct.json"]
+      },
+      "structs:verification": {
+        "verified": true,
+        "verifiedBy": "GameCodeAnalyst",
+        "verifiedDate": "2025-01-XX",
+        "verificationMethod": "api-response-analysis",
+        "confidence": "high",
+        "codeReference": "genesis_struct_type.go, technical/api-reference.md (GET /structs/struct_type/{id})"
+      }
+    }
+  },
+  "structs:notes": [
+    "Game state is distributed - no single endpoint returns all state",
+    "Use individual entity endpoints to query specific entities",
+    "Use list endpoints with pagination for bulk queries",
+    "Use filtered endpoints for player-specific queries",
+    "Use GRASS streaming for real-time updates"
+  ]
+}
+

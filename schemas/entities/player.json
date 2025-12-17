@@ -1,0 +1,183 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Player Entity Schema",
+  "description": "Complete Player entity definition extracted from game-state.json for context window efficiency. This schema can be loaded independently when only Player information is needed. See schemas/formats.json for format specifications.",
+  "type": "object",
+  "structs:category": "core",
+  "structs:entity": "Player",
+  "structs:endpoint": "/structs/player/{id}",
+  "structs:source": "schemas/game-state.json#/definitions/Player",
+  "structs:minimalSchema": "schemas/minimal/player-essential.json",
+  "properties": {
+    "Player": {
+      "type": "object",
+      "description": "Player core data",
+      "properties": {
+        "id": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "description": "Unique player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        },
+        "index": {
+          "type": "string",
+          "description": "Player index number"
+        },
+        "guildId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^0-[0-9]+$",
+          "structs:relationship": "Guild",
+          "description": "Guild ID if player is a member, empty string if not. Format: 'type-index' (e.g., '0-1' for guild type 0, index 1). Type 0 = Guild."
+        },
+        "substationId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^4-[0-9]+$",
+          "structs:relationship": "Substation",
+          "description": "Substation ID if connected, empty string if not. Format: 'type-index' (e.g., '4-3' for substation type 4, index 3). Type 4 = Substation."
+        },
+        "creator": {
+          "type": "string",
+          "structs:format": "blockchain-address",
+          "description": "Blockchain address that created this player"
+        },
+        "primaryAddress": {
+          "type": "string",
+          "structs:format": "blockchain-address",
+          "description": "Primary blockchain address for this player"
+        },
+        "planetId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^2-[0-9]+$",
+          "structs:relationship": "Planet",
+          "description": "Planet ID if player owns a planet, empty string if not. Format: 'type-index' (e.g., '2-1' for planet type 2, index 1). Type 2 = Planet."
+        },
+        "fleetId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^9-[0-9]+$",
+          "structs:relationship": "Fleet",
+          "description": "Fleet ID if player owns a fleet, empty string if not. Format: 'type-index' (e.g., '9-11' for fleet type 9, index 11). Type 9 = Fleet."
+        }
+      },
+      "required": ["id", "index", "creator", "primaryAddress"]
+    },
+    "gridAttributes": {
+      "type": "object",
+      "description": "Grid position and resource attributes",
+      "properties": {
+        "ore": {
+          "type": "string",
+          "description": "Current ore amount (string representation of integer)"
+        },
+        "fuel": {
+          "type": "string",
+          "description": "Current fuel amount (string representation of integer)"
+        },
+        "capacity": {
+          "type": "string",
+          "description": "Total capacity (string representation of integer)"
+        },
+        "load": {
+          "type": "string",
+          "description": "Current load (string representation of integer)"
+        },
+        "structsLoad": {
+          "type": "string",
+          "description": "Load from structs (string representation of integer)"
+        },
+        "power": {
+          "type": "string",
+          "description": "Current power/energy (string representation of integer)"
+        },
+        "connectionCapacity": {
+          "type": "string",
+          "description": "Connection capacity (string representation of integer)"
+        },
+        "connectionCount": {
+          "type": "string",
+          "description": "Number of connections (string representation of integer)"
+        },
+        "allocationPointerStart": {
+          "type": "string",
+          "description": "Start of allocation pointer (string representation of integer)"
+        },
+        "allocationPointerEnd": {
+          "type": "string",
+          "description": "End of allocation pointer (string representation of integer)"
+        },
+        "proxyNonce": {
+          "type": "string",
+          "description": "Proxy nonce value (string representation of integer)"
+        },
+        "lastAction": {
+          "type": "string",
+          "description": "Last action timestamp or block (string representation of integer)"
+        },
+        "nonce": {
+          "type": "string",
+          "description": "Nonce value (string representation of integer)"
+        },
+        "ready": {
+          "type": "string",
+          "description": "Ready status (string representation of integer, 0 = not ready, 1 = ready)"
+        },
+        "checkpointBlock": {
+          "type": "string",
+          "description": "Checkpoint block height (string representation of integer)"
+        }
+      }
+    },
+    "playerInventory": {
+      "type": "object",
+      "description": "Player resources and inventory",
+      "properties": {
+        "rocks": {
+          "type": "object",
+          "description": "Rock inventory (struct type IDs to counts)",
+          "additionalProperties": {
+            "type": "string",
+            "description": "Count of this rock type (string representation of integer)"
+          }
+        }
+      }
+    },
+    "halted": {
+      "type": "boolean",
+      "description": "Whether player is halted (cannot perform actions)"
+    }
+  },
+  "required": ["Player"],
+  "structs:loadingStrategy": {
+    "whenToLoad": [
+      "Need complete Player entity data",
+      "Working with player resources (ore, fuel, power)",
+      "Checking player inventory",
+      "Verifying player state for actions"
+    ],
+    "whenNotToLoad": [
+      "Simple existence check (use minimal schema instead)",
+      "ID format verification (use formats.json instead)",
+      "Basic status check (use minimal schema instead)"
+    ],
+    "relatedSchemas": [
+      "schemas/minimal/player-essential.json",
+      "schemas/entities/planet.json",
+      "schemas/entities/fleet.json",
+      "schemas/entities/guild.json"
+    ]
+  },
+  "structs:verification": {
+    "verified": true,
+    "verifiedBy": "GameCodeAnalyst",
+    "verifiedDate": "2025-01-XX",
+    "verificationMethod": "api-response-verification",
+    "confidence": "high",
+    "note": "API response schema verified against actual API responses. For code-based field definitions with formulas, see schemas/entities.json#/definitions/Player",
+    "codeReference": "x/structs/types/player.pb.go",
+    "apiReference": "ai/api/queries/player.yaml"
+  }
+}

@@ -1,0 +1,151 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "structs:workflow": "query-and-monitor-planet",
+  "description": "Query planet information and set up monitoring via streaming",
+  "category": "monitoring",
+  "prerequisites": [
+    "planet_id"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "endpoint": "webapp-planet-by-id",
+      "method": "GET",
+      "url": "http://localhost:8080/api/planet/{planet_id}",
+      "description": "Get planet information",
+      "parameters": {
+        "planet_id": "3-1"
+      },
+      "extract": {
+        "planet_id": "response.body.id",
+        "owner_id": "response.body.owner_id",
+        "planet_name": "response.body.name"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "schema": "schemas/entities.json#/definitions/Planet"
+      }
+    },
+    {
+      "step": 2,
+      "endpoint": "webapp-planet-shield-health",
+      "method": "GET",
+      "url": "http://localhost:8080/api/planet/{planet_id}/shield/health",
+      "description": "Get planetary shield health",
+      "parameters": {
+        "planet_id": "{{step1.extract.planet_id}}"
+      },
+      "extract": {
+        "shield_health": "response.body.health",
+        "shield_max_health": "response.body.max_health",
+        "shield_percentage": "response.body.health / response.body.max_health * 100"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "schema": "schemas/responses.json#/definitions/ShieldHealthResponse"
+      }
+    },
+    {
+      "step": 3,
+      "endpoint": "webapp-planet-raid-active",
+      "method": "GET",
+      "url": "http://localhost:8080/api/planet/{planet_id}/raid/active",
+      "description": "Check for active raids",
+      "parameters": {
+        "planet_id": "{{step1.extract.planet_id}}"
+      },
+      "extract": {
+        "has_active_raid": "response.body !== null",
+        "raid_info": "response.body"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "schema": "schemas/entities.json#/definitions/Raid"
+      },
+      "note": "Response may be null if no active raid"
+    },
+    {
+      "step": 4,
+      "endpoint": "webapp-struct-by-planet",
+      "method": "GET",
+      "url": "http://localhost:8080/api/struct/planet/{planet_id}",
+      "description": "Get all structs on planet",
+      "parameters": {
+        "planet_id": "{{step1.extract.planet_id}}"
+      },
+      "extract": {
+        "structs": "response.body",
+        "struct_count": "response.body.length"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "schema": "schemas/entities.json#/definitions/Struct[]"
+      }
+    },
+    {
+      "step": 5,
+      "endpoint": "grass-nats-protocol",
+      "method": "NATS",
+      "description": "Subscribe to planet updates via GRASS/NATS",
+      "connection": {
+        "url": "nats://localhost:4222"
+      },
+      "subscription": {
+        "subject": "structs.planet.{{step1.extract.planet_id}}",
+        "description": "Subscribe to planet-specific events"
+      },
+      "events": [
+        "raid_status",
+        "fleet_arrive",
+        "fleet_advance",
+        "fleet_depart"
+      ],
+      "documentation": "protocols/streaming.md"
+    }
+  ],
+  "result": {
+    "planet": {
+      "id": "{{step1.extract.planet_id}}",
+      "name": "{{step1.extract.planet_name}}",
+      "owner_id": "{{step1.extract.owner_id}}",
+      "shield": {
+        "health": "{{step2.extract.shield_health}}",
+        "max_health": "{{step2.extract.shield_max_health}}",
+        "health_percentage": "{{step2.extract.shield_percentage}}"
+      },
+      "raid": {
+        "active": "{{step3.extract.has_active_raid}}",
+        "info": "{{step3.extract.raid_info}}"
+      },
+      "structs": {
+        "count": "{{step4.extract.struct_count}}",
+        "list": "{{step4.extract.structs}}"
+      }
+    },
+    "monitoring": {
+      "streaming_subject": "structs.planet.{{step1.extract.planet_id}}",
+      "status": "subscribed"
+    }
+  },
+  "errorHandling": {
+    "step1": {
+      "404": "Planet not found - verify planet_id"
+    },
+    "step2": {
+      "404": "Planet not found or no shield data"
+    },
+    "step3": {
+      "404": "Planet not found (null response is valid if no active raid)"
+    },
+    "step4": {
+      "404": "Planet not found or no structs"
+    },
+    "step5": {
+      "connection_error": "NATS connection failed - check NATS server",
+      "subscription_error": "Subscription failed - verify subject pattern"
+    }
+  },
+  "notes": "This workflow demonstrates querying planet information and setting up real-time monitoring. Steps 2-4 can be executed in parallel for better performance. Step 5 establishes a streaming connection for real-time updates."
+}
+

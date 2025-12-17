@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Structs Documentation Discrepancies",
+  "description": "Tracking discrepancies between documentation and code",
+  "type": "object",
+  "structs:category": "verification",
+  "lastUpdated": "2025-01-XX",
+  "discrepancies": {
+    "critical": [
+      {
+        "id": "generator-rates",
+        "category": "economic",
+        "severity": "critical",
+        "description": "Documentation says '× 2' for all generators, code has 3 different rates (2, 5, 10)",
+        "documentation": {
+          "location": "economics/formulas.md",
+          "current": "Planetary Generator: × 2",
+          "section": "Generator Energy Production"
+        },
+        "code": {
+          "location": "genesis_struct_type.go",
+          "actual": "Field Generator: Rate 2, Continental Power Plant: Rate 5, World Engine: Rate 10"
+        },
+        "impact": "Players making decisions based on wrong rates",
+        "status": "documented",
+        "fixStatus": "pending",
+        "fixOwner": "TechnicalWriter",
+        "reportedBy": "GameCodeAnalyst",
+        "reportedDate": "2025-01-XX"
+      },
+      {
+        "id": "extraction-rate",
+        "category": "resource",
+        "severity": "critical",
+        "description": "Documentation says extraction rate depends on planet characteristics, code shows fixed 1 ore per operation",
+        "documentation": {
+          "location": "economics/formulas.md",
+          "current": "Extraction Rate = f(Planet Type, Mining Facilities, Efficiency Upgrades)",
+          "section": "Extraction Rate"
+        },
+        "code": {
+          "location": "x/structs/keeper/msg_server_struct_ore_miner_complete.go",
+          "actual": "StoredOreIncrement(1) - fixed 1 ore per operation"
+        },
+        "impact": "Players expecting variable rates",
+        "status": "documented",
+        "fixStatus": "pending",
+        "fixOwner": "TechnicalWriter",
+        "reportedBy": "GameCodeAnalyst",
+        "reportedDate": "2025-01-XX"
+      },
+      {
+        "id": "total-extraction-formula",
+        "category": "resource",
+        "severity": "critical",
+        "description": "Documentation formula for total extraction is incorrect",
+        "documentation": {
+          "location": "economics/formulas.md",
+          "current": "Total Extraction = Extraction Rate × Time × Efficiency Factor",
+          "section": "Total Extraction"
+        },
+        "code": {
+          "location": "x/structs/keeper/msg_server_struct_ore_miner_complete.go",
+          "actual": "Total Extraction = Number of Operations × 1 ore per operation"
+        },
+        "impact": "Formula is incorrect",
+        "status": "documented",
+        "fixStatus": "pending",
+        "fixOwner": "TechnicalWriter",
+        "reportedBy": "GameCodeAnalyst",
+        "reportedDate": "2025-01-XX"
+      }
+    ],
+    "medium": [
+      {
+        "id": "planet-starting-ore",
+        "category": "resource",
+        "severity": "medium",
+        "description": "Planet starting ore value not documented",
+        "documentation": {
+          "location": "gameplay/planets.md",
+          "current": "Not mentioned",
+          "section": "Planet Properties"
+        },
+        "code": {
+          "location": "x/structs/types/keys.go",
+          "actual": "PlanetStartingOre = 5"
+        },
+        "impact": "Missing information",
+        "status": "documented",
+        "fixStatus": "pending",
+        "fixOwner": "TechnicalWriter",
+        "reportedBy": "GameCodeAnalyst",
+        "reportedDate": "2025-01-XX"
+      }
+    ],
+    "low": []
+  },
+  "summary": {
+    "total": 4,
+    "critical": 3,
+    "medium": 1,
+    "low": 0,
+    "fixed": 0,
+    "pending": 4
+  },
+  "fixPriorities": {
+    "critical": "Fix immediately - affects player decisions",
+    "medium": "Fix soon - missing information",
+    "low": "Fix when convenient - minor issues"
+  }
+}
+

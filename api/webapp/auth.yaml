@@ -1,0 +1,47 @@
+# Webapp Authentication API Endpoints
+
+**Version**: 1.0.0  
+**Category**: webapp  
+**Entity**: Auth  
+**Base URL**: ${webappBaseUrl} (default: http://localhost:8080)
+
+---
+
+## Endpoints
+
+endpoints:
+  - id: "webapp-auth-signup"
+    method: "POST"
+    path: "/api/auth/signup"
+    description: "Sign up new user"
+    category: "webapp"
+    entity: "Auth"
+    authentication: "none"
+
+  - id: "webapp-auth-login"
+    method: "POST"
+    path: "/api/auth/login"
+    description: "Login user"
+    category: "webapp"
+    entity: "Auth"
+    authentication: "none"
+
+  - id: "webapp-auth-logout"
+    method: "GET"
+    path: "/api/auth/logout"
+    description: "Logout user"
+    category: "webapp"
+    entity: "Auth"
+    authentication: "required"
+
+---
+
+## Related Documentation
+
+- **Protocol**: `../../protocols/authentication.md` - Authentication patterns
+- **Example**: `../../examples/auth/webapp-login.json` - Working login example
+
+---
+
+*Last Updated: January 2025*
+

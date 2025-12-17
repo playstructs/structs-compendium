@@ -1,0 +1,125 @@
+{
+  "version": "1.0.0",
+  "id": "resource-security",
+  "name": "Resource Security Decision Tree",
+  "description": "Decision tree for securing resources by refining ore immediately",
+  "category": "gameplay",
+  "type": "decision-tree",
+  "root": {
+    "condition": {
+      "type": "check",
+      "property": "oreStored",
+      "operator": ">",
+      "value": 0,
+      "description": "Check if ore is stored (stealable)"
+    },
+    "true": {
+      "action": {
+        "type": "refine",
+        "priority": "immediate",
+        "reason": "Ore can be stolen in raids - refine immediately to secure resources",
+        "description": "Refine all stored ore to Alpha Matter"
+      },
+      "next": {
+        "condition": {
+          "type": "check",
+          "property": "alphaMatter",
+          "operator": ">",
+          "value": 0,
+          "description": "Check if Alpha Matter available after refinement"
+        },
+        "true": {
+          "action": {
+            "type": "evaluate",
+            "description": "Alpha Matter is secure - evaluate conversion needs"
+          },
+          "next": {
+            "condition": {
+              "type": "check",
+              "property": "wattsNeeded",
+              "operator": ">",
+              "value": 0,
+              "description": "Check if Watts are needed"
+            },
+            "true": {
+              "action": {
+                "type": "convert",
+                "method": "evaluate",
+                "description": "Convert Alpha Matter to Watts if needed, maintain 20-30% reserve"
+              }
+            },
+            "false": {
+              "action": {
+                "type": "store",
+                "description": "Maintain Alpha Matter reserve (20-30% of total)"
+              }
+            }
+          }
+        },
+        "false": {
+          "action": {
+            "type": "error",
+            "description": "Refinement failed - investigate issue"
+          }
+        }
+      }
+    },
+    "false": {
+      "condition": {
+        "type": "check",
+        "property": "currentOre",
+        "operator": ">",
+        "value": 0,
+        "description": "Check if ore available to mine"
+      },
+      "true": {
+        "action": {
+          "type": "mine",
+          "description": "Mine ore from planet"
+        },
+        "next": {
+          "condition": {
+            "type": "check",
+            "property": "oreStored",
+            "operator": ">",
+            "value": 0,
+            "description": "After mining, check if ore stored"
+          },
+          "true": {
+            "action": {
+              "type": "refine",
+              "priority": "immediate",
+              "reason": "Ore can be stolen - refine immediately",
+              "description": "Refine ore to Alpha Matter immediately"
+            }
+          }
+        }
+      },
+      "false": {
+        "action": {
+          "type": "explore",
+          "description": "No ore available - explore new planet or wait for extraction"
+        }
+      }
+    }
+  },
+  "principles": [
+    "Always refine ore to Alpha Matter immediately",
+    "Never leave ore unrefined",
+    "Maintain 20-30% Alpha Matter reserve",
+    "Ore can be stolen, Alpha Matter cannot"
+  ],
+  "security": {
+    "ore": {
+      "status": "stealable",
+      "risk": "high",
+      "action": "refine immediately"
+    },
+    "alphaMatter": {
+      "status": "secure",
+      "risk": "none",
+      "action": "maintain reserve"
+    }
+  }
+}
+

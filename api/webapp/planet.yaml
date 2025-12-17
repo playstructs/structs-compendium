@@ -1,0 +1,103 @@
+# Webapp Planet API Endpoints
+
+**Version**: 1.0.0  
+**Category**: webapp  
+**Entity**: Planet  
+**Base URL**: ${webappBaseUrl} (default: http://localhost:8080)
+
+---
+
+## Endpoints
+
+endpoints:
+  - id: "webapp-planet-by-id"
+    method: "GET"
+    path: "/api/planet/{planet_id}"
+    description: "Get planet information from web application"
+    category: "webapp"
+    entity: "Planet"
+    baseUrl: "${webappBaseUrl}"
+    parameters:
+      - name: "planet_id"
+        type: "string"
+        required: true
+        format: "planet-id"
+        description: "Planet identifier"
+    response:
+      schema: "schemas/entities.json#/definitions/Planet"
+      contentType: "application/json"
+    example:
+      request: "GET http://localhost:8080/api/planet/3-1"
+      response: |
+        {
+          "id": "3-1",
+          "owner_id": "1-11",
+          "max_ore": 5,
+          "space_slots": 4
+        }
+
+  - id: "webapp-planet-shield-health"
+    method: "GET"
+    path: "/api/planet/{planet_id}/shield/health"
+    description: "Get planet shield health"
+    category: "webapp"
+    entity: "Planet"
+    baseUrl: "${webappBaseUrl}"
+    parameters:
+      - name: "planet_id"
+        type: "string"
+        required: true
+        format: "planet-id"
+        description: "Planet identifier"
+    response:
+      schema: "schemas/responses.json#/definitions/ShieldHealthResponse"
+      contentType: "application/json"
+    example:
+      request: "GET http://localhost:8080/api/planet/3-1/shield/health"
+      response: |
+        {
+          "planet_id": "3-1",
+          "health": 1000,
+          "max_health": 1000
+        }
+
+  - id: "webapp-planet-shield"
+    method: "GET"
+    path: "/api/planet/{planet_id}/shield"
+    description: "Get planet shield information"
+    category: "webapp"
+    entity: "Planet"
+    parameters:
+      - name: "planet_id"
+        type: "string"
+        required: true
+        format: "planet-id"
+
+  - id: "webapp-planet-raid-active"
+    method: "GET"
+    path: "/api/planet/{planet_id}/raid/active"
+    description: "Get active raid for planet"
+    category: "webapp"
+    entity: "Planet"
+    parameters:
+      - name: "planet_id"
+        type: "string"
+        required: true
+        format: "planet-id"
+
+  - id: "webapp-planet-raid-active-fleet"
+    method: "GET"
+    path: "/api/planet/raid/active/fleet/{fleet_id}"
+    description: "Get active raid for fleet"
+    category: "webapp"
+    entity: "Planet"
+    parameters:
+      - name: "fleet_id"
+        type: "string"
+        required: true
+        format: "fleet-id"
+
+---
+
+*Last Updated: January 2025*
+

@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "structs:error": "cosmetic-mod-conflict",
+  "description": "Error handling example for cosmetic mod conflict",
+  "category": "modding",
+  "scenario": "Attempting to install a mod that conflicts with an existing mod",
+  "request": {
+    "endpoint": "cosmetic-mod-install",
+    "method": "POST",
+    "url": "http://localhost:8080/api/cosmetic-mods/install",
+    "body": {
+      "file": "path/to/guild-alpha-miner-v1.zip",
+      "validate": true,
+      "activate": true
+    }
+  },
+  "response": {
+    "status": 409,
+    "body": {
+      "error": "Mod conflict",
+      "code": 409,
+      "details": [
+        "Mod 'guild-alpha-miner-v1' version 1.0.0 already installed",
+        "Existing mod path: ~/.structs/mods/guild-alpha-miner-v1",
+        "Use uninstall endpoint to remove existing mod first"
+      ]
+    },
+    "schema": "schemas/responses.json#/definitions/ErrorResponse"
+  },
+  "errorHandling": {
+    "action": "Uninstall existing mod or use different mod ID",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Check existing mod",
+        "description": "Query existing mod to see current version and status",
+        "endpoint": "cosmetic-mod-get",
+        "url": "http://localhost:8080/api/cosmetic-mods/guild-alpha-miner-v1"
+      },
+      {
+        "step": 2,
+        "action": "Decide on resolution",
+        "description": "Choose to either uninstall existing mod or use different mod ID/version",
+        "options": [
+          {
+            "option": "uninstall-existing",
+            "description": "Uninstall existing mod, then install new version",
+            "steps": [
+              "DELETE /api/cosmetic-mods/guild-alpha-miner-v1",
+              "POST /api/cosmetic-mods/install (with new mod)"
+            ]
+          },
+          {
+            "option": "use-different-id",
+            "description": "Use different mod ID or version for new mod",
+            "steps": [
+              "Update mod manifest with new modId or version",
+              "POST /api/cosmetic-mods/install (with updated mod)"
+            ]
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "action": "Execute resolution",
+        "description": "Perform chosen resolution option"
+      }
+    ],
+    "recovery": "Uninstall conflicting mod first, or use different mod ID/version",
+    "retry": false,
+    "note": "Mod conflicts occur when same modId and version already exist. Use different version or uninstall first."
+  },
+  "relatedErrors": [
+    "COSMETIC_MOD_CONFLICT"
+  ],
+  "documentation": {
+    "errorCodes": "api/error-codes.yaml#COSMETIC_MOD_CONFLICT",
+    "modManagement": "api/cosmetic-mods.yaml#cosmetic-mod-install"
+  }
+}
+

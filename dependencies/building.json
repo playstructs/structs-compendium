@@ -1,0 +1,77 @@
+{
+  "version": "1.0.0",
+  "id": "building",
+  "name": "Building Dependencies",
+  "description": "Complete dependency requirements for building structures",
+  "category": "gameplay",
+  "type": "dependency",
+  "dependencies": [
+    {
+      "name": "Command Ship",
+      "required": true,
+      "condition": "locationType == 1 (planet building)",
+      "check": "commandShip.status == 'online'",
+      "reference": "dependencies/command-ship.json"
+    },
+    {
+      "name": "Fleet Status",
+      "required": true,
+      "condition": "locationType == 1 (planet building)",
+      "check": "fleet.status == 'onStation'",
+      "error": "Fleet must be on station for planet building"
+    },
+    {
+      "name": "Player Online",
+      "required": true,
+      "check": "player.online == true",
+      "error": "Player must be online (sufficient power)"
+    },
+    {
+      "name": "Power Capacity",
+      "required": true,
+      "calculation": "availablePower = (capacity + capacitySecondary) - (load + structsLoad)",
+      "check": "availablePower >= (buildPower + passivePower)",
+      "error": "Insufficient power capacity"
+    },
+    {
+      "name": "Available Slot",
+      "required": true,
+      "condition": "locationType == 1 (planet building)",
+      "check": "planetSlots[slotType] > 0",
+      "error": "No available slot on planet"
+    },
+    {
+      "name": "Build Limit",
+      "required": false,
+      "condition": "structType has build limit",
+      "check": "currentCount < maxPerPlayer",
+      "error": "Build limit exceeded"
+    }
+  ],
+  "powerRequirements": {
+    "oreExtractor": {
+      "buildPower": 500000,
+      "passivePower": 500000,
+      "total": 1000000
+    },
+    "planetaryDefenseCannon": {
+      "buildPower": 600000,
+      "passivePower": 600000,
+      "total": 1200000,
+      "limit": 1
+    }
+  },
+  "validationOrder": [
+    "Check player online",
+    "Check Command Ship online (if planet building)",
+    "Check fleet onStation (if planet building)",
+    "Check power capacity",
+    "Check available slots (if planet building)",
+    "Check build limits"
+  ],
+  "references": {
+    "task": "tasks/building.json",
+    "validation": "validation/common-failures.md#building"
+  }
+}
+

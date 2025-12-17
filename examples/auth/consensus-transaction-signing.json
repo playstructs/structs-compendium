@@ -1,0 +1,212 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "description": "Consensus network transaction signing examples",
+  "examples": [
+    {
+      "id": "get-account-info",
+      "name": "Get Account Information",
+      "description": "Get account information before signing transaction",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:1317/cosmos/auth/v1beta1/accounts/structs1abc...",
+        "headers": {
+          "Accept": "application/json"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "account": {
+            "@type": "/cosmos.auth.v1beta1.BaseAccount",
+            "address": "structs1abc...",
+            "pub_key": {
+              "@type": "/cosmos.crypto.secp256k1.PubKey",
+              "key": "base64_public_key"
+            },
+            "account_number": "0",
+            "sequence": "5"
+          }
+        }
+      },
+      "nextSteps": [
+        {
+          "action": "Store account sequence",
+          "store": "account.sequence = '5'"
+        },
+        {
+          "action": "Use sequence in transaction",
+          "note": "Sequence must match current account sequence"
+        }
+      ]
+    },
+    {
+      "id": "create-transaction",
+      "name": "Create Transaction",
+      "description": "Create transaction message structure",
+      "transaction": {
+        "body": {
+          "messages": [
+            {
+              "@type": "/structs.structs.MsgStructBuild",
+              "creator": "structs1abc...",
+              "structType": "1",
+              "locationType": 1,
+              "locationId": "1-1"
+            }
+          ],
+          "memo": "",
+          "timeout_height": "0"
+        },
+        "auth_info": {
+          "signer_infos": [
+            {
+              "public_key": {
+                "@type": "/cosmos.crypto.secp256k1.PubKey",
+                "key": "base64_public_key"
+              },
+              "mode_info": {
+                "single": {
+                  "mode": "SIGN_MODE_DIRECT"
+                }
+              },
+              "sequence": "5"
+            }
+          ],
+          "fee": {
+            "amount": [],
+            "gas_limit": "200000",
+            "payer": "",
+            "granter": ""
+          }
+        }
+      },
+      "nextSteps": [
+        {
+          "action": "Sign transaction",
+          "note": "Sign transaction body with private key"
+        }
+      ]
+    },
+    {
+      "id": "sign-transaction",
+      "name": "Sign Transaction",
+      "description": "Sign transaction with private key",
+      "signing": {
+        "method": "secp256k1",
+        "privateKey": "0x...",
+        "message": "transaction_bytes",
+        "result": "base64_signature"
+      },
+      "signedTransaction": {
+        "body": {
+          "messages": [
+            {
+              "@type": "/structs.structs.MsgStructBuild",
+              "creator": "structs1abc...",
+              "structType": "1",
+              "locationType": 1,
+              "locationId": "1-1"
+            }
+          ],
+          "memo": ""
+        },
+        "auth_info": {
+          "signer_infos": [
+            {
+              "public_key": {
+                "@type": "/cosmos.crypto.secp256k1.PubKey",
+                "key": "base64_public_key"
+              },
+              "mode_info": {
+                "single": {
+                  "mode": "SIGN_MODE_DIRECT"
+                }
+              },
+              "sequence": "5"
+            }
+          ],
+          "fee": {
+            "amount": [],
+            "gas_limit": "200000"
+          }
+        },
+        "signatures": [
+          "base64_signature"
+        ]
+      },
+      "nextSteps": [
+        {
+          "action": "Submit transaction",
+          "endpoint": "POST /cosmos/tx/v1beta1/txs"
+        }
+      ]
+    },
+    {
+      "id": "submit-transaction",
+      "name": "Submit Transaction",
+      "description": "Submit signed transaction to consensus network",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:1317/cosmos/tx/v1beta1/txs",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "tx_bytes": "base64_encoded_signed_transaction",
+          "mode": "BROADCAST_MODE_SYNC"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "tx_response": {
+            "code": 0,
+            "txhash": "ABC123...",
+            "height": 12345,
+            "gas_used": "150000",
+            "gas_wanted": "200000"
+          }
+        }
+      },
+      "handling": {
+        "code0": {
+          "description": "Success",
+          "action": "Transaction accepted"
+        },
+        "codeNonZero": {
+          "description": "Transaction failed",
+          "action": "Check tx_response.code and logs for error details"
+        }
+      }
+    },
+    {
+      "id": "transaction-sequence-error",
+      "name": "Sequence Error",
+      "description": "Transaction rejected due to incorrect sequence",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:1317/cosmos/tx/v1beta1/txs",
+        "body": {
+          "tx_bytes": "base64_encoded_signed_transaction",
+          "mode": "BROADCAST_MODE_SYNC"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "tx_response": {
+            "code": 4,
+            "txhash": "ABC123...",
+            "raw_log": "sequence mismatch: expected 5, got 4"
+          }
+        }
+      },
+      "handling": {
+        "action": "Get current account sequence",
+        "recovery": "Query account again, update sequence, re-sign and resubmit"
+      }
+    }
+  ]
+}
+

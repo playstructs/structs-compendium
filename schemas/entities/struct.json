@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Struct Entity Schema",
+  "description": "Struct entity definition - extracted from game-state.json for context window optimization. See schemas/formats.json for format specifications.",
+  "type": "object",
+  "structs:entity": "Struct",
+  "structs:endpoint": "/structs/struct/{id}",
+  "structs:category": "core",
+  "properties": {
+    "Struct": {
+      "type": "object",
+      "description": "Struct core data",
+      "properties": {
+        "id": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^5-[0-9]+$",
+          "description": "Unique struct identifier in format 'type-index' (e.g., '5-42' for struct type 5, index 42). Type 5 = Struct."
+        },
+        "owner": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "structs:relationship": "Player",
+          "description": "Player ID who owns this struct. Format: 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        },
+        "structType": {
+          "type": "string",
+          "structs:format": "struct-type-id",
+          "structs:relationship": "StructType",
+          "description": "Struct type ID"
+        },
+        "locationType": {
+          "type": "integer",
+          "enum": [1, 2],
+          "description": "Location type: 1 = planet, 2 = fleet"
+        },
+        "locationId": {
+          "type": "string",
+          "description": "Location ID (planet ID or fleet ID)"
+        }
+      },
+      "required": ["id", "owner", "structType", "locationType", "locationId"]
+    },
+    "gridAttributes": {
+      "type": "object",
+      "description": "Grid position and resource attributes",
+      "additionalProperties": true
+    }
+  },
+  "required": ["Struct"],
+  "structs:relationships": {
+    "owner": "schemas/entities/player.json",
+    "structType": "schemas/entities/struct-type.json",
+    "location": {
+      "planet": "schemas/entities/planet.json",
+      "fleet": "schemas/entities/fleet.json"
+    }
+  },
+  "structs:statusValues": {
+    "1": "materialized",
+    "2": "built",
+    "3": "online"
+  },
+  "structs:verification": {
+    "verified": true,
+    "verifiedBy": "GameCodeAnalyst",
+    "verifiedDate": "2025-01-XX",
+    "verificationMethod": "code-analysis",
+    "confidence": "high",
+    "note": "API response schema. For code-based field definitions with power draw, charge costs, and formulas, see schemas/entities.json#/definitions/Struct",
+    "codeReference": "x/structs/types/struct.pb.go, x/structs/keeper/struct_cache.go",
+    "verifiedFields": ["id", "owner", "structType", "locationType", "status"]
+  }
+}
+

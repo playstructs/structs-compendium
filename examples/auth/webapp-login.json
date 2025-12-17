@@ -1,0 +1,145 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "description": "Webapp authentication examples",
+  "examples": [
+    {
+      "id": "webapp-login-success",
+      "name": "Successful Webapp Login",
+      "description": "Login to webapp and receive session cookie",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8080/api/auth/login",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "username": "player_username",
+          "password": "player_password"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Set-Cookie": "PHPSESSID=abc123def456; Path=/; HttpOnly",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "success": true,
+          "message": "Login successful"
+        }
+      },
+      "nextSteps": [
+        {
+          "action": "Store session cookie",
+          "store": "session.cookie = 'PHPSESSID=abc123def456'"
+        },
+        {
+          "action": "Use cookie in subsequent requests",
+          "example": "GET /api/guild/this with Cookie header"
+        }
+      ]
+    },
+    {
+      "id": "webapp-login-failure",
+      "name": "Failed Webapp Login",
+      "description": "Login failure with invalid credentials",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8080/api/auth/login",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "username": "invalid_user",
+          "password": "wrong_password"
+        }
+      },
+      "response": {
+        "status": 401,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "success": false,
+          "message": "Invalid credentials"
+        }
+      },
+      "handling": {
+        "action": "Do not retry",
+        "recovery": "Request new credentials or check username/password"
+      }
+    },
+    {
+      "id": "webapp-authenticated-request",
+      "name": "Authenticated Request",
+      "description": "Make authenticated request using session cookie",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/guild/this",
+        "headers": {
+          "Cookie": "PHPSESSID=abc123def456",
+          "Accept": "application/json"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "guild": {
+            "id": "1",
+            "name": "My Guild"
+          }
+        }
+      }
+    },
+    {
+      "id": "webapp-unauthorized",
+      "name": "Unauthorized Request",
+      "description": "Request without authentication",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/guild/this",
+        "headers": {
+          "Accept": "application/json"
+        }
+      },
+      "response": {
+        "status": 401,
+        "body": {
+          "error": "Unauthorized",
+          "message": "Authentication required"
+        }
+      },
+      "handling": {
+        "action": "Re-authenticate",
+        "recovery": "Login first, then retry request with session cookie"
+      }
+    },
+    {
+      "id": "webapp-logout",
+      "name": "Logout",
+      "description": "Logout and clear session",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/auth/logout",
+        "headers": {
+          "Cookie": "PHPSESSID=abc123def456"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "success": true,
+          "message": "Logged out successfully"
+        }
+      },
+      "nextSteps": [
+        {
+          "action": "Clear session cookie",
+          "store": "session.cookie = null"
+        }
+      ]
+    }
+  ]
+}
+

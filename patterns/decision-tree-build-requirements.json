@@ -1,0 +1,204 @@
+{
+  "version": "1.0.0",
+  "id": "build-requirements",
+  "name": "Build Requirements Decision Tree",
+  "description": "Decision tree for verifying all requirements before building structures",
+  "category": "gameplay",
+  "type": "decision-tree",
+  "root": {
+    "condition": {
+      "type": "check",
+      "property": "playerOnline",
+      "operator": "==",
+      "value": true,
+      "description": "Check if player is online (sufficient power)"
+    },
+    "true": {
+      "next": {
+        "condition": {
+          "type": "check",
+          "property": "locationType",
+          "operator": "==",
+          "value": 1,
+          "description": "Check if building on planet (locationType = 1)"
+        },
+        "true": {
+          "condition": {
+            "type": "check",
+            "property": "fleetOnStation",
+            "operator": "==",
+            "value": true,
+            "description": "Check if fleet is on station (required for planet building)"
+          },
+          "true": {
+            "condition": {
+              "type": "check",
+              "property": "commandShipOnline",
+              "operator": "==",
+              "value": true,
+              "description": "Check if Command Ship is online (required for all building)"
+            },
+            "true": {
+              "condition": {
+                "type": "check",
+                "property": "availableSlot",
+                "operator": "==",
+                "value": true,
+                "description": "Check if available slot on planet"
+              },
+              "true": {
+                "condition": {
+                  "type": "check",
+                  "property": "sufficientPower",
+                  "operator": ">=",
+                  "value": "requiredPower",
+                  "description": "Check if sufficient power (buildPower + passivePower)"
+                },
+                "true": {
+                  "condition": {
+                    "type": "check",
+                    "property": "buildLimit",
+                    "operator": "check",
+                    "description": "Check if within build limit (e.g., Defense Cannon = 1 per player)"
+                  },
+                  "evaluation": {
+                    "condition": {
+                      "type": "check",
+                      "property": "currentCount",
+                      "operator": "<",
+                      "value": "maxPerPlayer"
+                    },
+                    "true": {
+                      "action": {
+                        "type": "build",
+                        "description": "All requirements met - proceed with build"
+                      }
+                    },
+                    "false": {
+                      "action": {
+                        "type": "error",
+                        "message": "Build limit exceeded - cannot build more of this struct type",
+                        "description": "Build limit check failed"
+                      }
+                    }
+                  }
+                },
+                "false": {
+                  "action": {
+                    "type": "error",
+                    "message": "Insufficient power - need (buildPower + passivePower) Watts",
+                    "description": "Power requirement not met"
+                  }
+                }
+              },
+              "false": {
+                "action": {
+                  "type": "error",
+                  "message": "No available slot on planet",
+                  "description": "Slot requirement not met"
+                }
+              }
+            },
+            "false": {
+              "action": {
+                "type": "error",
+                "message": "Command Ship must be online to build",
+                "description": "Command Ship requirement not met"
+              }
+            }
+          },
+          "false": {
+            "action": {
+              "type": "error",
+              "message": "Fleet must be on station to build on planets",
+              "description": "Fleet status requirement not met"
+            }
+          }
+        },
+        "false": {
+          "condition": {
+            "type": "check",
+            "property": "locationType",
+            "operator": "==",
+            "value": 2,
+            "description": "Check if building in fleet (locationType = 2)"
+          },
+          "true": {
+            "condition": {
+              "type": "check",
+              "property": "commandShipOnline",
+              "operator": "==",
+              "value": true,
+              "description": "Check if Command Ship is online"
+            },
+            "true": {
+              "condition": {
+                "type": "check",
+                "property": "sufficientPower",
+                "operator": ">=",
+                "value": "requiredPower"
+              },
+              "true": {
+                "action": {
+                  "type": "build",
+                  "description": "All requirements met - proceed with fleet build"
+                }
+              },
+              "false": {
+                "action": {
+                  "type": "error",
+                  "message": "Insufficient power for build"
+                }
+              }
+            },
+            "false": {
+              "action": {
+                "type": "error",
+                "message": "Command Ship must be online to build"
+              }
+            }
+          }
+        }
+      }
+    },
+    "false": {
+      "action": {
+        "type": "error",
+        "message": "Player is offline - cannot build. Need sufficient power capacity.",
+        "description": "Player must be online to build"
+      }
+    }
+  },
+  "requirements": {
+    "always": [
+      "playerOnline",
+      "commandShipOnline",
+      "sufficientPower"
+    ],
+    "planetBuilding": [
+      "fleetOnStation",
+      "availableSlot"
+    ],
+    "fleetBuilding": [
+      "fleetExists"
+    ],
+    "optional": [
+      "buildLimit"
+    ]
+  },
+  "principles": [
+    "Verify all requirements before attempting to build",
+    "Check requirements in order: playerOnline → fleetOnStation → commandShipOnline → availableSlot → sufficientPower → buildLimit",
+    "Fail fast if requirement not met",
+    "Provide clear error messages for each requirement"
+  ],
+  "commonFailures": {
+    "playerOffline": "Player must be online (sufficient power capacity)",
+    "fleetAway": "Fleet must be on station for planet building",
+    "commandShipOffline": "Command Ship must be online",
+    "noSlot": "No available slot on planet",
+    "insufficientPower": "Need (buildPower + passivePower) Watts",
+    "buildLimitExceeded": "Cannot build more of this struct type (limit reached)"
+  }
+}
+

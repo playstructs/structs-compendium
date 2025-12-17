@@ -1,0 +1,909 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "API Response Schemas",
+  "description": "Complete catalog of all API response formats for AI agents. See schemas/formats.json for format specifications.",
+  "type": "object",
+  "structs:category": "api",
+  "definitions": {
+    "SuccessResponse": {
+      "type": "object",
+      "description": "Generic success response",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "Operation success status"
+        },
+        "message": {
+          "type": "string",
+          "description": "Success message"
+        }
+      },
+      "required": ["success"]
+    },
+    "ErrorResponse": {
+      "type": "object",
+      "description": "Error response format",
+      "properties": {
+        "error": {
+          "type": "string",
+          "description": "Error message"
+        },
+        "code": {
+          "type": "integer",
+          "description": "Error code"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Error details"
+        }
+      },
+      "required": ["error"]
+    },
+    "AuthResponse": {
+      "type": "object",
+      "description": "Authentication response",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "player": {
+          "$ref": "#/definitions/PlayerData"
+        },
+        "token": {
+          "type": "string",
+          "description": "Authentication token (if applicable)"
+        }
+      }
+    },
+    "PlayerData": {
+      "type": "object",
+      "description": "Player data structure",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "description": "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        },
+        "username": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string",
+          "format": "blockchain-address"
+        }
+      }
+    },
+    "WebappPlayerResponse": {
+      "type": "object",
+      "description": "Web application player response",
+      "properties": {
+        "player": {
+          "$ref": "#/definitions/PlayerData"
+        },
+        "guild": {
+          "type": "object",
+          "description": "Guild information"
+        },
+        "stats": {
+          "type": "object",
+          "description": "Player statistics"
+        }
+      }
+    },
+    "BlockHeightResponse": {
+      "type": "object",
+      "description": "Block height response",
+      "properties": {
+        "height": {
+          "type": "integer",
+          "description": "Block height"
+        }
+      },
+      "required": ["height"]
+    },
+    "CountResponse": {
+      "type": "object",
+      "description": "Count response",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "description": "Count value"
+        }
+      },
+      "required": ["count"]
+    },
+    "OreStatsResponse": {
+      "type": "object",
+      "description": "Ore statistics response",
+      "properties": {
+        "player_id": {
+          "type": "string",
+          "format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "description": "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        },
+        "total_ore": {
+          "type": "integer",
+          "description": "Total ore mined"
+        },
+        "ore_by_type": {
+          "type": "object",
+          "description": "Ore counts by type"
+        }
+      }
+    },
+    "ShieldHealthResponse": {
+      "type": "object",
+      "description": "Planetary shield health response",
+      "properties": {
+        "planet_id": {
+          "type": "string",
+          "format": "entity-id",
+          "pattern": "^2-[0-9]+$",
+          "description": "Planet identifier in format 'type-index' (e.g., '2-1' for planet type 2, index 1). Type 2 = Planet."
+        },
+        "health": {
+          "type": "integer",
+          "description": "Shield health value"
+        },
+        "max_health": {
+          "type": "integer",
+          "description": "Maximum shield health"
+        }
+      }
+    },
+    "ShieldResponse": {
+      "type": "object",
+      "description": "Planetary shield information response",
+      "properties": {
+        "planet_id": {
+          "type": "string",
+          "format": "entity-id",
+          "pattern": "^2-[0-9]+$",
+          "description": "Planet identifier in format 'type-index' (e.g., '2-1' for planet type 2, index 1). Type 2 = Planet."
+        },
+        "shield": {
+          "type": "object",
+          "description": "Shield details"
+        }
+      }
+    },
+    "GuildNameResponse": {
+      "type": "object",
+      "description": "Guild name response",
+      "properties": {
+        "guild_id": {
+          "type": "string",
+          "format": "entity-id",
+          "pattern": "^0-[0-9]+$",
+          "description": "Guild identifier in format 'type-index' (e.g., '0-1' for guild type 0, index 1). Type 0 = Guild."
+        },
+        "name": {
+          "type": "string",
+          "description": "Guild name"
+        }
+      }
+    },
+    "GuildNameListResponse": {
+      "type": "array",
+      "description": "List of guild names",
+      "items": {
+        "type": "object",
+        "properties": {
+          "guild_id": {
+            "type": "string",
+            "format": "entity-id",
+            "pattern": "^0-[0-9]+$",
+            "description": "Guild identifier in format 'type-index' (e.g., '0-1' for guild type 0, index 1). Type 0 = Guild."
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "GuildRosterResponse": {
+      "type": "object",
+      "description": "Guild roster response",
+      "properties": {
+        "guild_id": {
+          "type": "string",
+          "format": "entity-id",
+          "pattern": "^0-[0-9]+$",
+          "description": "Guild identifier in format 'type-index' (e.g., '0-1' for guild type 0, index 1). Type 0 = Guild."
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PlayerData"
+          }
+        },
+        "member_count": {
+          "type": "integer"
+        }
+      }
+    },
+    "PowerStatsResponse": {
+      "type": "object",
+      "description": "Power statistics response",
+      "properties": {
+        "guild_id": {
+          "type": "string",
+          "format": "entity-id",
+          "pattern": "^0-[0-9]+$",
+          "description": "Guild identifier in format 'type-index' (e.g., '0-1' for guild type 0, index 1). Type 0 = Guild."
+        },
+        "total_power": {
+          "type": "integer",
+          "description": "Total power"
+        },
+        "power_by_type": {
+          "type": "object",
+          "description": "Power breakdown by type"
+        }
+      }
+    },
+    "PlayerIdResponse": {
+      "type": "object",
+      "description": "Player ID response",
+      "properties": {
+        "player_id": {
+          "type": "string",
+          "format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "description": "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        },
+        "address": {
+          "type": "string",
+          "format": "blockchain-address"
+        },
+        "guild_id": {
+          "type": "string",
+          "format": "entity-id",
+          "pattern": "^0-[0-9]+$",
+          "description": "Guild identifier in format 'type-index' (e.g., '0-1' for guild type 0, index 1). Type 0 = Guild."
+        }
+      }
+    },
+    "ActivationCodeResponse": {
+      "type": "object",
+      "description": "Activation code information response",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "Activation code"
+        },
+        "valid": {
+          "type": "boolean",
+          "description": "Whether code is valid"
+        },
+        "player_id": {
+          "type": "string",
+          "format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "description": "Associated player ID if applicable. Format: 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        }
+      }
+    },
+    "TimestampResponse": {
+      "type": "object",
+      "description": "Unix timestamp response",
+      "properties": {
+        "timestamp": {
+          "type": "integer",
+          "description": "Unix timestamp"
+        },
+        "iso": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 formatted timestamp"
+        }
+      },
+      "required": ["timestamp"]
+    },
+    "TransactionResponse": {
+      "type": "object",
+      "description": "Transaction submission response (Cosmos SDK format)",
+      "properties": {
+        "tx_response": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "integer",
+              "description": "Transaction result code (0 = success)"
+            },
+            "txhash": {
+              "type": "string",
+              "description": "Transaction hash"
+            },
+            "height": {
+              "type": "integer",
+              "description": "Block height"
+            },
+            "raw_log": {
+              "type": "string",
+              "description": "Raw log output"
+            }
+          }
+        }
+      },
+      "required": ["tx_response"]
+    },
+    "RPCStatusResponse": {
+      "type": "object",
+      "description": "RPC node status response",
+      "properties": {
+        "result": {
+          "type": "object",
+          "properties": {
+            "node_info": {
+              "type": "object"
+            },
+            "sync_info": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "PaginationResponse": {
+      "type": "object",
+      "description": "Paginated response wrapper",
+      "properties": {
+        "pagination": {
+          "type": "object",
+          "properties": {
+            "next_key": {
+              "type": "string",
+              "description": "Key for next page"
+            },
+            "total": {
+              "type": "string",
+              "description": "Total count"
+            }
+          }
+        }
+      }
+    },
+    "CosmeticModListResponse": {
+      "type": "object",
+      "description": "List of cosmetic mods response (DEPRECATED: Use CosmeticSetListResponse)",
+      "properties": {
+        "mods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CosmeticModSummary"
+          },
+          "description": "List of installed cosmetic mods"
+        }
+      },
+      "required": ["mods"]
+    },
+    "CosmeticSetListResponse": {
+      "type": "object",
+      "description": "List of cosmetic sets response",
+      "properties": {
+        "sets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CosmeticSetSummary"
+          },
+          "description": "List of installed cosmetic sets"
+        }
+      },
+      "required": ["sets"]
+    },
+    "CosmeticModSummary": {
+      "type": "object",
+      "description": "Summary information about a cosmetic mod (DEPRECATED: Use CosmeticSetSummary)",
+      "properties": {
+        "modId": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$",
+          "description": "Mod identifier"
+        },
+        "name": {
+          "type": "object",
+          "description": "Mod name by language",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Mod version"
+        },
+        "author": {
+          "type": "string",
+          "description": "Mod author"
+        },
+        "guildId": {
+          "type": "string",
+          "format": "entity-id",
+          "pattern": "^0-[0-9]+$",
+          "description": "Guild ID (if guild-specific)"
+        },
+        "active": {
+          "type": "boolean",
+          "description": "Whether mod is active"
+        },
+        "structTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Struct type IDs this mod affects"
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z]{2}$"
+          },
+          "description": "Supported language codes"
+        }
+      },
+      "required": ["modId", "version", "author", "active"]
+    },
+    "CosmeticSetSummary": {
+      "type": "object",
+      "description": "Summary information about a cosmetic set",
+      "properties": {
+        "setHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "Set hash (SHA-256, 64-character hexadecimal)"
+        },
+        "name": {
+          "type": "object",
+          "description": "Set name by language",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Set version"
+        },
+        "author": {
+          "type": "string",
+          "description": "Set author"
+        },
+        "guildId": {
+          "type": "string",
+          "format": "entity-id",
+          "pattern": "^0-[0-9]+$",
+          "description": "Guild ID (if guild-specific)"
+        },
+        "active": {
+          "type": "boolean",
+          "description": "Whether set is active"
+        },
+        "classes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Struct type classes this set affects (e.g., ['Miner', 'Reactor'])"
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z]{2}$"
+          },
+          "description": "Supported language codes"
+        }
+      },
+      "required": ["setHash", "version", "author", "active"]
+    },
+    "CosmeticModResponse": {
+      "type": "object",
+      "description": "Detailed cosmetic mod information response (DEPRECATED: Use CosmeticSetResponse)",
+      "properties": {
+        "modId": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "manifest": {
+          "$ref": "schemas/cosmetic-mod.json#/definitions/manifest"
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "structTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z]{2}$"
+          }
+        }
+      },
+      "required": ["modId", "manifest", "active"]
+    },
+    "CosmeticSetResponse": {
+      "type": "object",
+      "description": "Detailed cosmetic set information response",
+      "properties": {
+        "setHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "Set hash (SHA-256, 64-character hexadecimal)"
+        },
+        "name": {
+          "type": "object",
+          "description": "Set name by language",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Set version"
+        },
+        "author": {
+          "type": "string",
+          "description": "Set author"
+        },
+        "guildId": {
+          "type": "string",
+          "format": "entity-id",
+          "pattern": "^0-[0-9]+$",
+          "description": "Guild ID (if guild-specific)"
+        },
+        "description": {
+          "type": "object",
+          "description": "Set description by language",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "active": {
+          "type": "boolean",
+          "description": "Whether set is active"
+        },
+        "skins": {
+          "type": "array",
+          "description": "List of skins in this set",
+          "items": {
+            "$ref": "schemas/cosmetic-set.json#/definitions/SkinReference"
+          }
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z]{2}$"
+          },
+          "description": "Supported language codes"
+        }
+      },
+      "required": ["setHash", "version", "author", "active"]
+    },
+    "CosmeticModInstallResponse": {
+      "type": "object",
+      "description": "Cosmetic mod installation response. Mod is converted to Sets/Skins during ingestion.",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["success", "error"],
+          "description": "Installation status"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["set", "skin"],
+          "description": "Type of cosmetic installed (set or standalone skin)"
+        },
+        "setHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "Set hash (if type is 'set')"
+        },
+        "skinHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "Skin hash (if type is 'skin')"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Version"
+        },
+        "skins": {
+          "type": "array",
+          "description": "List of skins (if type is 'set')",
+          "items": {
+            "type": "object",
+            "properties": {
+              "skinHash": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "class": {
+                "type": "string"
+              }
+            },
+            "required": ["skinHash", "class"]
+          }
+        },
+        "storagePath": {
+          "type": "string",
+          "description": "Path where cosmetic was stored (using hash-based directory structure)"
+        },
+        "validated": {
+          "type": "boolean",
+          "description": "Whether mod was validated"
+        },
+        "activated": {
+          "type": "boolean",
+          "description": "Whether cosmetic was activated"
+        }
+      },
+      "required": ["status", "type"]
+    },
+    "CosmeticModUninstallResponse": {
+      "type": "object",
+      "description": "Cosmetic mod uninstallation response (DEPRECATED: Use CosmeticSetDeleteResponse)",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["success", "error"]
+        },
+        "modId": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        }
+      },
+      "required": ["status", "modId"]
+    },
+    "CosmeticSetDeleteResponse": {
+      "type": "object",
+      "description": "Cosmetic set deletion response",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["success", "error"],
+          "description": "Deletion status"
+        },
+        "setHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "Deleted set hash"
+        }
+      },
+      "required": ["status", "setHash"]
+    },
+    "CosmeticModActivateResponse": {
+      "type": "object",
+      "description": "Cosmetic mod activation response (DEPRECATED: Use CosmeticSetActivateResponse)",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["success", "error"]
+        },
+        "modId": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "active": {
+          "type": "boolean"
+        }
+      },
+      "required": ["status", "modId", "active"]
+    },
+    "CosmeticSetActivateResponse": {
+      "type": "object",
+      "description": "Cosmetic set activation response",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["success", "error"],
+          "description": "Activation status"
+        },
+        "setHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "Activated set hash"
+        },
+        "active": {
+          "type": "boolean",
+          "description": "Whether set is now active"
+        }
+      },
+      "required": ["status", "setHash", "active"]
+    },
+    "CosmeticModDeactivateResponse": {
+      "type": "object",
+      "description": "Cosmetic mod deactivation response (DEPRECATED: Use CosmeticSetDeactivateResponse)",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["success", "error"]
+        },
+        "modId": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "active": {
+          "type": "boolean"
+        }
+      },
+      "required": ["status", "modId", "active"]
+    },
+    "CosmeticSetDeactivateResponse": {
+      "type": "object",
+      "description": "Cosmetic set deactivation response",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["success", "error"],
+          "description": "Deactivation status"
+        },
+        "setHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "Deactivated set hash"
+        },
+        "active": {
+          "type": "boolean",
+          "description": "Whether set is now active (should be false)"
+        }
+      },
+      "required": ["status", "setHash", "active"]
+    },
+    "CosmeticModValidateResponse": {
+      "type": "object",
+      "description": "Cosmetic mod validation response",
+      "properties": {
+        "valid": {
+          "type": "boolean",
+          "description": "Whether mod is valid"
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Validation errors"
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Validation warnings"
+        },
+        "modId": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$",
+          "description": "Mod identifier (if valid)"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Mod version (if valid)"
+        }
+      },
+      "required": ["valid", "errors", "warnings"]
+    },
+    "StructTypeCosmeticResponse": {
+      "type": "object",
+      "description": "Cosmetic data for a struct type class (with skin overrides applied)",
+      "properties": {
+        "class": {
+          "type": "string",
+          "description": "Struct type class name (e.g., 'Miner', 'Reactor', 'Command Ship'). Must match struct_type.class field."
+        },
+        "skinHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "Skin hash (SHA-256, 64-character hexadecimal) of the active skin for this class"
+        },
+        "name": {
+          "type": "string",
+          "description": "Cosmetic name (localized)"
+        },
+        "lore": {
+          "type": "string",
+          "description": "Lore/description (localized)"
+        },
+        "weapons": {
+          "type": "array",
+          "items": {
+            "$ref": "schemas/cosmetic-skin.json#/definitions/WeaponCosmetic"
+          },
+          "description": "Weapon cosmetic overrides"
+        },
+        "abilities": {
+          "type": "array",
+          "items": {
+            "$ref": "schemas/cosmetic-skin.json#/definitions/AbilityCosmetic"
+          },
+          "description": "Ability cosmetic overrides"
+        },
+        "animations": {
+          "type": "object",
+          "description": "Animation file paths",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "icon": {
+          "type": "string",
+          "description": "Icon file path"
+        },
+        "skinSource": {
+          "type": "object",
+          "description": "Source skin information",
+          "properties": {
+            "skinHash": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$",
+              "description": "Skin hash (SHA-256, 64-character hexadecimal)"
+            },
+            "setHash": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$",
+              "description": "Parent set hash (if skin is part of a set)"
+            },
+            "version": {
+              "type": "string",
+              "pattern": "^\\d+\\.\\d+\\.\\d+$",
+              "description": "Skin version"
+            }
+          },
+          "required": ["skinHash"]
+        }
+      },
+      "required": ["class", "skinHash"]
+    },
+    "StructTypeCosmeticListResponse": {
+      "type": "object",
+      "description": "List of struct type cosmetics",
+      "properties": {
+        "structTypes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StructTypeCosmeticResponse"
+          }
+        }
+      },
+      "required": ["structTypes"]
+    },
+    "StructTypeFullResponse": {
+      "type": "object",
+      "description": "Struct type data with cosmetic overrides applied (integration endpoint)",
+      "properties": {
+        "structType": {
+          "type": "object",
+          "description": "Base struct type data from consensus network",
+          "additionalProperties": true
+        },
+        "cosmetic": {
+          "$ref": "#/definitions/StructTypeCosmeticResponse"
+        },
+        "merged": {
+          "type": "object",
+          "description": "Merged data combining base and cosmetic",
+          "additionalProperties": true
+        }
+      },
+      "required": ["structType", "cosmetic"]
+    }
+  }
+}
+

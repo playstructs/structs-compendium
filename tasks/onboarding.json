@@ -1,0 +1,131 @@
+{
+  "version": "1.0.0",
+  "id": "onboarding",
+  "name": "Player Onboarding Task",
+  "description": "Complete workflow for new player onboarding - first 30 minutes",
+  "category": "gameplay",
+  "type": "task",
+  "duration": "30 minutes",
+  "difficulty": "beginner",
+  "steps": [
+    {
+      "step": 1,
+      "action": "explore",
+      "description": "Explore your first planet",
+      "time": "2 minutes",
+      "requirements": {
+        "currentPlanetComplete": false,
+        "description": "You can only own one planet at a time"
+      },
+      "result": {
+        "newPlanetId": "generated",
+        "startingProperties": {
+          "maxOre": 5,
+          "spaceSlots": 4,
+          "airSlots": 4,
+          "landSlots": 4,
+          "waterSlots": 4
+        }
+      }
+    },
+    {
+      "step": 2,
+      "action": "build",
+      "description": "Build Command Ship in fleet",
+      "time": "5 minutes",
+      "requirements": {
+        "playerOnline": true,
+        "sufficientPower": 50000,
+        "locationType": 2,
+        "description": "Command Ship must be built in fleet (not on planet)"
+      },
+      "result": {
+        "commandShipId": "generated",
+        "status": "building"
+      }
+    },
+    {
+      "step": 3,
+      "action": "wait",
+      "description": "Wait for Command Ship to build (requires proof-of-work)",
+      "time": "varies",
+      "requirements": {
+        "proofOfWork": true
+      }
+    },
+    {
+      "step": 4,
+      "action": "activate",
+      "description": "Activate Command Ship",
+      "time": "1 minute",
+      "requirements": {
+        "commandShipBuilt": true,
+        "sufficientPower": 50000
+      },
+      "result": {
+        "commandShipOnline": true,
+        "canBuildOnPlanets": true
+      }
+    },
+    {
+      "step": 5,
+      "action": "chart",
+      "description": "Chart your planet to see resources",
+      "time": "instant",
+      "requirements": {
+        "cost": "free"
+      },
+      "result": {
+        "resourcesRevealed": true,
+        "maxOre": 5,
+        "currentOre": 5
+      }
+    },
+    {
+      "step": 6,
+      "action": "plan",
+      "description": "Plan your power infrastructure",
+      "time": "2 minutes",
+      "note": "Economic structs need 500k power each - plan accordingly"
+    },
+    {
+      "step": 7,
+      "action": "build",
+      "description": "Build first mining structure (when you have power)",
+      "time": "10 minutes",
+      "requirements": {
+        "fleetOnStation": true,
+        "commandShipOnline": true,
+        "sufficientPower": 500000,
+        "availableSlot": true
+      },
+      "result": {
+        "extractorId": "generated",
+        "canMine": true
+      }
+    }
+  ],
+  "outcomes": {
+    "success": {
+      "description": "Player has explored planet, built Command Ship, activated it, and started mining",
+      "nextSteps": [
+        "Continue mining",
+        "Refine ore to Alpha Matter",
+        "Convert to Watts",
+        "Build more infrastructure"
+      ]
+    }
+  },
+  "commonMistakes": [
+    "Trying to build on planets before Command Ship is built",
+    "Trying to build on planets when fleet is away",
+    "Not activating Command Ship after building",
+    "Building economic structs without sufficient power"
+  ],
+  "tips": [
+    "Command Ship must be built in fleet first",
+    "Command Ship must be activated before building on planets",
+    "Fleet must be on station to build on planets",
+    "Plan power infrastructure before building economic structs"
+  ]
+}

@@ -1,0 +1,195 @@
+{
+  "version": "1.0.0",
+  "id": "resource-extraction",
+  "name": "Resource Extraction Task",
+  "description": "Complete workflow for extracting Alpha Ore, refining to Alpha Matter, and understanding resource security",
+  "category": "economic",
+  "priority": "high",
+  "estimatedTime": "15-30 minutes",
+  "prerequisites": {
+    "playerOnline": true,
+    "planetOwned": true,
+    "sufficientPower": {
+      "amount": 1000000,
+      "description": "Need 500k for Ore Extractor + 500k for Ore Refinery"
+    }
+  },
+  "steps": [
+    {
+      "step": 1,
+      "name": "Explore and Find Planet",
+      "description": "Find a planet with Alpha Ore deposits",
+      "action": "MsgPlanetExplore",
+      "requirements": {
+        "currentPlanetEmpty": true,
+        "description": "Current planet must have 0 ore remaining"
+      },
+      "result": {
+        "newPlanetCreated": true,
+        "planetHasOre": true,
+        "maxOre": 5
+      }
+    },
+    {
+      "step": 2,
+      "name": "Build Ore Extractor",
+      "description": "Build Ore Extractor struct to mine Alpha Ore",
+      "action": "MsgStructBuild",
+      "requirements": {
+        "structType": "OreExtractor",
+        "powerRequired": 500000,
+        "buildDifficulty": 700,
+        "miningDifficulty": 14000
+      },
+      "costs": {
+        "buildDraw": 500000,
+        "passiveDraw": 500000,
+        "miningCharge": 20
+      },
+      "result": {
+        "oreExtractorBuilt": true,
+        "canMineOre": true
+      }
+    },
+    {
+      "step": 3,
+      "name": "Mine Alpha Ore",
+      "description": "Mine Alpha Ore from planet using Ore Extractor",
+      "action": "MsgOreMining",
+      "requirements": {
+        "oreExtractorBuilt": true,
+        "planetHasOre": true,
+        "sufficientCharge": true,
+        "proofOfWork": true
+      },
+      "security": {
+        "oreStealable": true,
+        "warning": "Alpha Ore can be stolen by other players. Refine immediately!"
+      },
+      "result": {
+        "oreExtracted": "Alpha Ore amount (grams)",
+        "oreStealable": true,
+        "nextStep": "refine-immediately"
+      }
+    },
+    {
+      "step": 4,
+      "name": "Build Ore Refinery",
+      "description": "Build Ore Refinery struct to refine Alpha Ore to Alpha Matter",
+      "action": "MsgStructBuild",
+      "requirements": {
+        "structType": "OreRefinery",
+        "powerRequired": 500000,
+        "buildDifficulty": 700,
+        "refiningDifficulty": 28000
+      },
+      "costs": {
+        "buildDraw": 500000,
+        "passiveDraw": 500000,
+        "refiningCharge": 20
+      },
+      "result": {
+        "oreRefineryBuilt": true,
+        "canRefineOre": true
+      }
+    },
+    {
+      "step": 5,
+      "name": "Refine to Alpha Matter",
+      "description": "Refine Alpha Ore to Alpha Matter (secure, non-stealable)",
+      "action": "MsgOreRefining",
+      "requirements": {
+        "oreRefineryBuilt": true,
+        "hasAlphaOre": true,
+        "sufficientCharge": true,
+        "proofOfWork": true
+      },
+      "conversion": {
+        "rate": 1,
+        "formula": "1 gram Alpha Ore = 1 gram Alpha Matter"
+      },
+      "security": {
+        "oreStealable": false,
+        "warning": "Alpha Matter cannot be stolen once refined. Resources are now secure!"
+      },
+      "result": {
+        "alphaMatterCreated": "Alpha Matter amount (grams)",
+        "oreStealable": false,
+        "readyForUse": true
+      }
+    }
+  ],
+  "resourceFlow": {
+    "input": "Planet with Alpha Ore deposits",
+    "step1": "Alpha Ore (stealable)",
+    "step2": "Alpha Matter (non-stealable)",
+    "output": "Alpha Matter ready for energy production or trading"
+  },
+  "securityNotes": {
+    "alphaOre": {
+      "stealable": true,
+      "action": "Refine immediately to secure resources",
+      "risk": "High - can be stolen by other players"
+    },
+    "alphaMatter": {
+      "stealable": false,
+      "action": "Safe to store and use",
+      "risk": "Low - cannot be stolen through gameplay"
+    }
+  },
+  "costs": {
+    "totalPowerRequired": 1000000,
+    "breakdown": {
+      "oreExtractor": {
+        "build": 500000,
+        "operate": 500000
+      },
+      "oreRefinery": {
+        "build": 500000,
+        "operate": 500000
+      }
+    },
+    "note": "Economic structs require massive power investment. Plan accordingly."
+  },
+  "bestPractices": {
+    "refineImmediately": {
+      "priority": "critical",
+      "reason": "Alpha Ore can be stolen, Alpha Matter cannot",
+      "action": "Refine ore as soon as it's mined"
+    },
+    "planPower": {
+      "priority": "high",
+      "reason": "Economic structs require 500k power each",
+      "action": "Ensure sufficient power infrastructure before building"
+    },
+    "multipleSites": {
+      "priority": "medium",
+      "reason": "Reduces risk if one site is attacked",
+      "action": "Establish multiple extraction sites"
+    }
+  },
+  "commonErrors": {
+    "insufficientPower": {
+      "code": "INSUFFICIENT_POWER",
+      "description": "Not enough power to build or operate economic structs",
+      "solution": "Build power infrastructure first (Reactors or Generators)"
+    },
+    "oreStolen": {
+      "code": "ORE_STOLEN",
+      "description": "Alpha Ore was stolen before refinement",
+      "solution": "Refine ore immediately after mining",
+      "prevention": "Build refinery before or immediately after extractor"
+    },
+    "planetEmpty": {
+      "code": "PLANET_EMPTY",
+      "description": "Planet has no ore remaining",
+      "solution": "Explore new planet or wait for ore regeneration"
+    }
+  },
+  "nextSteps": {
+    "energyProduction": "Convert Alpha Matter to energy using Reactors or Generators",
+    "trading": "Trade Alpha Matter on marketplace",
+    "guildCollateral": "Use Alpha Matter as guild token collateral"
+  }
+}
+

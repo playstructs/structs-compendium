@@ -1,0 +1,165 @@
+{
+  "version": "1.0.0",
+  "id": "resource-management",
+  "name": "Resource Management Task",
+  "description": "Complete workflow for managing resources (mining, refining, converting)",
+  "category": "gameplay",
+  "type": "task",
+  "difficulty": "intermediate",
+  "steps": [
+    {
+      "step": 1,
+      "action": "mine",
+      "description": "Mine ore from planet",
+      "requirements": {
+        "extractorOnline": true,
+        "currentOre": "> 0",
+        "sufficientPower": 500000
+      },
+      "result": {
+        "oreExtracted": "varies",
+        "oreStored": "increases",
+        "security": "stealable",
+        "warning": "Ore can be stolen in raids - refine immediately"
+      }
+    },
+    {
+      "step": 2,
+      "action": "refine",
+      "description": "Refine ore to Alpha Matter (SECURE)",
+      "priority": "immediate",
+      "requirements": {
+        "oreStored": "> 0",
+        "refineryOnline": true,
+        "sufficientPower": 500000
+      },
+      "result": {
+        "oreRefined": "all",
+        "alphaMatterGained": "oreAmount",
+        "security": "secure",
+        "cannotBeStolen": true
+      },
+      "reason": "Ore can be stolen, Alpha Matter cannot - refine immediately"
+    },
+    {
+      "step": 3,
+      "action": "evaluate",
+      "description": "Evaluate conversion needs",
+      "criteria": [
+        "Current Watts available",
+        "Power consumption needs",
+        "Reserve requirements (20-30%)",
+        "Conversion method (Reactor vs Generator)"
+      ]
+    },
+    {
+      "step": 4,
+      "action": "convert",
+      "description": "Convert Alpha Matter to Watts",
+      "options": {
+        "reactor": {
+          "rate": "1g:1kW",
+          "risk": "low",
+          "description": "Safe, reliable conversion"
+        },
+        "planetaryGenerator": {
+          "rate": "1g:2kW",
+          "risk": "high",
+          "description": "Efficient but risky conversion"
+        }
+      },
+      "requirements": {
+        "alphaMatter": "> 0",
+        "maintainReserve": "20-30%"
+      },
+      "result": {
+        "wattsGained": "varies by method",
+        "alphaMatterUsed": "amount converted",
+        "reserveMaintained": true
+      }
+    },
+    {
+      "step": 5,
+      "action": "monitor",
+      "description": "Monitor resource flow",
+      "metrics": [
+        "Ore extraction rate",
+        "Refinement rate",
+        "Conversion rate",
+        "Power consumption",
+        "Resource reserves"
+      ]
+    }
+  ],
+  "resourceFlow": {
+    "mining": {
+      "from": "planet",
+      "to": "oreStored",
+      "security": "stealable",
+      "action": "refine immediately"
+    },
+    "refinement": {
+      "from": "oreStored",
+      "to": "alphaMatter",
+      "security": "secure",
+      "action": "maintain reserve"
+    },
+    "conversion": {
+      "from": "alphaMatter",
+      "to": "watts",
+      "methods": ["reactor", "planetaryGenerator"],
+      "action": "convert when needed"
+    }
+  },
+  "security": {
+    "ore": {
+      "status": "stealable",
+      "risk": "high",
+      "action": "refine immediately"
+    },
+    "alphaMatter": {
+      "status": "secure",
+      "risk": "none",
+      "action": "maintain reserve (20-30%)"
+    },
+    "watts": {
+      "status": "secure",
+      "risk": "none",
+      "action": "use for operations"
+    }
+  },
+  "conversionRates": {
+    "reactor": {
+      "input": 1,
+      "output": 1,
+      "unit": "1g:1kW",
+      "risk": "low"
+    },
+    "planetaryGenerator": {
+      "input": 1,
+      "output": 2,
+      "unit": "1g:2kW",
+      "risk": "high"
+    }
+  },
+  "principles": [
+    "Always refine ore immediately to secure resources",
+    "Maintain 20-30% Alpha Matter reserve",
+    "Convert Alpha Matter to Watts when needed",
+    "Monitor resource flow continuously",
+    "Never leave ore unrefined"
+  ],
+  "commonMistakes": [
+    "Leaving ore unrefined (can be stolen)",
+    "Converting all Alpha Matter (no reserve)",
+    "Not monitoring resource flow",
+    "Choosing wrong conversion method for situation"
+  ],
+  "tips": [
+    "Refine ore as soon as it's mined",
+    "Maintain reserves for emergencies",
+    "Choose conversion method based on risk tolerance",
+    "Monitor power consumption vs capacity",
+    "Plan resource needs in advance"
+  ]
+}

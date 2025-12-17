@@ -1,0 +1,62 @@
+{
+  "version": "1.0.0",
+  "id": "exploration",
+  "name": "Exploration Dependencies",
+  "description": "Dependency requirements for exploring new planets",
+  "category": "gameplay",
+  "type": "dependency",
+  "dependencies": [
+    {
+      "name": "Current Planet Complete",
+      "required": true,
+      "check": "currentPlanet.currentOre == 0",
+      "error": "Current planet must be depleted (ore = 0) before exploring new one",
+      "description": "You can only own one planet at a time - must complete current planet first"
+    },
+    {
+      "name": "Player Online",
+      "required": true,
+      "check": "player.online == true",
+      "error": "Player must be online"
+    }
+  ],
+  "constraints": {
+    "onePlanetPerPlayer": {
+      "description": "Players can only own one planet at a time",
+      "implication": "Exploring new planet releases ownership of old planet"
+    },
+    "currentPlanetMustBeEmpty": {
+      "description": "Current planet must have 0 ore before exploring",
+      "implication": "Must mine all ore from current planet first"
+    }
+  },
+  "result": {
+    "newPlanetCreated": true,
+    "planetProperties": {
+      "maxOre": 5,
+      "spaceSlots": 4,
+      "airSlots": 4,
+      "landSlots": 4,
+      "waterSlots": 4
+    },
+    "fleetMoved": true,
+    "oldPlanetReleased": true
+  },
+  "validationOrder": [
+    "Check current planet ore amount",
+    "Verify ore == 0",
+    "Check player online",
+    "Explore new planet",
+    "Verify new planet created"
+  ],
+  "commonMistakes": [
+    "Trying to explore when current planet still has ore",
+    "Not checking ore amount before exploring",
+    "Assuming exploration will work without completing current planet"
+  ],
+  "references": {
+    "task": "tasks/exploration.json",
+    "validation": "validation/common-failures.md#exploration"
+  }
+}
+

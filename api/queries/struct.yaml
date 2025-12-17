@@ -1,0 +1,43 @@
+version: "1.0.0"
+lastUpdated: "2025-01-XX"
+baseUrl: "http://localhost:1317"
+basePath: "/structs"
+category: "query"
+entity: "Struct"
+
+endpoints:
+  - id: "struct-by-id"
+    method: "GET"
+    path: "/structs/struct/{id}"
+    description: "Get struct by ID"
+    category: "query"
+    entity: "Struct"
+    parameters:
+      - name: "id"
+        type: "string"
+        required: true
+        format: "entity-id"
+        description: "Struct identifier"
+    response:
+      schema: "schemas/entities/struct.json"
+      contentType: "application/json"
+  
+  - id: "struct-list"
+    method: "GET"
+    path: "/structs/struct"
+    description: "List all structs"
+    category: "query"
+    entity: "Struct"
+    pagination: true
+    parameters:
+      - name: "pagination.key"
+        type: "string"
+        required: false
+        description: "Pagination key"
+      - name: "pagination.limit"
+        type: "integer"
+        required: false
+        description: "Page size"
+    response:
+      schema: "schemas/entities/struct.json[]"
+      contentType: "application/json"

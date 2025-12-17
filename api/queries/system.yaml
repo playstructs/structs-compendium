@@ -1,0 +1,33 @@
+version: "1.0.0"
+lastUpdated: "2025-01-XX"
+baseUrl: "http://localhost:1317"
+basePath: "/structs"
+category: "query"
+entity: "System"
+
+endpoints:
+  - id: "block-height"
+    method: "GET"
+    path: "/blockheight"
+    description: "Get current block height"
+    category: "query"
+    entity: "BlockHeight"
+    response:
+      schema: "schemas/entities.json#/definitions/BlockHeight"
+      contentType: "application/json"
+    example:
+      request: "GET /blockheight"
+      response: |
+        {
+          "height": 12345
+        }
+  
+  - id: "params"
+    method: "GET"
+    path: "/structs/params"
+    description: "Get module parameters"
+    category: "query"
+    entity: "Params"
+    response:
+      schema: "schemas/entities.json#/definitions/Params"
+      contentType: "application/json"

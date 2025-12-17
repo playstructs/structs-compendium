@@ -1,0 +1,66 @@
+version: "1.0.0"
+lastUpdated: "2025-01-XX"
+baseUrl: "http://localhost:1317"
+basePath: "/structs"
+category: "query"
+entity: "Permission"
+
+endpoints:
+  - id: "permission-by-id"
+    method: "GET"
+    path: "/structs/permission/{permissionId}"
+    description: "Get permission by ID"
+    category: "query"
+    entity: "Permission"
+    parameters:
+      - name: "permissionId"
+        type: "string"
+        required: true
+        format: "permission-id"
+        description: "Permission identifier"
+    response:
+      schema: "schemas/entities.json#/definitions/Permission"
+      contentType: "application/json"
+  
+  - id: "permission-list"
+    method: "GET"
+    path: "/structs/permission"
+    description: "List all permissions"
+    category: "query"
+    entity: "Permission"
+    pagination: true
+    response:
+      schema: "schemas/entities.json#/definitions/Permission[]"
+      contentType: "application/json"
+  
+  - id: "permission-by-object"
+    method: "GET"
+    path: "/structs/permission/object/{objectId}"
+    description: "Get permissions by object"
+    category: "query"
+    entity: "Permission"
+    parameters:
+      - name: "objectId"
+        type: "string"
+        required: true
+        description: "Object identifier"
+    response:
+      schema: "schemas/entities.json#/definitions/Permission[]"
+      contentType: "application/json"
+  
+  - id: "permission-by-player"
+    method: "GET"
+    path: "/structs/permission/player/{playerId}"
+    description: "Get permissions by player"
+    category: "query"
+    entity: "Permission"
+    parameters:
+      - name: "playerId"
+        type: "string"
+        required: true
+        format: "entity-id"
+        pattern: "^1-[0-9]+$"
+        description: "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+    response:
+      schema: "schemas/entities.json#/definitions/Permission[]"
+      contentType: "application/json"

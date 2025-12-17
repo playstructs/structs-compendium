@@ -1,0 +1,227 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "API Endpoint Quick Lookup",
+  "description": "Quick lookup table for common API endpoints by use case",
+  "structs:category": "reference",
+  "lookup": {
+    "getPlayer": {
+      "consensus": {
+        "endpoint": "player-by-id",
+        "method": "GET",
+        "path": "/structs/player/{id}",
+        "baseUrl": "http://localhost:1317",
+        "fullUrl": "http://localhost:1317/structs/player/{id}"
+      },
+      "webapp": {
+        "endpoint": "webapp-player-by-id",
+        "method": "GET",
+        "path": "/api/player/{player_id}",
+        "baseUrl": "http://localhost:8080",
+        "fullUrl": "http://localhost:8080/api/player/{player_id}"
+      }
+    },
+    "getPlanet": {
+      "consensus": {
+        "endpoint": "planet-by-id",
+        "method": "GET",
+        "path": "/structs/planet/{id}",
+        "baseUrl": "http://localhost:1317",
+        "fullUrl": "http://localhost:1317/structs/planet/{id}"
+      },
+      "webapp": {
+        "endpoint": "webapp-planet-by-id",
+        "method": "GET",
+        "path": "/api/planet/{planet_id}",
+        "baseUrl": "http://localhost:8080",
+        "fullUrl": "http://localhost:8080/api/planet/{planet_id}"
+      }
+    },
+    "getGuild": {
+      "consensus": {
+        "endpoint": "guild-by-id",
+        "method": "GET",
+        "path": "/structs/guild/{id}",
+        "baseUrl": "http://localhost:1317",
+        "fullUrl": "http://localhost:1317/structs/guild/{id}"
+      },
+      "webapp": {
+        "endpoint": "webapp-guild-by-id",
+        "method": "GET",
+        "path": "/api/guild/{guild_id}",
+        "baseUrl": "http://localhost:8080",
+        "fullUrl": "http://localhost:8080/api/guild/{guild_id}"
+      }
+    },
+    "getStruct": {
+      "consensus": {
+        "endpoint": "struct-by-id",
+        "method": "GET",
+        "path": "/structs/struct/{id}",
+        "baseUrl": "http://localhost:1317",
+        "fullUrl": "http://localhost:1317/structs/struct/{id}"
+      },
+      "webapp": {
+        "endpoint": "webapp-struct-by-id",
+        "method": "GET",
+        "path": "/api/struct/{struct_id}",
+        "baseUrl": "http://localhost:8080",
+        "fullUrl": "http://localhost:8080/api/struct/{struct_id}"
+      }
+    },
+    "getPlayerPlanets": {
+      "endpoint": "planet-by-player",
+      "method": "GET",
+      "path": "/structs/planet_by_player/{playerId}",
+      "baseUrl": "http://localhost:1317",
+      "fullUrl": "http://localhost:1317/structs/planet_by_player/{playerId}"
+    },
+    "getPlanetShield": {
+      "endpoint": "webapp-planet-shield-health",
+      "method": "GET",
+      "path": "/api/planet/{planet_id}/shield/health",
+      "baseUrl": "http://localhost:8080",
+      "fullUrl": "http://localhost:8080/api/planet/{planet_id}/shield/health"
+    },
+    "getGuildMembers": {
+      "endpoint": "webapp-guild-member-count",
+      "method": "GET",
+      "path": "/api/guild/{guild_id}/members/count",
+      "baseUrl": "http://localhost:8080",
+      "fullUrl": "http://localhost:8080/api/guild/{guild_id}/members/count"
+    },
+    "getGuildPower": {
+      "endpoint": "webapp-guild-power-stats",
+      "method": "GET",
+      "path": "/api/guild/{guild_id}/power/stats",
+      "baseUrl": "http://localhost:8080",
+      "fullUrl": "http://localhost:8080/api/guild/{guild_id}/power/stats"
+    },
+    "getPlayerOreStats": {
+      "endpoint": "webapp-player-ore-stats",
+      "method": "GET",
+      "path": "/api/player/{player_id}/ore/stats",
+      "baseUrl": "http://localhost:8080",
+      "fullUrl": "http://localhost:8080/api/player/{player_id}/ore/stats"
+    },
+    "submitTransaction": {
+      "endpoint": "submit-transaction",
+      "method": "POST",
+      "path": "/cosmos/tx/v1beta1/txs",
+      "baseUrl": "http://localhost:1317",
+      "fullUrl": "http://localhost:1317/cosmos/tx/v1beta1/txs",
+      "authentication": "required",
+      "note": "Requires transaction signing"
+    },
+    "getBlockHeight": {
+      "endpoint": "block-height",
+      "method": "GET",
+      "path": "/blockheight",
+      "baseUrl": "http://localhost:1317",
+      "fullUrl": "http://localhost:1317/blockheight"
+    },
+    "getTimestamp": {
+      "endpoint": "webapp-timestamp",
+      "method": "GET",
+      "path": "/api/timestamp",
+      "baseUrl": "http://localhost:8080",
+      "fullUrl": "http://localhost:8080/api/timestamp"
+    }
+  },
+  "streaming": {
+    "connectNATS": {
+      "protocol": "nats://localhost:4222",
+      "websocket": "ws://localhost:1443",
+      "documentation": "protocols/streaming.md"
+    },
+    "subscribePlayer": {
+      "subject": "structs.player.*",
+      "example": "structs.player.0-1.1-11",
+      "documentation": "api/streaming/subscription-patterns.yaml"
+    },
+    "subscribeGuild": {
+      "subject": "structs.guild.*",
+      "example": "structs.guild.0-1",
+      "documentation": "api/streaming/subscription-patterns.yaml"
+    },
+    "subscribePlanet": {
+      "subject": "structs.planet.*",
+      "example": "structs.planet.3-1",
+      "documentation": "api/streaming/subscription-patterns.yaml"
+    }
+  },
+  "authentication": {
+    "webappLogin": {
+      "endpoint": "webapp-auth-login",
+      "method": "POST",
+      "path": "/api/auth/login",
+      "baseUrl": "http://localhost:8080",
+      "fullUrl": "http://localhost:8080/api/auth/login",
+      "documentation": "protocols/authentication.md"
+    },
+    "webappSignup": {
+      "endpoint": "webapp-auth-signup",
+      "method": "POST",
+      "path": "/api/auth/signup",
+      "baseUrl": "http://localhost:8080",
+      "fullUrl": "http://localhost:8080/api/auth/signup",
+      "documentation": "protocols/authentication.md"
+    }
+  },
+  "errorCodes": {
+    "success": 0,
+    "generalError": 1,
+    "insufficientFunds": 2,
+    "invalidSignature": 3,
+    "insufficientGas": 4,
+    "invalidMessage": 5,
+    "playerHalted": 6,
+    "insufficientCharge": 7,
+    "invalidLocation": 8,
+    "invalidTarget": 9,
+    "badRequest": 400,
+    "notFound": 404,
+    "rateLimitExceeded": 429,
+    "internalServerError": 500,
+    "serviceUnavailable": 503,
+    "documentation": "api/error-codes.yaml"
+  },
+  "rateLimits": {
+    "consensusNetwork": {
+      "requestsPerMinute": 60,
+      "requestsPerHour": 3600
+    },
+    "webApplication": {
+      "requestsPerMinute": 100,
+      "requestsPerHour": 6000
+    },
+    "rpc": {
+      "requestsPerMinute": 30,
+      "requestsPerHour": 1800
+    },
+    "documentation": "api/rate-limits.yaml"
+  },
+  "schemas": {
+    "requests": "schemas/requests.json",
+    "responses": "schemas/responses.json",
+    "entities": "schemas/entities.json",
+    "errors": "schemas/errors.json",
+    "authentication": "schemas/authentication.json"
+  },
+  "examples": {
+    "workflows": "examples/workflows/",
+    "errors": "examples/errors/",
+    "auth": "examples/auth/",
+    "bots": "examples/*-bot.json"
+  },
+  "protocols": {
+    "query": "protocols/query-protocol.md",
+    "action": "protocols/action-protocol.md",
+    "webapp": "protocols/webapp-api-protocol.md",
+    "streaming": "protocols/streaming.md",
+    "authentication": "protocols/authentication.md",
+    "errorHandling": "protocols/error-handling.md",
+    "testing": "protocols/testing-protocol.md"
+  }
+}
+

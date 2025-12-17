@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Fleet Entity Schema",
+  "description": "Fleet entity definition - extracted from game-state.json for context window optimization. See schemas/formats.json for format specifications.",
+  "type": "object",
+  "structs:entity": "Fleet",
+  "structs:endpoint": "/structs/fleet/{id}",
+  "structs:category": "core",
+  "properties": {
+    "Fleet": {
+      "type": "object",
+      "description": "Fleet core data",
+      "properties": {
+        "id": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^9-[0-9]+$",
+          "description": "Unique fleet identifier in format 'type-index' (e.g., '9-11' for fleet type 9, index 11). Type 9 = Fleet."
+        },
+        "owner": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "structs:relationship": "Player",
+          "description": "Player ID who owns this fleet. Format: 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        },
+        "planetId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^2-[0-9]+$",
+          "structs:relationship": "Planet",
+          "description": "Planet ID where fleet is located, empty string if away. Format: 'type-index' (e.g., '2-1' for planet type 2, index 1). Type 2 = Planet."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["onStation", "away"],
+          "description": "Fleet status: 'onStation' = at planet (can build), 'away' = away from planet (cannot build)"
+        }
+      },
+      "required": ["id", "owner"]
+    },
+    "structs": {
+      "type": "array",
+      "description": "Struct IDs in this fleet",
+      "items": {
+        "type": "string",
+        "structs:format": "entity-id",
+        "pattern": "^5-[0-9]+$",
+        "description": "Struct identifier in format 'type-index' (e.g., '5-42' for struct type 5, index 42). Type 5 = Struct.",
+        "structs:relationship": "Struct"
+      }
+    }
+  },
+  "required": ["Fleet"],
+  "structs:relationships": {
+    "owner": "schemas/entities/player.json",
+    "planet": "schemas/entities/planet.json",
+    "structs": "schemas/entities/struct.json"
+  },
+  "structs:statusValues": {
+    "onStation": "Fleet at planet, can build on planets",
+    "away": "Fleet away from planet, cannot build on planets"
+  },
+  "structs:verification": {
+    "verified": true,
+    "verifiedBy": "GameCodeAnalyst",
+    "verifiedDate": "2025-01-XX",
+    "verificationMethod": "code-analysis",
+    "confidence": "high",
+    "note": "API response schema. Status values verified. For code-based field definitions with movement requirements, see schemas/entities.json#/definitions/Fleet",
+    "codeReference": "x/structs/types/fleet.pb.go, x/structs/keeper/fleet_cache.go",
+    "verifiedFields": ["id", "owner", "status", "canMove"]
+  }
+}
+

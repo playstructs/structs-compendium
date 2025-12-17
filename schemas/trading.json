@@ -1,0 +1,366 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Structs Trading Operation Schemas",
+  "description": "Complete catalog of trading operations for AI agents. See schemas/formats.json for format specifications.",
+  "type": "object",
+  "structs:category": "economic",
+  "tradingOperations": {
+    "TradeAlphaMatter": {
+      "id": "trade-alpha-matter",
+      "name": "Trade Alpha Matter",
+      "category": "economic",
+      "description": "Trade Alpha Matter on the marketplace",
+      "action": "MsgTradeAlphaMatter",
+      "messageType": "/structs.structs.MsgTradeAlphaMatter",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "requiredFields": ["creator", "resource", "quantity", "price", "type"],
+      "optionalFields": ["orderId"],
+      "properties": {
+        "creator": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "description": "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player.",
+          "description": "Player initiating trade"
+        },
+        "resource": {
+          "type": "string",
+          "enum": ["AlphaMatter"],
+          "description": "Resource being traded"
+        },
+        "quantity": {
+          "type": "number",
+          "description": "Quantity in grams (will be converted to micrograms)",
+          "minimum": 0
+        },
+        "quantityMicrograms": {
+          "type": "string",
+          "description": "Quantity in micrograms (blockchain format)",
+          "pattern": "^[0-9]+$"
+        },
+        "price": {
+          "type": "number",
+          "description": "Price per unit",
+          "minimum": 0
+        },
+        "type": {
+          "type": "string",
+          "enum": ["buy", "sell"],
+          "description": "Trade type"
+        },
+        "orderId": {
+          "type": "string",
+          "structs:format": "order-id",
+          "description": "Order ID if matching existing order"
+        }
+      },
+      "requirements": {
+        "playerOnline": true,
+        "sufficientResources": true,
+        "validMarket": true
+      },
+      "security": {
+        "alphaMatterStealable": false,
+        "note": "Alpha Matter cannot be stolen once refined"
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgTradeAlphaMatter",
+                "creator": "structs1...",
+                "resource": "AlphaMatter",
+                "quantityMicrograms": "100000000",
+                "price": "0.001",
+                "type": "sell"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "TradeEnergy": {
+      "id": "trade-energy",
+      "name": "Trade Energy",
+      "category": "economic",
+      "description": "Trade energy through marketplace or agreements",
+      "action": "MsgTradeEnergy",
+      "messageType": "/structs.structs.MsgTradeEnergy",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "requiredFields": ["creator", "quantity", "price", "type"],
+      "optionalFields": ["agreementId"],
+      "properties": {
+        "creator": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "description": "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player.",
+          "description": "Player initiating trade"
+        },
+        "quantity": {
+          "type": "number",
+          "description": "Energy quantity in kW",
+          "minimum": 0
+        },
+        "price": {
+          "type": "number",
+          "description": "Price per kW (in Alpha Matter)",
+          "minimum": 0
+        },
+        "type": {
+          "type": "string",
+          "enum": ["buy", "sell", "agreement"],
+          "description": "Trade type"
+        },
+        "agreementId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^11-[0-9]+$",
+          "description": "Agreement identifier in format 'type-index' (e.g., '11-1' for agreement type 11, index 1). Type 11 = Agreement.",
+          "description": "Agreement ID if using automated agreement"
+        }
+      },
+      "requirements": {
+        "playerOnline": true,
+        "sufficientResources": true,
+        "energyEphemeral": true,
+        "note": "Energy must be consumed immediately - cannot be stored"
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgTradeEnergy",
+                "creator": "structs1...",
+                "quantity": 100,
+                "price": 0.01,
+                "type": "buy"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "PlaceMarketOrder": {
+      "id": "place-market-order",
+      "name": "Place Market Order",
+      "category": "economic",
+      "description": "Place a buy or sell order on the marketplace",
+      "action": "MsgPlaceMarketOrder",
+      "messageType": "/structs.structs.MsgPlaceMarketOrder",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "requiredFields": ["creator", "resource", "quantity", "price", "orderType"],
+      "optionalFields": [],
+      "properties": {
+        "creator": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "description": "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player.",
+          "description": "Player placing order"
+        },
+        "resource": {
+          "type": "string",
+          "enum": ["AlphaMatter", "Energy", "GuildToken"],
+          "description": "Resource type"
+        },
+        "quantity": {
+          "type": "number",
+          "description": "Order quantity",
+          "minimum": 0
+        },
+        "price": {
+          "type": "number",
+          "description": "Order price per unit",
+          "minimum": 0
+        },
+        "orderType": {
+          "type": "string",
+          "enum": ["buy", "sell"],
+          "description": "Order type"
+        }
+      },
+      "requirements": {
+        "playerOnline": true,
+        "sufficientResources": true,
+        "validMarket": true
+      },
+      "response": {
+        "orderId": {
+          "type": "string",
+          "structs:format": "order-id"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["placed", "filled", "rejected"]
+        }
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgPlaceMarketOrder",
+                "creator": "structs1...",
+                "resource": "AlphaMatter",
+                "quantity": 100,
+                "price": 0.001,
+                "orderType": "sell"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "CancelMarketOrder": {
+      "id": "cancel-market-order",
+      "name": "Cancel Market Order",
+      "category": "economic",
+      "description": "Cancel an existing market order",
+      "action": "MsgCancelMarketOrder",
+      "messageType": "/structs.structs.MsgCancelMarketOrder",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "requiredFields": ["creator", "orderId"],
+      "optionalFields": [],
+      "properties": {
+        "creator": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "description": "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player.",
+          "description": "Player cancelling order"
+        },
+        "orderId": {
+          "type": "string",
+          "structs:format": "order-id",
+          "description": "Order ID to cancel"
+        }
+      },
+      "requirements": {
+        "playerOnline": true,
+        "orderExists": true,
+        "orderOwner": true
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgCancelMarketOrder",
+                "creator": "structs1...",
+                "orderId": "order-123"
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "tradingStrategies": {
+    "buyLowSellHigh": {
+      "description": "Buy when prices are low, sell when prices are high",
+      "strategy": {
+        "monitorPrices": true,
+        "identifyTrends": true,
+        "timePurchases": "low prices",
+        "timeSales": "high prices"
+      }
+    },
+    "marketTiming": {
+      "description": "Time trades based on market cycles",
+      "strategy": {
+        "expansionPhase": "High demand, rising prices - sell",
+        "consolidationPhase": "Balanced market, stable prices - trade normally",
+        "conflictPhase": "Price volatility - buy if supply available",
+        "recoveryPhase": "Market normalization - buy low"
+      }
+    },
+    "arbitrage": {
+      "description": "Profit from price differences",
+      "strategy": {
+        "identifyPriceDifferences": true,
+        "buyLowMarket": true,
+        "sellHighMarket": true,
+        "profitMargin": "price difference"
+      }
+    },
+    "guildCoordination": {
+      "description": "Coordinate trading within guild",
+      "strategy": {
+        "internalTrading": true,
+        "coordinatedPurchases": true,
+        "sharedResources": true,
+        "collectiveBargaining": true
+      }
+    }
+  },
+  "tradingFlow": {
+    "step1": {
+      "action": "Query market data",
+      "description": "Get current market prices and conditions",
+      "endpoint": "GET /structs/market/{resource}",
+      "response": "MarketData"
+    },
+    "step2": {
+      "action": "Analyze market conditions",
+      "description": "Determine if conditions are favorable for trading",
+      "factors": ["price", "supply", "demand", "volatility", "trend"]
+    },
+    "step3": {
+      "action": "Place order or execute trade",
+      "description": "Place market order or execute immediate trade",
+      "options": ["placeMarketOrder", "tradeAlphaMatter", "tradeEnergy"]
+    },
+    "step4": {
+      "action": "Monitor trade status",
+      "description": "Check if order was filled or trade completed",
+      "endpoint": "GET /structs/market/order/{orderId}"
+    },
+    "step5": {
+      "action": "Update resources",
+      "description": "Verify resource balance after trade",
+      "endpoint": "GET /structs/player/{id}"
+    }
+  },
+  "tradingErrors": {
+    "insufficientResources": {
+      "code": "INSUFFICIENT_RESOURCES",
+      "description": "Not enough resources to complete trade",
+      "solution": "Check resource balance, mine more resources, or reduce trade quantity"
+    },
+    "orderNotFound": {
+      "code": "ORDER_NOT_FOUND",
+      "description": "Order ID does not exist",
+      "solution": "Verify order ID, check order status"
+    },
+    "orderAlreadyFilled": {
+      "code": "ORDER_ALREADY_FILLED",
+      "description": "Order has already been filled",
+      "solution": "Query order status before attempting to cancel"
+    },
+    "invalidPrice": {
+      "code": "INVALID_PRICE",
+      "description": "Price is outside acceptable range",
+      "solution": "Check current market prices, adjust price"
+    },
+    "marketClosed": {
+      "code": "MARKET_CLOSED",
+      "description": "Market is currently closed",
+      "solution": "Wait for market to open, check market status"
+    },
+    "energyExpired": {
+      "code": "ENERGY_EXPIRED",
+      "description": "Energy expired before trade completed (ephemeral)",
+      "solution": "Consume energy immediately, trade energy quickly"
+    }
+  },
+  "verified": {
+    "date": "2025-01-XX",
+    "source": "documentation",
+    "notes": "Trading operations based on economic documentation. Some trading actions may need code verification for exact message types and endpoints."
+  }
+}
+

@@ -1,0 +1,484 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "id": "system-integration",
+  "type": "relationship",
+  "title": "System Integration Graph",
+  "description": "Complete system integration showing how technical systems, gameplay, economics, and operations connect",
+  "category": "system",
+  "entities": [
+    {
+      "id": "api",
+      "label": "REST API",
+      "entityType": "TechnicalSystem",
+      "schemaReference": "api/endpoints.yaml",
+      "metadata": {
+        "category": "technical",
+        "type": "REST",
+        "endpoints": ["/structs/player", "/structs/planet", "/structs/struct"],
+        "purpose": "Query game state, submit actions"
+      }
+    },
+    {
+      "id": "grass-stream",
+      "label": "GRASS/NATS Streaming",
+      "entityType": "TechnicalSystem",
+      "schemaReference": "api/streaming/event-types.yaml",
+      "metadata": {
+        "category": "technical",
+        "type": "Event Streaming",
+        "protocol": "NATS",
+        "purpose": "Real-time game state updates"
+      }
+    },
+    {
+      "id": "blockchain",
+      "label": "Blockchain (Consensus Network)",
+      "entityType": "TechnicalSystem",
+      "schemaReference": "protocols/action-protocol.md",
+      "metadata": {
+        "category": "technical",
+        "type": "Blockchain",
+        "purpose": "Permanent record, on-chain state"
+      }
+    },
+    {
+      "id": "webapp",
+      "label": "Web Application",
+      "entityType": "TechnicalSystem",
+      "schemaReference": "api/webapp/",
+      "metadata": {
+        "category": "technical",
+        "type": "Web Application",
+        "purpose": "Player interface, aggregated data"
+      }
+    },
+    {
+      "id": "player-actions",
+      "label": "Player Actions",
+      "entityType": "GameplayMechanic",
+      "schemaReference": "schemas/actions.json",
+      "metadata": {
+        "category": "gameplay",
+        "examples": ["build", "mine", "attack", "explore"]
+      }
+    },
+    {
+      "id": "game-state",
+      "label": "Game State",
+      "entityType": "GameplayMechanic",
+      "schemaReference": "schemas/game-state.json",
+      "metadata": {
+        "category": "gameplay",
+        "components": ["planets", "resources", "structs", "players"]
+      }
+    },
+    {
+      "id": "on-chain-operations",
+      "label": "On-chain Operations",
+      "entityType": "GameplayMechanic",
+      "schemaReference": "protocols/action-protocol.md",
+      "metadata": {
+        "category": "gameplay",
+        "examples": ["battles", "ownership", "transactions"]
+      }
+    },
+    {
+      "id": "market-data",
+      "label": "Market Data",
+      "entityType": "EconomicSystem",
+      "schemaReference": "schemas/markets.json",
+      "metadata": {
+        "category": "economics",
+        "components": ["prices", "supply", "demand", "trades"]
+      }
+    },
+    {
+      "id": "resource-tracking",
+      "label": "Resource Tracking",
+      "entityType": "EconomicSystem",
+      "schemaReference": "schemas/entities.json#/definitions/Resource",
+      "metadata": {
+        "category": "economics",
+        "resources": ["Alpha Matter", "Watts", "Ore"]
+      }
+    },
+    {
+      "id": "infrastructure",
+      "label": "Infrastructure",
+      "entityType": "OperationsSystem",
+      "schemaReference": "technical/docker-containers.md",
+      "metadata": {
+        "category": "operations",
+        "components": ["nodes", "services", "database"]
+      }
+    },
+    {
+      "id": "system-support",
+      "label": "System Support",
+      "entityType": "OperationsSystem",
+      "schemaReference": "technical/",
+      "metadata": {
+        "category": "operations",
+        "components": ["monitoring", "deployment", "scaling"]
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "id": "r1",
+      "from": "api",
+      "to": "player-actions",
+      "type": "enables",
+      "label": "enables",
+      "direction": "directed",
+      "cardinality": "many-to-many",
+      "metadata": {
+        "description": "REST API enables player actions by providing endpoints to query game state and submit actions"
+      }
+    },
+    {
+      "id": "r2",
+      "from": "player-actions",
+      "to": "api",
+      "type": "uses",
+      "label": "uses",
+      "direction": "directed",
+      "cardinality": "many-to-many",
+      "metadata": {
+        "description": "Player actions use API to query game state and submit transactions"
+      }
+    },
+    {
+      "id": "r3",
+      "from": "api",
+      "to": "game-state",
+      "type": "provides",
+      "label": "provides",
+      "direction": "directed",
+      "cardinality": "many-to-many",
+      "metadata": {
+        "description": "API provides game state data through query endpoints"
+      }
+    },
+    {
+      "id": "r4",
+      "from": "game-state",
+      "to": "api",
+      "type": "accessedVia",
+      "label": "accessed via",
+      "direction": "directed",
+      "cardinality": "many-to-many",
+      "metadata": {
+        "description": "Game state is accessed via API endpoints"
+      }
+    },
+    {
+      "id": "r5",
+      "from": "grass-stream",
+      "to": "game-state",
+      "type": "delivers",
+      "label": "delivers real-time updates",
+      "direction": "directed",
+      "cardinality": "one-to-many",
+      "metadata": {
+        "description": "GRASS/NATS streaming delivers real-time game state updates"
+      }
+    },
+    {
+      "id": "r6",
+      "from": "game-state",
+      "to": "grass-stream",
+      "type": "streamedVia",
+      "label": "streamed via",
+      "direction": "directed",
+      "cardinality": "many-to-one",
+      "metadata": {
+        "description": "Game state changes are streamed via GRASS/NATS"
+      }
+    },
+    {
+      "id": "r7",
+      "from": "blockchain",
+      "to": "on-chain-operations",
+      "type": "records",
+      "label": "records",
+      "direction": "directed",
+      "cardinality": "one-to-many",
+      "metadata": {
+        "description": "Blockchain records all on-chain operations (battles, ownership, transactions)"
+      }
+    },
+    {
+      "id": "r8",
+      "from": "on-chain-operations",
+      "to": "blockchain",
+      "type": "storedOn",
+      "label": "stored on",
+      "direction": "directed",
+      "cardinality": "many-to-one",
+      "metadata": {
+        "description": "On-chain operations are permanently stored on blockchain"
+      }
+    },
+    {
+      "id": "r9",
+      "from": "blockchain",
+      "to": "game-state",
+      "type": "stores",
+      "label": "stores",
+      "direction": "directed",
+      "cardinality": "one-to-one",
+      "metadata": {
+        "description": "Blockchain stores permanent, verifiable game state"
+      }
+    },
+    {
+      "id": "r10",
+      "from": "game-state",
+      "to": "blockchain",
+      "type": "storedOn",
+      "label": "stored on",
+      "direction": "directed",
+      "cardinality": "one-to-one",
+      "metadata": {
+        "description": "Game state is stored on blockchain for permanence and verification"
+      }
+    },
+    {
+      "id": "r11",
+      "from": "api",
+      "to": "market-data",
+      "type": "provides",
+      "label": "provides",
+      "direction": "directed",
+      "cardinality": "many-to-many",
+      "metadata": {
+        "description": "API provides market data (prices, supply, demand)"
+      }
+    },
+    {
+      "id": "r12",
+      "from": "market-data",
+      "to": "api",
+      "type": "accessedVia",
+      "label": "accessed via",
+      "direction": "directed",
+      "cardinality": "many-to-many",
+      "metadata": {
+        "description": "Market data is accessed via API endpoints"
+      }
+    },
+    {
+      "id": "r13",
+      "from": "grass-stream",
+      "to": "market-data",
+      "type": "delivers",
+      "label": "delivers real-time updates",
+      "direction": "directed",
+      "cardinality": "one-to-many",
+      "metadata": {
+        "description": "GRASS/NATS streaming delivers real-time market updates"
+      }
+    },
+    {
+      "id": "r14",
+      "from": "market-data",
+      "to": "grass-stream",
+      "type": "streamedVia",
+      "label": "streamed via",
+      "direction": "directed",
+      "cardinality": "many-to-one",
+      "metadata": {
+        "description": "Market data changes are streamed via GRASS/NATS"
+      }
+    },
+    {
+      "id": "r15",
+      "from": "api",
+      "to": "resource-tracking",
+      "type": "provides",
+      "label": "provides",
+      "direction": "directed",
+      "cardinality": "many-to-many",
+      "metadata": {
+        "description": "API provides resource tracking data (Alpha Matter, Watts, Ore levels)"
+      }
+    },
+    {
+      "id": "r16",
+      "from": "resource-tracking",
+      "to": "api",
+      "type": "accessedVia",
+      "label": "accessed via",
+      "direction": "directed",
+      "cardinality": "many-to-many",
+      "metadata": {
+        "description": "Resource tracking data is accessed via API endpoints"
+      }
+    },
+    {
+      "id": "r17",
+      "from": "infrastructure",
+      "to": "api",
+      "type": "hosts",
+      "label": "hosts",
+      "direction": "directed",
+      "cardinality": "one-to-many",
+      "metadata": {
+        "description": "Infrastructure hosts API services"
+      }
+    },
+    {
+      "id": "r18",
+      "from": "api",
+      "to": "infrastructure",
+      "type": "runsOn",
+      "label": "runs on",
+      "direction": "directed",
+      "cardinality": "many-to-one",
+      "metadata": {
+        "description": "API runs on infrastructure (nodes, services)"
+      }
+    },
+    {
+      "id": "r19",
+      "from": "infrastructure",
+      "to": "grass-stream",
+      "type": "hosts",
+      "label": "hosts",
+      "direction": "directed",
+      "cardinality": "one-to-many",
+      "metadata": {
+        "description": "Infrastructure hosts GRASS/NATS streaming services"
+      }
+    },
+    {
+      "id": "r20",
+      "from": "grass-stream",
+      "to": "infrastructure",
+      "type": "runsOn",
+      "label": "runs on",
+      "direction": "directed",
+      "cardinality": "many-to-one",
+      "metadata": {
+        "description": "GRASS/NATS streaming runs on infrastructure"
+      }
+    },
+    {
+      "id": "r21",
+      "from": "infrastructure",
+      "to": "blockchain",
+      "type": "hosts",
+      "label": "hosts",
+      "direction": "directed",
+      "cardinality": "one-to-many",
+      "metadata": {
+        "description": "Infrastructure hosts blockchain nodes (structsd)"
+      }
+    },
+    {
+      "id": "r22",
+      "from": "blockchain",
+      "to": "infrastructure",
+      "type": "runsOn",
+      "label": "runs on",
+      "direction": "directed",
+      "cardinality": "many-to-one",
+      "metadata": {
+        "description": "Blockchain runs on infrastructure nodes"
+      }
+    },
+    {
+      "id": "r23",
+      "from": "system-support",
+      "to": "infrastructure",
+      "type": "supports",
+      "label": "supports",
+      "direction": "directed",
+      "cardinality": "one-to-many",
+      "metadata": {
+        "description": "System support (monitoring, deployment) supports infrastructure"
+      }
+    },
+    {
+      "id": "r24",
+      "from": "infrastructure",
+      "to": "system-support",
+      "type": "monitoredBy",
+      "label": "monitored by",
+      "direction": "directed",
+      "cardinality": "many-to-one",
+      "metadata": {
+        "description": "Infrastructure is monitored and supported by system support"
+      }
+    },
+    {
+      "id": "r25",
+      "from": "webapp",
+      "to": "api",
+      "type": "uses",
+      "label": "uses",
+      "direction": "directed",
+      "cardinality": "one-to-many",
+      "metadata": {
+        "description": "Web application uses API for data access"
+      }
+    },
+    {
+      "id": "r26",
+      "from": "api",
+      "to": "webapp",
+      "type": "serves",
+      "label": "serves",
+      "direction": "directed",
+      "cardinality": "many-to-one",
+      "metadata": {
+        "description": "API serves web application with game data"
+      }
+    },
+    {
+      "id": "r27",
+      "from": "webapp",
+      "to": "player-actions",
+      "type": "enables",
+      "label": "enables",
+      "direction": "directed",
+      "cardinality": "one-to-many",
+      "metadata": {
+        "description": "Web application enables player actions through UI"
+      }
+    },
+    {
+      "id": "r28",
+      "from": "player-actions",
+      "to": "webapp",
+      "type": "performedVia",
+      "label": "performed via",
+      "direction": "directed",
+      "cardinality": "many-to-one",
+      "metadata": {
+        "description": "Player actions can be performed via web application UI"
+      }
+    }
+  ],
+  "relatedSchemas": [
+    "schemas/game-state.json",
+    "schemas/entities.json",
+    "schemas/markets.json",
+    "api/endpoints.yaml",
+    "api/streaming/event-types.yaml"
+  ],
+  "relatedEndpoints": [
+    "/structs/player",
+    "/structs/planet",
+    "/structs/struct",
+    "/structs/market"
+  ],
+  "relatedDiagrams": [
+    "visuals/graphs/gameplay-economics.json",
+    "visuals/graphs/resource-flow.json",
+    "visuals/graphs/entity-relationships.json"
+  ]
+}
+

@@ -1,0 +1,72 @@
+version: "1.0.0"
+lastUpdated: "2025-01-XX"
+baseUrl: "http://localhost:1317"
+basePath: "/structs"
+category: "query"
+entity: "Player"
+
+endpoints:
+  - id: "player-by-id"
+    method: "GET"
+    path: "/structs/player/{id}"
+    description: "Get player by ID"
+    category: "query"
+    entity: "Player"
+    parameters:
+      - name: "id"
+        type: "string"
+        required: true
+        format: "entity-id"
+        pattern: "^1-[0-9]+$"
+        description: "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+    response:
+      schema: "schemas/entities/player.json"
+      contentType: "application/json"
+    example:
+      request: "GET /structs/player/1-11"
+      response: |
+        {
+          "Player": {
+            "id": "1-11",
+            "index": "11",
+            "guildId": "0-1",
+            "substationId": "",
+            "creator": "structs1...",
+            "primaryAddress": "structs1...",
+            "planetId": "2-1",
+            "fleetId": "11-11"
+          },
+          "gridAttributes": {...},
+          "playerInventory": {...},
+          "halted": false
+        }
+  
+  - id: "player-list"
+    method: "GET"
+    path: "/structs/player"
+    description: "List all players"
+    category: "query"
+    entity: "Player"
+    pagination: true
+    parameters:
+      - name: "pagination.key"
+        type: "string"
+        required: false
+        description: "Pagination key"
+      - name: "pagination.limit"
+        type: "integer"
+        required: false
+        description: "Page size"
+    response:
+      schema: "schemas/entities/player.json[]"
+      contentType: "application/json"
+  
+  - id: "player-halted"
+    method: "GET"
+    path: "/structs/player_halted"
+    description: "List all halted players"
+    category: "query"
+    entity: "Player"
+    response:
+      schema: "schemas/entities/player.json[]"
+      contentType: "application/json"

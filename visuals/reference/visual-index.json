@@ -1,0 +1,98 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Visual Content Index",
+  "description": "Complete index of all visual content for AI agents",
+  "type": "object",
+  "structs:category": "visual",
+  "lastUpdated": "2025-12-07",
+  "visuals": {
+    "schemas": [
+      {
+        "id": "diagram-schema",
+        "path": "visuals/schemas/diagram-schema.json",
+        "type": "schema",
+        "description": "Schema for diagram structures"
+      },
+      {
+        "id": "relationship-graph-schema",
+        "path": "visuals/schemas/relationship-graph.json",
+        "type": "schema",
+        "description": "Schema for relationship graphs"
+      },
+      {
+        "id": "flow-schema",
+        "path": "visuals/schemas/flow-schema.json",
+        "type": "schema",
+        "description": "Schema for process flows and workflows"
+      },
+      {
+        "id": "decision-tree-schema",
+        "path": "visuals/schemas/decision-tree.json",
+        "type": "schema",
+        "description": "Schema for decision trees"
+      },
+      {
+        "id": "pattern-schema",
+        "path": "visuals/schemas/pattern-schema.json",
+        "type": "schema",
+        "description": "Schema for visual patterns"
+      },
+      {
+        "id": "spatial-schema",
+        "path": "visuals/schemas/spatial-schema.json",
+        "type": "schema",
+        "description": "Schema for spatial/geometric data"
+      },
+      {
+        "id": "ui-schema",
+        "path": "visuals/schemas/ui-schema.json",
+        "type": "schema",
+        "description": "Schema for UI elements and screens"
+      }
+    ],
+    "graphs": [
+      {
+        "id": "resource-flow",
+        "path": "visuals/graphs/resource-flow.json",
+        "type": "flow",
+        "category": "gameplay",
+        "description": "Complete resource flow from extraction to consumption"
+      },
+      {
+        "id": "entity-relationships",
+        "path": "visuals/graphs/entity-relationships.json",
+        "type": "relationship",
+        "category": "system",
+        "description": "Complete entity relationship graph"
+      },
+      {
+        "id": "gameplay-economics",
+        "path": "visuals/graphs/gameplay-economics.json",
+        "type": "relationship",
+        "category": "system",
+        "description": "Gameplay ↔ Economics relationships"
+      },
+      {
+        "id": "system-integration",
+        "path": "visuals/graphs/system-integration.json",
+        "type": "relationship",
+        "category": "system",
+        "description": "Complete system integration graph"
+      }
+    ],
+    "spatial": [
+      {
+        "id": "coordinate-system",
+        "path": "visuals/spatial/coordinate-system.json",
+        "type": "coordinate-system",
+        "description": "Galactic coordinate system definition"
+      }
+    ],
+    "metadata": [],
+    "ui": [],
+    "patterns": []
+  },
+  "structs:note": "Visual content foundation created. Additional graphs, spatial data, metadata, UI elements, and patterns pending."
+}
+

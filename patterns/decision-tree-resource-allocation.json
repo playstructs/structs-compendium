@@ -1,0 +1,250 @@
+{
+  "version": "1.0.0",
+  "id": "resource-allocation",
+  "name": "Resource Allocation Decision Tree",
+  "description": "Decision tree for allocating resources (Alpha Matter, Energy) across different operations",
+  "category": "economic",
+  "priority": "high",
+  "root": {
+    "id": "start",
+    "question": "What resources do you have?",
+    "type": "choice",
+    "options": [
+      {
+        "value": "alpha-matter",
+        "label": "Alpha Matter",
+        "result": {
+          "id": "alpha-matter-allocation",
+          "question": "How should you allocate Alpha Matter?",
+          "type": "choice",
+          "options": [
+            {
+              "value": "energy-production",
+              "label": "Energy Production",
+              "result": {
+                "id": "energy-production-allocation",
+                "question": "How much Alpha Matter for energy?",
+                "type": "analysis",
+                "factors": [
+                  "Current energy needs",
+                  "Planned operations",
+                  "Energy buffer (20-30%)",
+                  "Reserve Alpha Matter (20-30%)"
+                ],
+                "recommendation": "Allocate based on immediate needs + buffer, keep reserve",
+                "nextStep": "Calculate energy needs, allocate Alpha Matter accordingly"
+              }
+            },
+            {
+              "value": "trading",
+              "label": "Trading",
+              "result": {
+                "id": "trading-allocation",
+                "question": "Is market price favorable?",
+                "type": "boolean",
+                "true": {
+                  "recommendation": "Allocate some Alpha Matter for trading",
+                  "reason": "Market conditions are favorable",
+                  "action": "Trade Alpha Matter on marketplace",
+                  "nextStep": "Execute trade"
+                },
+                "false": {
+                  "recommendation": "Hold Alpha Matter",
+                  "reason": "Market conditions not favorable",
+                  "nextStep": "Wait for better market conditions"
+                }
+              }
+            },
+            {
+              "value": "guild-collateral",
+              "label": "Guild Token Collateral",
+              "result": {
+                "id": "guild-collateral-allocation",
+                "question": "Do you need guild tokens?",
+                "type": "boolean",
+                "true": {
+                  "recommendation": "Allocate Alpha Matter for guild token collateral",
+                  "reason": "Need guild tokens for guild operations",
+                  "action": "Lock Alpha Matter as collateral, mint tokens",
+                  "nextStep": "Set up guild central bank, mint tokens"
+                },
+                "false": {
+                  "recommendation": "Don't allocate for collateral",
+                  "reason": "No need for guild tokens right now",
+                  "nextStep": "Use Alpha Matter for other purposes"
+                }
+              }
+            },
+            {
+              "value": "reserve",
+              "label": "Reserve",
+              "result": {
+                "recommendation": "Keep Alpha Matter in reserve",
+                "reason": "Maintain 20-30% reserve for emergencies",
+                "action": "Store Alpha Matter (secure, non-stealable)",
+                "nextStep": "Keep reserve, use rest for operations"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "value": "energy",
+        "label": "Energy",
+        "result": {
+          "id": "energy-allocation",
+          "question": "How should you allocate Energy?",
+          "type": "choice",
+          "options": [
+            {
+              "value": "operations",
+              "label": "Operations (Combat, Building, Expansion)",
+              "result": {
+                "id": "operations-allocation",
+                "question": "What operations need energy?",
+                "type": "choice",
+                "options": [
+                  {
+                    "value": "combat",
+                    "label": "Combat",
+                    "result": {
+                      "recommendation": "Allocate energy for combat",
+                      "reason": "Combat requires energy",
+                      "action": "Use energy for attacks",
+                      "priority": "high",
+                      "nextStep": "Execute combat operations"
+                    }
+                  },
+                  {
+                    "value": "building",
+                    "label": "Building",
+                    "result": {
+                      "recommendation": "Allocate energy for building",
+                      "reason": "Building requires energy",
+                      "action": "Use energy for struct construction",
+                      "priority": "medium",
+                      "nextStep": "Execute building operations"
+                    }
+                  },
+                  {
+                    "value": "expansion",
+                    "label": "Expansion",
+                    "result": {
+                      "recommendation": "Allocate energy for expansion",
+                      "reason": "Expansion requires energy",
+                      "action": "Use energy for planet exploration and expansion",
+                      "priority": "medium",
+                      "nextStep": "Execute expansion operations"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "value": "trading",
+              "label": "Trading",
+              "result": {
+                "id": "energy-trading-allocation",
+                "question": "Do you have excess energy?",
+                "type": "boolean",
+                "true": {
+                  "recommendation": "Trade excess energy",
+                  "reason": "Have excess energy to sell",
+                  "action": "Trade energy on marketplace or set up agreement",
+                  "warning": "Energy is ephemeral - trade quickly",
+                  "nextStep": "Execute energy trade immediately"
+                },
+                "false": {
+                  "recommendation": "Don't trade energy",
+                  "reason": "No excess energy to trade",
+                  "nextStep": "Use energy for operations"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "value": "both",
+        "label": "Both Alpha Matter and Energy",
+        "result": {
+          "id": "both-allocation",
+          "question": "What's your priority?",
+          "type": "choice",
+          "options": [
+            {
+              "value": "immediate-needs",
+              "label": "Immediate Needs",
+              "result": {
+                "recommendation": "Use Energy for immediate needs, keep Alpha Matter for future",
+                "reason": "Energy is ephemeral, use it now",
+                "action": "Allocate energy to operations, reserve Alpha Matter",
+                "nextStep": "Use energy immediately, save Alpha Matter"
+              }
+            },
+            {
+              "value": "long-term",
+              "label": "Long-term Planning",
+              "result": {
+                "recommendation": "Convert Alpha Matter to Energy as needed",
+                "reason": "Alpha Matter can be stored, convert when needed",
+                "action": "Keep Alpha Matter, convert to energy when operations need it",
+                "nextStep": "Monitor operations, convert Alpha Matter as needed"
+              }
+            },
+            {
+              "value": "balance",
+              "label": "Balance",
+              "result": {
+                "recommendation": "Balance immediate needs with reserves",
+                "reason": "Maintain both operational capacity and reserves",
+                "action": "Use some energy for operations, keep Alpha Matter reserve",
+                "allocation": {
+                  "energy": "70-80% for operations",
+                  "alphaMatter": "20-30% reserve"
+                },
+                "nextStep": "Allocate resources based on balance"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "allocationPrinciples": {
+    "energyEphemeral": {
+      "principle": "Energy must be consumed immediately",
+      "action": "Allocate energy to operations right away"
+    },
+    "alphaMatterSecure": {
+      "principle": "Alpha Matter cannot be stolen",
+      "action": "Safe to store, allocate as needed"
+    },
+    "maintainReserves": {
+      "principle": "Maintain 20-30% reserve",
+      "action": "Keep reserves for emergencies"
+    },
+    "prioritizeOperations": {
+      "principle": "Prioritize critical operations",
+      "action": "Allocate resources to high-priority operations first"
+    }
+  },
+  "bestPractices": {
+    "useEnergyImmediately": {
+      "priority": "critical",
+      "reason": "Energy is ephemeral and cannot be stored",
+      "action": "Allocate energy to operations immediately"
+    },
+    "maintainAlphaMatterReserve": {
+      "priority": "high",
+      "reason": "Reserves provide flexibility and security",
+      "action": "Keep 20-30% Alpha Matter in reserve"
+    },
+    "balanceAllocation": {
+      "priority": "high",
+      "reason": "Balance immediate needs with long-term planning",
+      "action": "Allocate resources based on priorities and reserves"
+    }
+  }
+}
+

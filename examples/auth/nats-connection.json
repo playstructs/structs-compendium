@@ -1,0 +1,105 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "description": "NATS streaming connection examples",
+  "examples": [
+    {
+      "id": "nats-connect-protocol",
+      "name": "Connect to NATS (Protocol)",
+      "description": "Connect to NATS using NATS protocol",
+      "connection": {
+        "url": "nats://localhost:4222",
+        "protocol": "NATS",
+        "authentication": "optional"
+      },
+      "code": {
+        "javascript": "import { connect } from 'nats';\n\nconst nc = await connect({\n  servers: ['nats://localhost:4222']\n});",
+        "python": "import asyncio\nfrom nats.aio.client import Client as NATS\n\nnc = NATS()\nawait nc.connect('nats://localhost:4222')"
+      },
+      "nextSteps": [
+        {
+          "action": "Subscribe to subjects",
+          "example": "Subscribe to structs.player.1"
+        }
+      ]
+    },
+    {
+      "id": "nats-connect-websocket",
+      "name": "Connect to NATS (WebSocket)",
+      "description": "Connect to NATS using WebSocket wrapper",
+      "connection": {
+        "url": "ws://localhost:1443",
+        "protocol": "NATS",
+        "transport": "WebSocket"
+      },
+      "code": {
+        "javascript": "const ws = new WebSocket('ws://localhost:1443');\n\nws.onopen = () => {\n  ws.send(JSON.stringify({\n    action: 'subscribe',\n    subjects: ['structs.player.1']\n  }));\n};"
+      },
+      "nextSteps": [
+        {
+          "action": "Handle messages",
+          "example": "ws.onmessage = (event) => { ... }"
+        }
+      ]
+    },
+    {
+      "id": "nats-subscribe",
+      "name": "Subscribe to Subjects",
+      "description": "Subscribe to NATS subjects for real-time updates",
+      "subscription": {
+        "subjects": [
+          "structs.player.1",
+          "structs.planet.1-1",
+          "structs.global"
+        ]
+      },
+      "code": {
+        "javascript": "const playerSub = nc.subscribe('structs.player.1', {\n  callback: (err, msg) => {\n    if (err) {\n      console.error('Error:', err);\n      return;\n    }\n    const data = JSON.parse(msg.data.toString());\n    handlePlayerUpdate(data);\n  }\n});",
+        "python": "async def player_handler(msg):\n    data = json.loads(msg.data.decode())\n    handle_player_update(data)\n\nawait nc.subscribe('structs.player.1', cb=player_handler)"
+      }
+    },
+    {
+      "id": "nats-message-handling",
+      "name": "Handle NATS Messages",
+      "description": "Process messages received from NATS",
+      "message": {
+        "subject": "structs.player.1",
+        "data": {
+          "id": "1",
+          "primaryAddress": "structs1abc...",
+          "playerId": "1",
+          "updatedAt": "2025-01-XX 12:00:00"
+        }
+      },
+      "handling": {
+        "step1": "Parse message data",
+        "step2": "Validate message format",
+        "step3": "Update local game state",
+        "step4": "Process update"
+      },
+      "code": {
+        "javascript": "function handlePlayerUpdate(data) {\n  // Update local game state\n  gameState.players[data.id] = data;\n  \n  // Process update\n  processPlayerUpdate(data);\n}"
+      }
+    },
+    {
+      "id": "nats-reconnection",
+      "name": "Handle Reconnection",
+      "description": "Reconnect to NATS on connection loss",
+      "error": {
+        "type": "connection-lost",
+        "message": "Connection to NATS server lost"
+      },
+      "recovery": {
+        "step1": "Detect disconnection",
+        "step2": "Wait for reconnection delay",
+        "step3": "Reconnect to NATS",
+        "step4": "Re-subscribe to all subjects",
+        "step5": "Resume processing"
+      },
+      "code": {
+        "javascript": "nc.closed().then(() => {\n  console.log('Connection closed, reconnecting...');\n  \n  // Reconnect with exponential backoff\n  setTimeout(async () => {\n    nc = await connect({ servers: ['nats://localhost:4222'] });\n    \n    // Re-subscribe\n    await resubscribeAll();\n  }, 2000);\n});"
+      }
+    }
+  ]
+}
+

@@ -1,0 +1,142 @@
+{
+  "version": "1.0.0",
+  "id": "power-management",
+  "name": "Power Management Decision Tree",
+  "description": "Decision tree for managing power capacity and maintaining online status",
+  "category": "gameplay",
+  "type": "decision-tree",
+  "root": {
+    "condition": {
+      "type": "calculate",
+      "formula": "(capacity + capacitySecondary) - (load + structsLoad)",
+      "property": "availableCapacity",
+      "description": "Calculate available power capacity"
+    },
+    "evaluation": {
+      "condition": {
+        "type": "check",
+        "property": "availableCapacity",
+        "operator": ">",
+        "value": 0,
+        "description": "Check if available capacity is positive"
+      },
+      "true": {
+        "action": {
+          "type": "status",
+          "status": "online",
+          "description": "Player is online - sufficient power capacity"
+        },
+        "next": {
+          "condition": {
+            "type": "check",
+            "property": "availableCapacity",
+            "operator": "<",
+            "value": "reserveThreshold",
+            "description": "Check if capacity is below reserve threshold (20% of total)"
+          },
+          "true": {
+            "action": {
+              "type": "warning",
+              "message": "Low power capacity - consider reducing consumption or increasing capacity",
+              "priority": "medium"
+            }
+          },
+          "false": {
+            "action": {
+              "type": "continue",
+              "description": "Sufficient capacity - continue operations"
+            }
+          }
+        }
+      },
+      "false": {
+        "action": {
+          "type": "status",
+          "status": "offline",
+          "description": "Player is offline - insufficient power capacity",
+          "priority": "critical"
+        },
+        "next": {
+          "condition": {
+            "type": "check",
+            "property": "alphaMatter",
+            "operator": ">",
+            "value": 0,
+            "description": "Check if Alpha Matter available to convert"
+          },
+          "true": {
+            "action": {
+              "type": "convert",
+              "method": "reactor",
+              "reason": "Convert Alpha Matter to Watts to restore online status",
+              "description": "Convert Alpha Matter to Watts using Reactor (safe method)"
+            },
+            "next": {
+              "condition": {
+                "type": "recalculate",
+                "formula": "(capacity + capacitySecondary) - (load + structsLoad)",
+                "property": "availableCapacity"
+              },
+              "evaluation": {
+                "condition": {
+                  "type": "check",
+                  "property": "availableCapacity",
+                  "operator": ">",
+                  "value": 0
+                },
+                "true": {
+                  "action": {
+                    "type": "status",
+                    "status": "online",
+                    "description": "Online status restored"
+                  }
+                },
+                "false": {
+                  "action": {
+                    "type": "reduce",
+                    "description": "Reduce power consumption - deactivate non-essential structs"
+                  }
+                }
+              }
+            }
+          },
+          "false": {
+            "action": {
+              "type": "reduce",
+              "description": "No Alpha Matter available - must reduce power consumption",
+              "options": [
+                "Deactivate non-essential structs",
+                "Remove structs from planets",
+                "Wait for resource generation"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "formulas": {
+    "availableCapacity": "(capacity + capacitySecondary) - (load + structsLoad)",
+    "playerOnline": "(load + structsLoad) <= (capacity + capacitySecondary)",
+    "reserveThreshold": "(capacity + capacitySecondary) * 0.2"
+  },
+  "principles": [
+    "Maintain online status: (load + structsLoad) <= (capacity + capacitySecondary)",
+    "Keep 20% reserve capacity",
+    "Convert Alpha Matter to Watts when needed",
+    "Reduce consumption if going offline"
+  ],
+  "status": {
+    "online": {
+      "condition": "(load + structsLoad) <= (capacity + capacitySecondary)",
+      "canAct": true,
+      "description": "Player can perform actions"
+    },
+    "offline": {
+      "condition": "(load + structsLoad) > (capacity + capacitySecondary)",
+      "canAct": false,
+      "description": "Player cannot perform actions"
+    }
+  }
+}
+

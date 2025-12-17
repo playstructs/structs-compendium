@@ -1,0 +1,28 @@
+# Webapp Infusion API Endpoints
+
+**Version**: 1.0.0  
+**Category**: webapp  
+**Entity**: Infusion  
+**Base URL**: ${webappBaseUrl} (default: http://localhost:8080)
+
+---
+
+## Endpoints
+
+endpoints:
+  - id: "webapp-infusion-by-player"
+    method: "GET"
+    path: "/api/infusion/player/{player_id}"
+    description: "Get infusions for player"
+    category: "webapp"
+    entity: "Infusion"
+    parameters:
+      - name: "player_id"
+        type: "string"
+        required: true
+        format: "player-id"
+
+---
+
+*Last Updated: January 2025*
+

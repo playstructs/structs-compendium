@@ -1,0 +1,185 @@
+{
+  "version": "1.0.0",
+  "id": "energy-agreement-setup",
+  "name": "Energy Agreement Setup Workflow",
+  "description": "Complete workflow for setting up automated energy agreements",
+  "category": "economic",
+  "estimatedTime": "5-10 minutes",
+  "prerequisites": {
+    "playerOnline": true,
+    "hasProviderOrNeedsEnergy": true
+  },
+  "steps": [
+    {
+      "step": 1,
+      "name": "Query Energy Market",
+      "description": "Get current energy market data and available providers",
+      "action": {
+        "method": "GET",
+        "endpoint": "/structs/market/Energy",
+        "responseSchema": "schemas/markets.json#/markets/EnergyMarketData"
+      },
+      "expectedResponse": {
+        "currentPrice": "number",
+        "supply": "number",
+        "demand": "number",
+        "agreements": "array",
+        "providers": "array"
+      }
+    },
+    {
+      "step": 2,
+      "name": "Find Energy Provider",
+      "description": "Find suitable energy provider for agreement",
+      "action": {
+        "method": "GET",
+        "endpoint": "/structs/provider",
+        "responseSchema": "schemas/entities.json#/entities/Provider"
+      },
+      "criteria": {
+        "rate": "Energy rate (kW per unit)",
+        "price": "Price per unit",
+        "available": "Available energy capacity",
+        "penaltyProtection": "Whether penalty protection is enabled",
+        "reputation": "Provider reputation"
+      }
+    },
+    {
+      "step": 3,
+      "name": "Query Provider Details",
+      "description": "Get detailed provider information",
+      "action": {
+        "method": "GET",
+        "endpoint": "/structs/provider/{providerId}",
+        "responseSchema": "schemas/entities.json#/entities/Provider"
+      },
+      "expectedResponse": {
+        "id": "string",
+        "rate": "number",
+        "capacity": "number",
+        "penaltyProtection": "boolean",
+        "automatic": "boolean"
+      }
+    },
+    {
+      "step": 4,
+      "name": "Create Energy Agreement",
+      "description": "Create automated energy agreement with provider",
+      "action": {
+        "method": "POST",
+        "endpoint": "/cosmos/tx/v1beta1/txs",
+        "messageType": "/structs.structs.MsgAgreementCreate",
+        "schema": "schemas/actions.json#/actions/MsgAgreementCreate"
+      },
+      "requiredFields": {
+        "creator": "player-id",
+        "providerId": "provider-id",
+        "terms": {
+          "energyAmount": "number",
+          "price": "number",
+          "duration": "number"
+        }
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgAgreementOpen",
+                "creator": "structs1...",
+                "providerId": "1-1",
+                "terms": {
+                  "energyAmount": 100,
+                  "price": 0.01,
+                  "duration": 1000
+                }
+              }
+            ]
+          }
+        }
+      },
+      "result": {
+        "agreementCreated": true,
+        "agreementId": "string",
+        "automatic": true,
+        "penaltyProtection": true
+      }
+    },
+    {
+      "step": 5,
+      "name": "Verify Agreement Status",
+      "description": "Verify agreement was created and is active",
+      "action": {
+        "method": "GET",
+        "endpoint": "/structs/agreement/{agreementId}",
+        "responseSchema": "schemas/economics.json#/entities/EnergyAgreement"
+      },
+      "verify": {
+        "status": "active",
+        "penaltyProtection": true,
+        "automatic": true
+      }
+    },
+    {
+      "step": 6,
+      "name": "Monitor Agreement",
+      "description": "Monitor agreement performance and energy supply",
+      "action": {
+        "method": "GET",
+        "endpoint": "/structs/agreement/{agreementId}",
+        "responseSchema": "schemas/economics.json#/entities/EnergyAgreement"
+      },
+      "monitor": {
+        "energyAmount": "Track energy received",
+        "status": "Monitor agreement status",
+        "penalties": "Check for any penalties applied"
+      }
+    }
+  ],
+  "agreementProperties": {
+    "automatic": {
+      "description": "Agreement executes automatically on-chain",
+      "benefit": "No manual intervention needed"
+    },
+    "penaltyProtection": {
+      "description": "Automatic, on-chain penalty enforcement",
+      "benefit": "Protection for both parties",
+      "enforcement": "Automatic by code on blockchain"
+    },
+    "persistent": {
+      "description": "Long-term energy supply arrangement",
+      "benefit": "Consistent energy supply"
+    },
+    "selfEnforcing": {
+      "description": "Terms enforced automatically by blockchain",
+      "benefit": "Trustless, automatic enforcement"
+    }
+  },
+  "errorHandling": {
+    "providerNotFound": {
+      "code": "PROVIDER_NOT_FOUND",
+      "step": 2,
+      "solution": "Verify provider ID, check provider list",
+      "retry": true
+    },
+    "invalidTerms": {
+      "code": "INVALID_TERMS",
+      "step": 4,
+      "solution": "Check provider requirements, adjust terms",
+      "retry": true
+    },
+    "insufficientResources": {
+      "code": "INSUFFICIENT_RESOURCES",
+      "step": 4,
+      "solution": "Check resource balance, ensure sufficient funds",
+      "retry": true
+    }
+  },
+  "bestPractices": {
+    "chooseReputableProvider": "Select provider with good reputation",
+    "enablePenaltyProtection": "Always use agreements with penalty protection",
+    "monitorAgreement": "Regularly monitor agreement performance",
+    "renewSuccessfulAgreements": "Renew agreements that work well"
+  }
+}
+

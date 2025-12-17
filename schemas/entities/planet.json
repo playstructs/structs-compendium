@@ -1,0 +1,121 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Planet Entity Schema",
+  "description": "Planet entity definition - extracted from game-state.json for context window optimization. See schemas/formats.json for format specifications.",
+  "type": "object",
+  "structs:entity": "Planet",
+  "structs:endpoint": "/structs/planet/{id}",
+  "structs:category": "core",
+  "properties": {
+    "Planet": {
+      "type": "object",
+      "description": "Planet core data",
+      "properties": {
+        "id": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^2-[0-9]+$",
+          "description": "Unique planet identifier in format 'type-index' (e.g., '2-1' for planet type 2, index 1). Type 2 = Planet."
+        },
+        "maxOre": {
+          "type": "string",
+          "description": "Maximum ore capacity (string representation of integer, typically '5')"
+        },
+        "creator": {
+          "type": "string",
+          "structs:format": "blockchain-address",
+          "description": "Blockchain address that created this planet"
+        },
+        "owner": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^1-[0-9]+$",
+          "structs:relationship": "Player",
+          "description": "Player ID who owns this planet, empty string if unowned. Format: 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+        },
+        "space": {
+          "type": "array",
+          "description": "Space slot array (4 slots, struct IDs or empty strings)",
+          "items": {
+            "type": "string",
+            "structs:format": "entity-id",
+            "pattern": "^5-[0-9]+$",
+            "description": "Struct identifier in format 'type-index' (e.g., '5-42' for struct type 5, index 42). Type 5 = Struct.",
+            "structs:relationship": "Struct"
+          },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "air": {
+          "type": "array",
+          "description": "Air slot array (4 slots, struct IDs or empty strings)",
+          "items": {
+            "type": "string",
+            "structs:format": "entity-id",
+            "pattern": "^5-[0-9]+$",
+            "description": "Struct identifier in format 'type-index' (e.g., '5-42' for struct type 5, index 42). Type 5 = Struct.",
+            "structs:relationship": "Struct"
+          },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "land": {
+          "type": "array",
+          "description": "Land slot array (4 slots, struct IDs or empty strings)",
+          "items": {
+            "type": "string",
+            "structs:format": "entity-id",
+            "pattern": "^5-[0-9]+$",
+            "description": "Struct identifier in format 'type-index' (e.g., '5-42' for struct type 5, index 42). Type 5 = Struct.",
+            "structs:relationship": "Struct"
+          },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "water": {
+          "type": "array",
+          "description": "Water slot array (4 slots, struct IDs or empty strings)",
+          "items": {
+            "type": "string",
+            "structs:format": "entity-id",
+            "pattern": "^5-[0-9]+$",
+            "description": "Struct identifier in format 'type-index' (e.g., '5-42' for struct type 5, index 42). Type 5 = Struct.",
+            "structs:relationship": "Struct"
+          },
+          "minItems": 4,
+          "maxItems": 4
+        }
+      },
+      "required": ["id", "maxOre", "creator"]
+    },
+    "map": {
+      "type": "object",
+      "description": "Planet map data (JSONB)",
+      "additionalProperties": true
+    }
+  },
+  "required": ["Planet"],
+  "structs:relationships": {
+    "owner": "schemas/entities/player.json",
+    "structs": "schemas/entities/struct.json"
+  },
+  "structs:startingProperties": {
+    "maxOre": 5,
+    "spaceSlots": 4,
+    "airSlots": 4,
+    "landSlots": 4,
+    "waterSlots": 4
+  },
+  "structs:verification": {
+    "verified": true,
+    "verifiedBy": "GameCodeAnalyst",
+    "verifiedDate": "2025-01-XX",
+    "verificationMethod": "code-analysis",
+    "confidence": "high",
+    "note": "API response schema. Starting properties verified: maxOre=5, slots=4 each. For code-based field definitions with formulas, see schemas/entities.json#/definitions/Planet",
+    "codeReference": "x/structs/types/keys.go (PlanetStartingOre = 5), x/structs/keeper/planet_cache.go",
+    "verifiedFields": ["maxOre", "startingOre", "status", "remainingOre"]
+  }
+}
+

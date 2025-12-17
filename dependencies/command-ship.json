@@ -1,0 +1,78 @@
+{
+  "version": "1.0.0",
+  "id": "command-ship",
+  "name": "Command Ship Dependency Chain",
+  "description": "Complete dependency chain for Command Ship - required for planet building",
+  "category": "gameplay",
+  "type": "dependency",
+  "critical": true,
+  "dependencyChain": [
+    {
+      "step": 1,
+      "action": "build",
+      "description": "Build Command Ship in fleet",
+      "location": "fleet",
+      "requirements": {
+        "playerOnline": true,
+        "sufficientPower": 50000,
+        "locationType": 2
+      },
+      "result": {
+        "commandShipId": "generated",
+        "status": "materialized"
+      }
+    },
+    {
+      "step": 2,
+      "action": "complete",
+      "description": "Complete Command Ship build with proof-of-work",
+      "requirements": {
+        "commandShipMaterialized": true,
+        "proofOfWork": true
+      },
+      "result": {
+        "status": "built"
+      }
+    },
+    {
+      "step": 3,
+      "action": "activate",
+      "description": "Activate Command Ship to bring it online",
+      "requirements": {
+        "commandShipBuilt": true,
+        "sufficientPower": 50000
+      },
+      "result": {
+        "status": "online",
+        "canBuildOnPlanets": true
+      }
+    }
+  ],
+  "unlocks": [
+    {
+      "action": "build on planets",
+      "description": "Can now build structures on planets",
+      "requirements": {
+        "commandShipOnline": true,
+        "fleetOnStation": true
+      }
+    }
+  ],
+  "commonMistakes": [
+    "Trying to build on planets before Command Ship is built",
+    "Trying to build on planets when Command Ship is only materialized (not online)",
+    "Not activating Command Ship after building",
+    "Building Command Ship on planet (must be in fleet)"
+  ],
+  "validation": {
+    "check": "Query fleet for Command Ship struct",
+    "endpoint": "/structs/struct",
+    "filter": "By fleet_id and struct_type = Command Ship",
+    "expected": "Command Ship exists, status = 'online'"
+  },
+  "references": {
+    "task": "tasks/onboarding.json",
+    "validation": "validation/common-failures.md#command-ship"
+  }
+}
+

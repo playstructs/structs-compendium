@@ -1,0 +1,129 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Diagram Schema",
+  "description": "Schema for diagram structures (process flows, relationships, etc.)",
+  "type": "object",
+  "structs:category": "visual",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique diagram identifier"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["flow", "relationship", "process", "decision-tree", "system"],
+      "description": "Type of diagram"
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable diagram title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of what the diagram represents"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["gameplay", "economics", "technical", "system"],
+      "description": "Category of diagram"
+    },
+    "nodes": {
+      "type": "array",
+      "description": "Nodes in the diagram",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique node identifier"
+          },
+          "label": {
+            "type": "string",
+            "description": "Human-readable node label"
+          },
+          "type": {
+            "type": "string",
+            "description": "Node type (entity, action, state, etc.)"
+          },
+          "entityType": {
+            "type": "string",
+            "description": "Entity type if node represents an entity (e.g., 'Player', 'Planet')"
+          },
+          "schemaReference": {
+            "type": "string",
+            "description": "Reference to schema definition (e.g., 'schemas/entities.json#/definitions/Player')"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional node metadata"
+          }
+        },
+        "required": ["id", "label", "type"]
+      }
+    },
+    "edges": {
+      "type": "array",
+      "description": "Edges (connections) in the diagram",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique edge identifier"
+          },
+          "source": {
+            "type": "string",
+            "description": "Source node ID"
+          },
+          "target": {
+            "type": "string",
+            "description": "Target node ID"
+          },
+          "label": {
+            "type": "string",
+            "description": "Edge label (relationship type, action, etc.)"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["relationship", "action", "flow", "dependency"],
+            "description": "Type of edge"
+          },
+          "direction": {
+            "type": "string",
+            "enum": ["directed", "undirected", "bidirectional"],
+            "description": "Edge direction"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional edge metadata"
+          }
+        },
+        "required": ["id", "source", "target", "type"]
+      }
+    },
+    "relatedSchemas": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "References to related schemas"
+    },
+    "relatedEndpoints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "References to related API endpoints"
+    },
+    "relatedDiagrams": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "References to related diagrams"
+    }
+  },
+  "required": ["id", "type", "title", "nodes", "edges"]
+}
+

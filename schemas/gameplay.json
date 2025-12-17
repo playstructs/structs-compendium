@@ -1,0 +1,804 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Structs Gameplay Schema",
+  "description": "Gameplay mechanics, systems, and patterns for AI agents",
+  "type": "object",
+  "structs:category": "gameplay",
+  "definitions": {
+    "Resource": {
+      "type": "object",
+      "description": "Game resource definition",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["alphaMatter", "watts", "ore", "computingPower", "arms"],
+          "description": "Resource type"
+        },
+        "amount": {
+          "type": "number",
+          "description": "Resource amount",
+          "minimum": 0
+        },
+        "unit": {
+          "type": "string",
+          "description": "Resource unit (grams, kW, etc.)"
+        },
+        "security": {
+          "type": "string",
+          "enum": ["secure", "stealable"],
+          "description": "Whether resource can be stolen (ore=stealable, alphaMatter=secure)"
+        }
+      },
+      "required": ["type", "amount", "unit", "security"]
+    },
+    "ResourceConversion": {
+      "type": "object",
+      "description": "Resource conversion definition",
+      "properties": {
+        "from": {
+          "type": "string",
+          "enum": ["alphaMatter", "ore"],
+          "description": "Source resource type"
+        },
+        "to": {
+          "type": "string",
+          "enum": ["alphaMatter", "watts"],
+          "description": "Target resource type"
+        },
+        "method": {
+          "type": "string",
+          "enum": ["reactor", "planetaryGenerator"],
+          "description": "Conversion method"
+        },
+        "rate": {
+          "type": "object",
+          "description": "Conversion rate",
+          "properties": {
+            "input": {
+              "type": "number",
+              "description": "Input amount"
+            },
+            "output": {
+              "type": "number",
+              "description": "Output amount"
+            },
+            "unit": {
+              "type": "string",
+              "description": "Rate unit (e.g., '1g:1kW' for reactor)"
+            }
+          },
+          "required": ["input", "output", "unit"]
+        },
+        "risk": {
+          "type": "string",
+          "enum": ["low", "high"],
+          "description": "Conversion risk level (reactor=low, generator=high)"
+        }
+      },
+      "required": ["from", "to", "method", "rate", "risk"]
+    },
+    "CombatAction": {
+      "type": "object",
+      "description": "Combat action definition",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["attack", "defend", "raid"],
+          "description": "Combat action type"
+        },
+        "attacker": {
+          "type": "string",
+          "description": "Attacker player ID"
+        },
+        "target": {
+          "type": "string",
+          "description": "Target planet ID or struct ID"
+        },
+        "structs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Struct IDs participating in combat"
+        },
+        "requirements": {
+          "type": "object",
+          "description": "Combat requirements",
+          "properties": {
+            "playerOnline": {
+              "type": "boolean",
+              "description": "Player must be online"
+            },
+            "sufficientPower": {
+              "type": "boolean",
+              "description": "Sufficient Watts available"
+            },
+            "fleetAway": {
+              "type": "boolean",
+              "description": "Fleet must be away (for raids)"
+            },
+            "proofOfWork": {
+              "type": "boolean",
+              "description": "Proof-of-work required (for raids)"
+            }
+          }
+        },
+        "outcome": {
+          "type": "object",
+          "description": "Combat outcome",
+          "properties": {
+            "victory": {
+              "type": "boolean",
+              "description": "Whether attacker won"
+            },
+            "alphaMatterGained": {
+              "type": "number",
+              "description": "Alpha Matter gained by victor"
+            },
+            "unitsDestroyed": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Struct IDs destroyed"
+            },
+            "resourcesLost": {
+              "type": "object",
+              "description": "Resources lost by defender",
+              "properties": {
+                "ore": {
+                  "type": "number",
+                  "description": "Ore stolen (if raid)"
+                }
+              }
+            }
+          }
+        }
+      },
+      "required": ["type", "attacker", "target"]
+    },
+    "BuildingAction": {
+      "type": "object",
+      "description": "Building/construction action",
+      "properties": {
+        "structType": {
+          "type": "string",
+          "description": "Struct type ID to build"
+        },
+        "locationType": {
+          "type": "integer",
+          "enum": [1, 2, 3, 4],
+          "description": "Location type: 1=planet, 2=fleet, 3=substation, 4=reactor"
+        },
+        "locationId": {
+          "type": "string",
+          "description": "Location ID (planet ID, fleet ID, etc.)"
+        },
+        "slot": {
+          "type": "string",
+          "enum": ["space", "air", "land", "water"],
+          "description": "Planet slot type (if building on planet)"
+        },
+        "requirements": {
+          "type": "object",
+          "description": "Building requirements",
+          "properties": {
+            "playerOnline": {
+              "type": "boolean",
+              "description": "Player must be online"
+            },
+            "fleetOnStation": {
+              "type": "boolean",
+              "description": "Fleet must be on station (for planet building)"
+            },
+            "commandShipOnline": {
+              "type": "boolean",
+              "description": "Command Ship must be online"
+            },
+            "sufficientPower": {
+              "type": "boolean",
+              "description": "Sufficient Watts for build and operation"
+            },
+            "availableSlot": {
+              "type": "boolean",
+              "description": "Available slot on planet"
+            },
+            "buildLimit": {
+              "type": "object",
+              "description": "Build limit check",
+              "properties": {
+                "maxPerPlayer": {
+                  "type": "integer",
+                  "description": "Maximum per player (e.g., 1 for Defense Cannon)"
+                },
+                "currentCount": {
+                  "type": "integer",
+                  "description": "Current count owned by player"
+                }
+              }
+            }
+          }
+        },
+        "costs": {
+          "type": "object",
+          "description": "Building costs",
+          "properties": {
+            "buildPower": {
+              "type": "number",
+              "description": "Watts required to build"
+            },
+            "passivePower": {
+              "type": "number",
+              "description": "Watts required to operate (passive draw)"
+            },
+            "buildTime": {
+              "type": "number",
+              "description": "Build time in seconds"
+            }
+          }
+        }
+      },
+      "required": ["structType", "locationType", "locationId"]
+    },
+    "MiningOperation": {
+      "type": "object",
+      "description": "Mining operation definition",
+      "properties": {
+        "planetId": {
+          "type": "string",
+          "description": "Planet ID being mined"
+        },
+        "extractorId": {
+          "type": "string",
+          "description": "Ore Extractor struct ID"
+        },
+        "currentOre": {
+          "type": "number",
+          "description": "Current ore on planet"
+        },
+        "maxOre": {
+          "type": "number",
+          "description": "Maximum ore on planet"
+        },
+        "extractionRate": {
+          "type": "number",
+          "description": "Ore extracted per time unit"
+        },
+        "security": {
+          "type": "object",
+          "description": "Mining security status",
+          "properties": {
+            "oreStored": {
+              "type": "number",
+              "description": "Ore stored (stealable)"
+            },
+            "alphaMatterRefined": {
+              "type": "number",
+              "description": "Alpha Matter refined (secure)"
+            },
+            "needsRefinement": {
+              "type": "boolean",
+              "description": "Whether ore needs to be refined"
+            }
+          }
+        }
+      },
+      "required": ["planetId", "extractorId", "currentOre", "maxOre"]
+    },
+    "GameplayLoop": {
+      "type": "object",
+      "description": "5X Framework gameplay loop",
+      "properties": {
+        "phase": {
+          "type": "string",
+          "enum": ["explore", "extract", "expand", "exterminate", "exchange"],
+          "description": "Current gameplay phase"
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "description": "Action in this phase",
+            "properties": {
+              "actionType": {
+                "type": "string",
+                "description": "Action type (chart, mine, build, attack, trade)"
+              },
+              "target": {
+                "type": "string",
+                "description": "Target ID (planet, struct, player)"
+              },
+              "requirements": {
+                "type": "object",
+                "description": "Action requirements"
+              }
+            }
+          }
+        },
+        "nextPhase": {
+          "type": "string",
+          "enum": ["explore", "extract", "expand", "exterminate", "exchange"],
+          "description": "Next phase in loop"
+        }
+      },
+      "required": ["phase", "actions"]
+    },
+    "PowerManagement": {
+      "type": "object",
+      "description": "Power capacity and consumption",
+      "properties": {
+        "capacity": {
+          "type": "number",
+          "description": "Primary power capacity (from substation)"
+        },
+        "capacitySecondary": {
+          "type": "number",
+          "description": "Secondary power capacity (from secondary substation)"
+        },
+        "load": {
+          "type": "number",
+          "description": "Current power consumption (active operations)"
+        },
+        "structsLoad": {
+          "type": "number",
+          "description": "Total power consumption from all structs (passive draw)"
+        },
+        "availableCapacity": {
+          "type": "number",
+          "description": "Available capacity: (capacity + capacitySecondary) - (load + structsLoad)"
+        },
+        "allocatableCapacity": {
+          "type": "number",
+          "description": "Allocatable capacity: capacity - load"
+        },
+        "playerOnline": {
+          "type": "boolean",
+          "description": "Player online status: (load + structsLoad) <= (capacity + capacitySecondary)"
+        }
+      },
+      "required": ["capacity", "capacitySecondary", "load", "structsLoad", "playerOnline"]
+    },
+    "PlanetCompletion": {
+      "type": "object",
+      "description": "Planet completion mechanics",
+      "properties": {
+        "planetId": {
+          "type": "string",
+          "description": "Planet ID"
+        },
+        "currentOre": {
+          "type": "number",
+          "description": "Current ore remaining"
+        },
+        "isComplete": {
+          "type": "boolean",
+          "description": "Whether planet is complete (ore depleted)"
+        },
+        "consequences": {
+          "type": "object",
+          "description": "What happens when planet completes",
+          "properties": {
+            "structsDestroyed": {
+              "type": "boolean",
+              "description": "All structs on planet are destroyed"
+            },
+            "fleetsSentAway": {
+              "type": "boolean",
+              "description": "All fleets are sent away (peace deal)"
+            },
+            "planetStatus": {
+              "type": "string",
+              "enum": ["active", "complete"],
+              "description": "Planet status after completion"
+            }
+          }
+        }
+      },
+      "required": ["planetId", "currentOre", "isComplete"]
+    },
+    "GameplayQuery": {
+      "type": "object",
+      "description": "Gameplay-specific state query definition",
+      "properties": {
+        "queryType": {
+          "type": "string",
+          "enum": ["playerOnline", "canBuild", "canRaid", "canMine", "canExplore"],
+          "description": "Type of gameplay query"
+        },
+        "playerId": {
+          "type": "string",
+          "description": "Player ID to query"
+        },
+        "parameters": {
+          "type": "object",
+          "description": "Query-specific parameters"
+        },
+        "result": {
+          "type": "object",
+          "description": "Query result",
+          "properties": {
+            "value": {
+              "type": "boolean",
+              "description": "Query result value"
+            },
+            "reason": {
+              "type": "string",
+              "description": "Reason for result"
+            },
+            "requirements": {
+              "type": "object",
+              "description": "Requirements status"
+            }
+          }
+        }
+      },
+      "required": ["queryType", "playerId"]
+    }
+  },
+  "gameplay": {
+    "resourceTypes": {
+      "alphaMatter": {
+        "id": "alphaMatter",
+        "name": "Alpha Matter",
+        "unit": "grams",
+        "security": "secure",
+        "description": "Refined Alpha Matter - secure, cannot be stolen",
+        "sources": ["mining", "raids", "trading", "guild"],
+        "uses": ["convertToWatts", "trading", "advancedOperations"]
+      },
+      "ore": {
+        "id": "ore",
+        "name": "Alpha Ore",
+        "unit": "grams",
+        "security": "stealable",
+        "description": "Raw ore - can be stolen in raids, must be refined",
+        "sources": ["mining"],
+        "uses": ["refineToAlphaMatter"]
+      },
+      "watts": {
+        "id": "watts",
+        "name": "Watts",
+        "unit": "kW",
+        "security": "secure",
+        "description": "Energy units - powers all operations",
+        "sources": ["conversion", "generation", "trading", "guild"],
+        "uses": ["powerOperations", "building", "combat", "trading"]
+      }
+    },
+    "conversionRates": {
+      "reactor": {
+        "method": "reactor",
+        "from": "alphaMatter",
+        "to": "watts",
+        "rate": {
+          "input": 1,
+          "output": 1,
+          "unit": "1g:1kW"
+        },
+        "risk": "low",
+        "description": "Safe, reliable conversion - 1 gram Alpha Matter = 1 kilowatt"
+      },
+      "planetaryGenerator": {
+        "method": "planetaryGenerator",
+        "from": "alphaMatter",
+        "to": "watts",
+        "rate": {
+          "input": 1,
+          "output": 2,
+          "unit": "1g:2kW"
+        },
+        "risk": "high",
+        "description": "Efficient conversion - 1 gram Alpha Matter = 2 kilowatts (higher risk)"
+      }
+    },
+    "powerRequirements": {
+      "commandShip": {
+        "structType": "commandShip",
+        "passiveDraw": 50000,
+        "buildDraw": 50000,
+        "description": "Command Ship power requirements"
+      },
+      "planetaryBattleship": {
+        "structType": "planetaryBattleship",
+        "passiveDraw": 135000,
+        "buildDraw": 135000,
+        "description": "Planetary Battleship power requirements"
+      },
+      "oreExtractor": {
+        "structType": "oreExtractor",
+        "passiveDraw": 500000,
+        "buildDraw": 500000,
+        "description": "Ore Extractor power requirements - high power needed"
+      },
+      "oreRefinery": {
+        "structType": "oreRefinery",
+        "passiveDraw": 500000,
+        "buildDraw": 500000,
+        "description": "Ore Refinery power requirements - high power needed"
+      },
+      "planetaryDefenseCannon": {
+        "structType": "planetaryDefenseCannon",
+        "passiveDraw": 600000,
+        "buildDraw": 600000,
+        "description": "Planetary Defense Cannon power requirements"
+      },
+      "oreBunker": {
+        "structType": "oreBunker",
+        "passiveDraw": 200000,
+        "buildDraw": 200000,
+        "description": "Ore Bunker power requirements"
+      }
+    },
+    "buildLimits": {
+      "planetaryDefenseCannon": {
+        "structType": "planetaryDefenseCannon",
+        "maxPerPlayer": 1,
+        "description": "Only 1 Planetary Defense Cannon per player total"
+      },
+      "commandShip": {
+        "structType": "commandShip",
+        "maxPerPlayer": 1,
+        "description": "Only 1 Command Ship per player"
+      }
+    },
+    "combatMechanics": {
+      "evasion": {
+        "description": "Structs can evade attacks based on weapon type",
+        "guidedWeapons": {
+          "uses": "guidedDefensiveSuccessRate",
+          "description": "Target uses guided defensive success rate"
+        },
+        "unguidedWeapons": {
+          "uses": "unguidedDefensiveSuccessRate",
+          "description": "Target uses unguided defensive success rate"
+        }
+      },
+      "blocking": {
+        "description": "Defenders can block attacks for other structs",
+        "requirements": {
+          "defenderAssigned": "Defender must be assigned to protect struct",
+          "defenderOnline": "Defender must be online",
+          "sameAmbit": "Defender must be in same ambit as target"
+        }
+      },
+      "counterAttack": {
+        "description": "Structs can counter-attack when attacked",
+        "sameAmbit": {
+          "uses": "counterAttackSameAmbit",
+          "description": "Damage when countering at same ambit"
+        },
+        "differentAmbit": {
+          "uses": "counterAttack",
+          "description": "Damage when countering at different ambit"
+        }
+      },
+      "multiShot": {
+        "description": "Weapons can fire multiple shots per attack",
+        "eachShot": {
+          "successRate": "weaponShotSuccessRate",
+          "description": "Each shot has independent success chance"
+        }
+      },
+      "recoil": {
+        "description": "Weapons can deal damage to attacker - recoil damage applied after all shots complete",
+        "uses": "weaponRecoilDamage"
+      }
+    },
+    "fleetMechanics": {
+      "status": {
+        "onStation": {
+          "description": "Fleet is at planet - can build on planets",
+          "canBuild": true,
+          "canRaid": false
+        },
+        "away": {
+          "description": "Fleet is away from planet - can raid, cannot build",
+          "canBuild": false,
+          "canRaid": true
+        }
+      },
+      "requirements": {
+        "commandShip": {
+          "required": true,
+          "description": "Fleet must have Command Ship to operate"
+        },
+        "commandShipOnline": {
+          "required": true,
+          "description": "Command Ship must be online for fleet operations"
+        },
+        "playerOnline": {
+          "required": true,
+          "description": "Player must be online (sufficient power) to control fleet"
+        }
+      }
+    },
+    "planetMechanics": {
+      "exploration": {
+        "description": "Create new planets",
+        "requirements": {
+          "currentPlanetComplete": "Current planet must be complete (ore depleted)",
+          "description": "You can only own one planet at a time - must complete current planet first"
+        },
+        "startingProperties": {
+          "maxOre": 5,
+          "spaceSlots": 4,
+          "airSlots": 4,
+          "landSlots": 4,
+          "waterSlots": 4
+        }
+      },
+      "charting": {
+        "description": "Survey planets to reveal resources",
+        "cost": "free",
+        "time": "instant",
+        "reveals": ["resources", "slotAvailability", "ownership", "defenses"]
+      },
+      "completion": {
+        "description": "When planet ore is depleted",
+        "consequences": {
+          "structsDestroyed": "All structs on planet are destroyed",
+          "fleetsSentAway": "All fleets are sent away (peace deal)",
+          "planetStatus": "Planet status changes to 'complete'"
+        }
+      }
+    },
+    "gameplayQueries": {
+      "playerOnline": {
+        "id": "player-online",
+        "name": "Player Online Status",
+        "description": "Check if player is online (sufficient power capacity)",
+        "formula": "(load + structsLoad) <= (capacity + capacitySecondary)",
+        "query": {
+          "type": "calculate",
+          "properties": ["capacity", "capacitySecondary", "load", "structsLoad"],
+          "result": "boolean"
+        },
+        "result": {
+          "true": {
+            "status": "online",
+            "canAct": true,
+            "description": "Player can perform actions"
+          },
+          "false": {
+            "status": "offline",
+            "canAct": false,
+            "description": "Player cannot perform actions"
+          }
+        }
+      },
+      "canBuild": {
+        "id": "can-build",
+        "name": "Can Build Check",
+        "description": "Check if player can build structures",
+        "requirements": [
+          "playerOnline",
+          "commandShipOnline",
+          "fleetOnStation (if building on planet)",
+          "sufficientPower",
+          "availableSlot (if building on planet)",
+          "withinBuildLimit"
+        ],
+        "query": {
+          "type": "check",
+          "checks": [
+            {
+              "requirement": "playerOnline",
+              "check": "powerStatus.playerOnline == true"
+            },
+            {
+              "requirement": "commandShipOnline",
+              "check": "fleet.commandShip.status == 'online'"
+            },
+            {
+              "requirement": "fleetOnStation",
+              "check": "fleet.status == 'onStation'",
+              "condition": "locationType == 1"
+            },
+            {
+              "requirement": "sufficientPower",
+              "check": "availableCapacity >= (buildPower + passivePower)"
+            },
+            {
+              "requirement": "availableSlot",
+              "check": "planetSlots[slotType] > 0",
+              "condition": "locationType == 1"
+            },
+            {
+              "requirement": "withinBuildLimit",
+              "check": "currentCount < maxPerPlayer",
+              "condition": "structType has build limit"
+            }
+          ],
+          "result": "boolean"
+        }
+      },
+      "canRaid": {
+        "id": "can-raid",
+        "name": "Can Raid Check",
+        "description": "Check if player can raid planets",
+        "requirements": [
+          "playerOnline",
+          "fleetAway",
+          "commandShipOnline",
+          "proofOfWork"
+        ],
+        "query": {
+          "type": "check",
+          "checks": [
+            {
+              "requirement": "playerOnline",
+              "check": "powerStatus.playerOnline == true"
+            },
+            {
+              "requirement": "fleetAway",
+              "check": "fleet.status == 'away'"
+            },
+            {
+              "requirement": "commandShipOnline",
+              "check": "fleet.commandShip.status == 'online'"
+            },
+            {
+              "requirement": "proofOfWork",
+              "check": "proofOfWorkAvailable == true"
+            }
+          ],
+          "result": "boolean"
+        }
+      },
+      "canMine": {
+        "id": "can-mine",
+        "name": "Can Mine Check",
+        "description": "Check if player can mine ore",
+        "requirements": [
+          "extractorOnline",
+          "currentOre > 0",
+          "sufficientPower"
+        ],
+        "query": {
+          "type": "check",
+          "checks": [
+            {
+              "requirement": "extractorOnline",
+              "check": "extractor.status == 'online'"
+            },
+            {
+              "requirement": "currentOre > 0",
+              "check": "planet.currentOre > 0"
+            },
+            {
+              "requirement": "sufficientPower",
+              "check": "availableCapacity >= extractor.passivePower"
+            }
+          ],
+          "result": "boolean"
+        }
+      },
+      "canExplore": {
+        "id": "can-explore",
+        "name": "Can Explore Check",
+        "description": "Check if player can explore new planet",
+        "requirements": [
+          "playerOnline",
+          "currentPlanetComplete"
+        ],
+        "query": {
+          "type": "check",
+          "checks": [
+            {
+              "requirement": "playerOnline",
+              "check": "powerStatus.playerOnline == true"
+            },
+            {
+              "requirement": "currentPlanetComplete",
+              "check": "currentPlanet.currentOre == 0",
+              "description": "Current planet must be depleted (ore = 0)"
+            }
+          ],
+          "result": "boolean"
+        }
+      }
+    }
+  }
+}
+

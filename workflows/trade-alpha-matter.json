@@ -1,0 +1,196 @@
+{
+  "version": "1.0.0",
+  "id": "trade-alpha-matter",
+  "name": "Trade Alpha Matter Workflow",
+  "description": "Complete multi-step workflow for trading Alpha Matter on the marketplace",
+  "category": "economic",
+  "estimatedTime": "2-5 minutes",
+  "prerequisites": {
+    "playerOnline": true,
+    "hasAlphaMatter": true
+  },
+  "steps": [
+    {
+      "step": 1,
+      "name": "Query Market Data",
+      "description": "Get current Alpha Matter market prices and conditions",
+      "action": {
+        "method": "GET",
+        "endpoint": "/structs/market/AlphaMatter",
+        "responseSchema": "schemas/markets.json#/markets/MarketData"
+      },
+      "expectedResponse": {
+        "currentPrice": "number",
+        "high24h": "number",
+        "low24h": "number",
+        "volume24h": "number",
+        "supply": "number",
+        "demand": "number",
+        "volatility": "number",
+        "trend": "string"
+      }
+    },
+    {
+      "step": 2,
+      "name": "Analyze Market Conditions",
+      "description": "Determine if conditions are favorable for trading",
+      "analysis": {
+        "priceComparison": {
+          "currentVsAverage": "Compare current price to 24h average",
+          "trend": "Identify price trend (rising, falling, stable)"
+        },
+        "supplyDemand": {
+          "balance": "Analyze supply/demand balance",
+          "imbalance": "Identify supply or demand surplus"
+        },
+        "volatility": {
+          "level": "Assess market volatility",
+          "risk": "Determine risk level"
+        }
+      },
+      "decision": {
+        "buy": {
+          "condition": "Price is low and trend is rising",
+          "action": "Execute buy trade"
+        },
+        "sell": {
+          "condition": "Price is high and trend is falling",
+          "action": "Execute sell trade"
+        },
+        "wait": {
+          "condition": "Conditions are uncertain",
+          "action": "Wait for better conditions"
+        }
+      }
+    },
+    {
+      "step": 3,
+      "name": "Check Resource Balance",
+      "description": "Verify Alpha Matter balance before trading",
+      "action": {
+        "method": "GET",
+        "endpoint": "/structs/player/{playerId}",
+        "responseSchema": "schemas/entities.json#/entities/Player"
+      },
+      "check": {
+        "alphaMatterBalance": "number",
+        "sufficientForTrade": "boolean"
+      }
+    },
+    {
+      "step": 4,
+      "name": "Execute Trade",
+      "description": "Place market order or execute immediate trade",
+      "options": {
+        "immediateTrade": {
+          "name": "Immediate Trade",
+          "description": "Execute trade immediately at current market price",
+          "action": {
+            "method": "POST",
+            "endpoint": "/cosmos/tx/v1beta1/txs",
+            "messageType": "/structs.structs.MsgTradeAlphaMatter",
+            "schema": "schemas/trading.json#/tradingOperations/TradeAlphaMatter"
+          },
+          "example": {
+            "body": {
+              "body": {
+                "messages": [
+                  {
+                    "@type": "/structs.structs.MsgTradeAlphaMatter",
+                    "creator": "structs1...",
+                    "resource": "AlphaMatter",
+                    "quantityMicrograms": "100000000",
+                    "price": "0.001",
+                    "type": "sell"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "placeOrder": {
+          "name": "Place Market Order",
+          "description": "Place order at specific price (may take time to fill)",
+          "action": {
+            "method": "POST",
+            "endpoint": "/cosmos/tx/v1beta1/txs",
+            "messageType": "/structs.structs.MsgPlaceMarketOrder",
+            "schema": "schemas/trading.json#/tradingOperations/PlaceMarketOrder"
+          },
+          "example": {
+            "body": {
+              "body": {
+                "messages": [
+                  {
+                    "@type": "/structs.structs.MsgPlaceMarketOrder",
+                    "creator": "structs1...",
+                    "resource": "AlphaMatter",
+                    "quantity": 100,
+                    "price": 0.001,
+                    "orderType": "sell"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "step": 5,
+      "name": "Verify Trade Status",
+      "description": "Check if trade was executed successfully",
+      "action": {
+        "method": "GET",
+        "endpoint": "/structs/market/order/{orderId}",
+        "responseSchema": "schemas/markets.json#/markets/MarketOrder"
+      },
+      "check": {
+        "status": "placed | filled | rejected",
+        "filled": "boolean",
+        "quantityFilled": "number"
+      }
+    },
+    {
+      "step": 6,
+      "name": "Update Resource Balance",
+      "description": "Verify resource balance after trade",
+      "action": {
+        "method": "GET",
+        "endpoint": "/structs/player/{playerId}",
+        "responseSchema": "schemas/entities.json#/entities/Player"
+      },
+      "verify": {
+        "alphaMatterBalance": "updated",
+        "tradeSuccessful": "boolean"
+      }
+    }
+  ],
+  "errorHandling": {
+    "insufficientResources": {
+      "code": "INSUFFICIENT_RESOURCES",
+      "step": 3,
+      "solution": "Check resource balance, mine more resources, or reduce trade quantity",
+      "retry": true
+    },
+    "invalidPrice": {
+      "code": "INVALID_PRICE",
+      "step": 4,
+      "solution": "Check current market prices, adjust price",
+      "retry": true
+    },
+    "orderNotFound": {
+      "code": "ORDER_NOT_FOUND",
+      "step": 5,
+      "solution": "Verify order ID, check order status",
+      "retry": false
+    }
+  },
+  "bestPractices": {
+    "monitorMarket": "Track prices over time to identify trends",
+    "timeTrades": "Buy during low-demand periods, sell during high-demand periods",
+    "verifyBalance": "Always verify resource balance before and after trades",
+    "useOrders": "Use market orders for better price control"
+  }
+}
+

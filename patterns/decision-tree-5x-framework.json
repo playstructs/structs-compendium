@@ -1,0 +1,214 @@
+{
+  "version": "1.0.0",
+  "id": "5x-framework",
+  "name": "5X Framework Decision Tree",
+  "description": "Decision tree for executing the 5X Framework gameplay loop (Explore, Extract, Expand, Exterminate, Exchange)",
+  "category": "gameplay",
+  "type": "decision-tree",
+  "root": {
+    "condition": {
+      "type": "check",
+      "property": "currentPhase",
+      "description": "Determine current gameplay phase"
+    },
+    "evaluation": {
+      "explore": {
+        "actions": [
+          {
+            "type": "chart",
+            "description": "Chart planets to reveal resources"
+          },
+          {
+            "type": "identify",
+            "targets": ["resources", "enemies", "allies"],
+            "description": "Identify resources, enemies, and allies"
+          }
+        ],
+        "nextPhase": "extract",
+        "transition": {
+          "condition": {
+            "type": "check",
+            "property": "resourceRichPlanetFound",
+            "operator": "==",
+            "value": true
+          },
+          "true": {
+            "action": {
+              "type": "transition",
+              "to": "extract",
+              "reason": "Resource-rich planet found"
+            }
+          }
+        }
+      },
+      "extract": {
+        "actions": [
+          {
+            "type": "mine",
+            "description": "Mine Alpha Matter from planets"
+          },
+          {
+            "type": "refine",
+            "priority": "immediate",
+            "description": "Refine ore to Alpha Matter"
+          },
+          {
+            "type": "convert",
+            "description": "Convert Alpha Matter to Watts"
+          }
+        ],
+        "nextPhase": "expand",
+        "transition": {
+          "condition": {
+            "type": "check",
+            "property": "resourceFlowEstablished",
+            "operator": "==",
+            "value": true
+          },
+          "true": {
+            "action": {
+              "type": "transition",
+              "to": "expand",
+              "reason": "Resource flow established"
+            }
+          }
+        }
+      },
+      "expand": {
+        "actions": [
+          {
+            "type": "claim",
+            "description": "Claim planets"
+          },
+          {
+            "type": "build",
+            "priority": "defenses",
+            "description": "Build infrastructure (defenses first)"
+          },
+          {
+            "type": "grow",
+            "description": "Grow influence"
+          }
+        ],
+        "nextPhase": "exterminate",
+        "transition": {
+          "condition": {
+            "type": "check",
+            "property": "territoryExpanded",
+            "operator": "==",
+            "value": true
+          },
+          "true": {
+            "action": {
+              "type": "transition",
+              "to": "exterminate",
+              "reason": "Territory expanded - defend and attack"
+            }
+          }
+        }
+      },
+      "exterminate": {
+        "actions": [
+          {
+            "type": "defend",
+            "description": "Defend assets"
+          },
+          {
+            "type": "attack",
+            "description": "Attack enemies"
+          },
+          {
+            "type": "gain",
+            "description": "Gain resources from combat"
+          }
+        ],
+        "nextPhase": "exchange",
+        "transition": {
+          "condition": {
+            "type": "check",
+            "property": "combatComplete",
+            "operator": "==",
+            "value": true
+          },
+          "true": {
+            "action": {
+              "type": "transition",
+              "to": "exchange",
+              "reason": "Combat complete - trade resources"
+            }
+          }
+        }
+      },
+      "exchange": {
+        "actions": [
+          {
+            "type": "trade",
+            "description": "Trade resources"
+          },
+          {
+            "type": "buy",
+            "description": "Buy equipment"
+          },
+          {
+            "type": "sell",
+            "description": "Sell excess resources"
+          }
+        ],
+        "nextPhase": "explore",
+        "transition": {
+          "condition": {
+            "type": "check",
+            "property": "tradingComplete",
+            "operator": "==",
+            "value": true
+          },
+          "true": {
+            "action": {
+              "type": "transition",
+              "to": "explore",
+              "reason": "Trading complete - explore for more"
+            }
+          }
+        }
+      }
+    }
+  },
+  "phases": {
+    "explore": {
+      "purpose": "Discover galaxy, find resources, locate enemies",
+      "actions": ["chart", "identify", "map"],
+      "next": "extract"
+    },
+    "extract": {
+      "purpose": "Mine Alpha Matter, convert to Watts, power operations",
+      "actions": ["mine", "refine", "convert"],
+      "next": "expand"
+    },
+    "expand": {
+      "purpose": "Control planets, build infrastructure, grow influence",
+      "actions": ["claim", "build", "grow"],
+      "next": "exterminate"
+    },
+    "exterminate": {
+      "purpose": "Defend assets, attack enemies, gain resources",
+      "actions": ["defend", "attack", "gain"],
+      "next": "exchange"
+    },
+    "exchange": {
+      "purpose": "Trade resources, buy/sell equipment, planet trading",
+      "actions": ["trade", "buy", "sell"],
+      "next": "explore"
+    }
+  },
+  "principles": [
+    "Execute phases in order",
+    "Complete phase actions before transitioning",
+    "Loop continuously",
+    "Adapt based on situation"
+  ],
+  "loop": {
+    "description": "Continuous gameplay loop: Explore → Extract → Expand → Exterminate → Exchange → Explore",
+    "flexibility": "Can adapt order based on situation, but core loop remains"
+  }
+}
+

@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "structs:workflow": "get-player-and-planets",
+  "description": "Get player information and their planets - Multi-step API workflow",
+  "category": "query",
+  "prerequisites": [],
+  "steps": [
+    {
+      "step": 1,
+      "endpoint": "webapp-player-by-id",
+      "method": "GET",
+      "url": "http://localhost:8080/api/player/{player_id}",
+      "description": "Get player information",
+      "parameters": {
+        "player_id": "1-11"
+      },
+      "extract": {
+        "player_id": "response.player.id",
+        "guild_id": "response.guild.id"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "schema": "schemas/responses.json#/definitions/WebappPlayerResponse"
+      }
+    },
+    {
+      "step": 2,
+      "endpoint": "planet-by-player",
+      "method": "GET",
+      "url": "http://localhost:1317/structs/planet_by_player/{playerId}",
+      "description": "Get planets owned by player",
+      "parameters": {
+        "playerId": "{{step1.extract.player_id}}"
+      },
+      "extract": {
+        "planets": "response.Planet"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "schema": "schemas/entities.json#/definitions/Planet[]"
+      }
+    }
+  ],
+  "result": {
+    "player": "{{step1.response.player}}",
+    "guild": "{{step1.response.guild}}",
+    "planets": "{{step2.extract.planets}}"
+  },
+  "errorHandling": {
+    "step1": {
+      "404": "Player not found - verify player_id",
+      "500": "Server error - retry with exponential backoff"
+    },
+    "step2": {
+      "404": "No planets found for player (may be empty array)",
+      "500": "Server error - retry with exponential backoff"
+    }
+  },
+  "notes": "This workflow demonstrates chaining API calls where step 2 depends on data from step 1."
+}
+

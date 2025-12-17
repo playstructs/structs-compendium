@@ -1,0 +1,138 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "UI Schema",
+  "description": "Schema for UI elements and screens",
+  "type": "object",
+  "structs:category": "visual",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique UI element identifier"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["screen", "element", "component", "pattern"],
+      "description": "Type of UI item"
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of UI element"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["gameplay", "economics", "technical", "navigation"],
+      "description": "UI category"
+    },
+    "path": {
+      "type": "string",
+      "description": "Path to image or visual representation"
+    },
+    "location": {
+      "type": "object",
+      "description": "UI element location",
+      "properties": {
+        "screen": {
+          "type": "string",
+          "description": "Screen identifier"
+        },
+        "area": {
+          "type": "string",
+          "enum": ["top", "bottom", "left", "right", "center", "sidebar", "header", "footer"],
+          "description": "Area within screen"
+        },
+        "coordinates": {
+          "type": "object",
+          "properties": {
+            "x": {"type": "number"},
+            "y": {"type": "number"},
+            "width": {"type": "number"},
+            "height": {"type": "number"}
+          },
+          "description": "Pixel coordinates (if applicable)"
+        }
+      }
+    },
+    "elements": {
+      "type": "array",
+      "description": "Child UI elements (for screens/components)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["button", "panel", "list", "input", "display", "icon", "text"]
+          },
+          "label": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string",
+            "description": "Action triggered by element (if applicable)"
+          },
+          "relatedEndpoint": {
+            "type": "string",
+            "description": "Related API endpoint (if applicable)"
+          },
+          "relatedSchema": {
+            "type": "string",
+            "description": "Related schema reference (if applicable)"
+          }
+        },
+        "required": ["id", "type"]
+      }
+    },
+    "annotations": {
+      "type": "array",
+      "description": "Annotations or highlights",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["highlight", "note", "label", "arrow"]
+          },
+          "area": {
+            "type": "object",
+            "properties": {
+              "x": {"type": "number"},
+              "y": {"type": "number"},
+              "width": {"type": "number"},
+              "height": {"type": "number"}
+            }
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": ["id", "type"]
+      }
+    },
+    "relatedSchemas": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "References to related schemas"
+    },
+    "relatedEndpoints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "References to related API endpoints"
+    }
+  },
+  "required": ["id", "type", "title"]
+}
+

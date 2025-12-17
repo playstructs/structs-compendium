@@ -1,0 +1,261 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Structs Documentation Code References",
+  "description": "Mapping of all documentation elements to code locations",
+  "type": "object",
+  "structs:category": "verification",
+  "lastUpdated": "2025-12-07",
+  "codeReferences": {
+    "schemas": {
+      "formulas": {
+        "damage-calculation": {
+          "codeReference": "x/structs/keeper/struct_cache.go:956-1015",
+          "function": "TakeAttackDamage",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "evasion-calculation": {
+          "codeReference": "x/structs/keeper/struct_cache.go:911-954",
+          "function": "CanEvade",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "recoil-damage": {
+          "codeReference": "x/structs/keeper/struct_cache.go:1018-1043",
+          "function": "TakeRecoilDamage",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "post-destruction-damage": {
+          "codeReference": "x/structs/keeper/struct_cache.go:1045-1070",
+          "function": "TakePostDestructionDamage",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "blocking-calculation": {
+          "codeReference": "x/structs/keeper/struct_cache.go:1072-1105",
+          "function": "CanBlock",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "counter-attack-damage": {
+          "codeReference": "x/structs/keeper/struct_cache.go:1107-1135",
+          "function": "TakeCounterAttackDamage",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "planetary-defense-cannon-damage": {
+          "codeReference": "x/structs/keeper/struct_cache.go:1137-1165",
+          "function": "TakePlanetaryDefenseCannonDamage",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "success-rate-probability": {
+          "codeReference": "x/structs/keeper/struct_cache.go:1167-1185",
+          "function": "IsSuccessful",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "reactor-energy-production": {
+          "codeReference": "x/structs/types/keys.go:88",
+          "constant": "ReactorFuelToEnergyConversion = 1",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "generator-energy-production": {
+          "codeReference": "genesis_struct_type.go",
+          "fields": ["GeneratingRate: 2", "GeneratingRate: 5", "GeneratingRate: 10"],
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "player-passive-draw": {
+          "codeReference": "x/structs/types/keys.go:129",
+          "constant": "PlayerPassiveDraw = 25000",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "charge-accumulation": {
+          "codeReference": "x/structs/keeper/player.go",
+          "function": "GetPlayerCharge",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "power-capacity": {
+          "codeReference": "x/structs/keeper/player_cache.go",
+          "function": "GetAvailableCapacity",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "allocatable-capacity": {
+          "codeReference": "x/structs/keeper/player_cache.go",
+          "function": "GetAllocatableCapacity",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "build-difficulty": {
+          "codeReference": "x/structs/types/work.go",
+          "function": "HashBuildAndCheckDifficulty",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "ore-mining-difficulty": {
+          "codeReference": "genesis_struct_type.go",
+          "field": "OreMiningDifficulty: 14000",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "ore-refining-difficulty": {
+          "codeReference": "genesis_struct_type.go",
+          "field": "OreRefiningDifficulty: 28000",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "ore-extraction-rate": {
+          "codeReference": "x/structs/keeper/msg_server_struct_ore_miner_complete.go",
+          "function": "StoredOreIncrement(1)",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "ore-refining-conversion": {
+          "codeReference": "x/structs/keeper/msg_server_struct_ore_refinery_complete.go",
+          "function": "DepositRefinedAlpha",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "planet-starting-ore": {
+          "codeReference": "x/structs/types/keys.go",
+          "constant": "PlanetStartingOre = 5",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        }
+      },
+      "entities": {
+        "Player": {
+          "codeReference": "x/structs/types/player.pb.go",
+          "protoFile": "proto/structs/structs/player.proto",
+          "verified": false,
+          "notes": "Basic structure exists, needs field-level verification"
+        },
+        "Planet": {
+          "codeReference": "x/structs/types/planet.pb.go",
+          "protoFile": "proto/structs/structs/planet.proto",
+          "verified": false,
+          "notes": "Basic structure exists, needs field-level verification"
+        },
+        "Struct": {
+          "codeReference": "x/structs/types/struct.pb.go",
+          "protoFile": "proto/structs/structs/struct.proto",
+          "verified": false,
+          "notes": "Basic structure exists, needs field-level verification"
+        }
+      },
+      "actions": {
+        "MsgStructBuildInitiate": {
+          "codeReference": "x/structs/keeper/msg_server_struct_build_initiate.go:18-88",
+          "protoFile": "proto/structs/structs/tx.proto:660-669",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "MsgStructBuildComplete": {
+          "codeReference": "x/structs/keeper/msg_server_struct_build_complete.go:11-85",
+          "protoFile": "proto/structs/structs/tx.proto:672-679",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "MsgStructAttack": {
+          "codeReference": "x/structs/keeper/msg_server_struct_attack.go:13-184",
+          "protoFile": "proto/structs/structs/tx.proto:727-734",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "MsgPlanetRaidComplete": {
+          "codeReference": "x/structs/keeper/msg_server_planet_raid_complete.go:29-94",
+          "protoFile": "proto/structs/structs/tx.proto:515-522",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "MsgStructOreMinerComplete": {
+          "codeReference": "x/structs/keeper/msg_server_struct_ore_miner_complete.go",
+          "protoFile": "proto/structs/structs/tx.proto:763-770",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "MsgStructOreRefineryComplete": {
+          "codeReference": "x/structs/keeper/msg_server_struct_ore_refinery_complete.go",
+          "protoFile": "proto/structs/structs/tx.proto:777-784",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "MsgFleetMove": {
+          "codeReference": "x/structs/keeper/msg_server_fleet_move.go",
+          "protoFile": "proto/structs/structs/tx.proto:236-242",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        },
+        "MsgStructActivate": {
+          "codeReference": "x/structs/keeper/msg_server_struct_activate.go",
+          "protoFile": "proto/structs/structs/tx.proto:644-649",
+          "verified": true,
+          "verifiedBy": "GameCodeAnalyst"
+        }
+      }
+    },
+    "protocols": {
+      "query-protocol": {
+        "codeReference": "proto/structs/structs/query.proto",
+        "verified": true,
+        "verifiedBy": "APIDocumentationSpecialist"
+      },
+      "action-protocol": {
+        "codeReference": "proto/structs/structs/tx.proto",
+        "verified": true,
+        "verifiedBy": "APIDocumentationSpecialist"
+      }
+    },
+    "indexes": {
+      "entity-index": {
+        "codeReference": "ai/reference/entity-index.json",
+        "verified": true,
+        "verifiedBy": "GameCodeAnalyst",
+        "note": "Indexes 14 entities, 4 fully verified with field definitions"
+      },
+      "action-index": {
+        "codeReference": "ai/reference/action-index.json",
+        "verified": true,
+        "verifiedBy": "GameCodeAnalyst",
+        "note": "Indexes 30 actions, 18 fully verified with code references"
+      }
+    },
+    "schemas": {
+      "code-structures": {
+        "codeReference": "ai/schemas/code-structures.json",
+        "verified": true,
+        "verifiedBy": "GameCodeAnalyst",
+        "structures": {
+          "PlayerCache": "x/structs/keeper/player_cache.go",
+          "StructCache": "x/structs/keeper/struct_cache.go",
+          "FleetCache": "x/structs/keeper/fleet_cache.go",
+          "PlanetCache": "x/structs/keeper/planet_cache.go",
+          "Player": "x/structs/keeper/player.go",
+          "Work": "x/structs/types/work.go",
+          "Keys": "x/structs/types/keys.go",
+          "StructType": "genesis_struct_type.go"
+        }
+      }
+    }
+  },
+  "repository": {
+    "name": "structsd",
+    "path": "ProductManagement/GameCodeAnalyst/repositories/structsd",
+    "branch": "main",
+    "lastSync": "2025-01-XX"
+  },
+  "verificationStandards": {
+    "codeReferenceFormat": "path/to/file.go:line-range",
+    "functionFormat": "FunctionName",
+    "constantFormat": "ConstantName = value",
+    "fieldFormat": "FieldName: value"
+  }
+}
+

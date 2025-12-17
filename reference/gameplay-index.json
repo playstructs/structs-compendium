@@ -1,0 +1,338 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-01-XX",
+  "title": "Gameplay Documentation Index",
+  "description": "Complete index of gameplay documentation for AI agents",
+  "type": "object",
+  "gameplay": {
+    "schemas": [
+      {
+        "id": "gameplay-schema",
+        "name": "Gameplay Schema",
+        "category": "gameplay",
+        "file": "schemas/gameplay.json",
+        "description": "Complete gameplay mechanics schema (resources, combat, building, mining)",
+        "definitions": [
+          "Resource",
+          "ResourceConversion",
+          "CombatAction",
+          "BuildingAction",
+          "MiningOperation",
+          "GameplayLoop",
+          "PowerManagement",
+          "PlanetCompletion",
+          "GameplayQuery"
+        ]
+      }
+    ],
+    "protocols": [
+      {
+        "id": "gameplay-protocol",
+        "name": "Gameplay Protocol",
+        "category": "gameplay",
+        "file": "protocols/gameplay-protocol.md",
+        "description": "How to interact with gameplay mechanics",
+        "sections": [
+          "Resource Management",
+          "Mining Protocol",
+          "Power Management Protocol",
+          "Building Protocol",
+          "Combat Protocol",
+          "Exploration Protocol",
+          "Fleet Management Protocol",
+          "Guild Operations Protocol",
+          "Planet Management Protocol",
+          "Gameplay State Queries Protocol",
+          "5X Framework Protocol"
+        ]
+      }
+    ],
+    "patterns": [
+      {
+        "id": "gameplay-strategies",
+        "name": "Gameplay Strategy Patterns",
+        "category": "gameplay",
+        "file": "patterns/gameplay-strategies.md",
+        "description": "Common gameplay strategy patterns",
+        "patterns": [
+          "Resource Security Pattern",
+          "Power Management Pattern",
+          "Build Requirements Pattern",
+          "Mining Optimization Pattern",
+          "Combat Preparation Pattern",
+          "Defense Pattern",
+          "Expansion Pattern",
+          "5X Framework Pattern"
+        ]
+      }
+    ],
+    "decisionTrees": [
+      {
+        "id": "resource-security",
+        "name": "Resource Security Decision Tree",
+        "category": "gameplay",
+        "file": "patterns/decision-tree-resource-security.json",
+        "description": "Decision tree for securing resources by refining ore immediately"
+      },
+      {
+        "id": "power-management",
+        "name": "Power Management Decision Tree",
+        "category": "gameplay",
+        "file": "patterns/decision-tree-power-management.json",
+        "description": "Decision tree for managing power capacity and maintaining online status"
+      },
+      {
+        "id": "build-requirements",
+        "name": "Build Requirements Decision Tree",
+        "category": "gameplay",
+        "file": "patterns/decision-tree-build-requirements.json",
+        "description": "Decision tree for verifying all requirements before building structures"
+      },
+      {
+        "id": "combat",
+        "name": "Combat Decision Tree",
+        "category": "gameplay",
+        "file": "patterns/decision-tree-combat.json",
+        "description": "Decision tree for scouting, assessing, preparing, and executing combat operations"
+      },
+      {
+        "id": "5x-framework",
+        "name": "5X Framework Decision Tree",
+        "category": "gameplay",
+        "file": "patterns/decision-tree-5x-framework.json",
+        "description": "Decision tree for executing the 5X Framework gameplay loop"
+      }
+    ],
+    "tasks": [
+      {
+        "id": "onboarding",
+        "name": "Player Onboarding Task",
+        "category": "gameplay",
+        "file": "tasks/onboarding.json",
+        "description": "Complete workflow for new player onboarding - first 30 minutes"
+      },
+      {
+        "id": "building",
+        "name": "Building Task",
+        "category": "gameplay",
+        "file": "tasks/building.json",
+        "description": "Complete workflow for building structures on planets or in fleets"
+      },
+      {
+        "id": "exploration",
+        "name": "Exploration Task",
+        "category": "gameplay",
+        "file": "tasks/exploration.json",
+        "description": "Complete workflow for exploring and charting planets"
+      },
+      {
+        "id": "resource-management",
+        "name": "Resource Management Task",
+        "category": "gameplay",
+        "file": "tasks/resource-management.json",
+        "description": "Complete workflow for managing resources (mining, refining, converting)"
+      }
+    ],
+    "workflows": [
+      {
+        "id": "get-player-and-planets",
+        "name": "Get Player and Planets Workflow",
+        "category": "gameplay",
+        "file": "workflows/get-player-and-planets.json",
+        "description": "Multi-step workflow to get player information and all associated planets"
+      },
+      {
+        "id": "mine-refine-convert",
+        "name": "Mine, Refine, Convert Workflow",
+        "category": "gameplay",
+        "file": "workflows/mine-refine-convert.json",
+        "description": "Complete workflow for mining ore, refining to Alpha Matter, and converting to Watts"
+      },
+      {
+        "id": "planet-setup",
+        "name": "Planet Setup Workflow",
+        "category": "gameplay",
+        "file": "workflows/planet-setup.json",
+        "description": "Complete workflow for setting up a new planet"
+      }
+    ],
+    "examples": [
+      {
+        "id": "mining-bot",
+        "name": "Mining Bot Example",
+        "category": "gameplay",
+        "file": "examples/gameplay-mining-bot.json",
+        "description": "Example bot for mining Alpha Matter, refining ore, and converting to Watts",
+        "workflow": "Resource Extraction Workflow"
+      },
+      {
+        "id": "combat-bot",
+        "name": "Combat Bot Example",
+        "category": "gameplay",
+        "file": "examples/gameplay-combat-bot.json",
+        "description": "Example bot for scouting, assembling forces, and executing attacks",
+        "workflows": [
+          "Combat Workflow",
+          "Raid Workflow",
+          "Defense Workflow"
+        ]
+      }
+    ],
+    "concepts": {
+      "resources": {
+        "alphaMatter": {
+          "id": "alphaMatter",
+          "name": "Alpha Matter",
+          "security": "secure",
+          "description": "Refined resource - cannot be stolen",
+          "schema": "schemas/gameplay.json#/definitions/Resource"
+        },
+        "ore": {
+          "id": "ore",
+          "name": "Alpha Ore",
+          "security": "stealable",
+          "description": "Raw ore - can be stolen, must be refined",
+          "schema": "schemas/gameplay.json#/definitions/Resource"
+        },
+        "watts": {
+          "id": "watts",
+          "name": "Watts",
+          "security": "secure",
+          "description": "Energy units - powers all operations",
+          "schema": "schemas/gameplay.json#/definitions/Resource"
+        }
+      },
+      "conversion": {
+        "reactor": {
+          "method": "reactor",
+          "rate": "1g:1kW",
+          "risk": "low",
+          "description": "Safe, reliable conversion",
+          "schema": "schemas/gameplay.json#/definitions/ResourceConversion"
+        },
+        "planetaryGenerator": {
+          "method": "planetaryGenerator",
+          "rate": "1g:2kW",
+          "risk": "high",
+          "description": "Efficient conversion, higher risk",
+          "schema": "schemas/gameplay.json#/definitions/ResourceConversion"
+        }
+      },
+      "combat": {
+        "evasion": {
+          "description": "Structs can evade attacks",
+          "schema": "schemas/gameplay.json#/gameplay/combatMechanics/evasion"
+        },
+        "blocking": {
+          "description": "Defenders can block attacks",
+          "schema": "schemas/gameplay.json#/gameplay/combatMechanics/blocking"
+        },
+        "counterAttack": {
+          "description": "Structs counter-attack automatically",
+          "schema": "schemas/gameplay.json#/gameplay/combatMechanics/counterAttack"
+        }
+      },
+      "building": {
+        "requirements": {
+          "description": "Building requirements checklist",
+          "schema": "schemas/gameplay.json#/definitions/BuildingAction/requirements"
+        },
+        "limits": {
+          "description": "Per-player build limits",
+          "schema": "schemas/gameplay.json#/gameplay/buildLimits"
+        }
+      },
+      "5XFramework": {
+        "phases": [
+          "explore",
+          "extract",
+          "expand",
+          "exterminate",
+          "exchange"
+        ],
+        "description": "Core gameplay loop",
+        "schema": "schemas/gameplay.json#/definitions/GameplayLoop"
+      }
+    },
+    "quickReference": {
+      "resourceSecurity": {
+        "principle": "Always refine ore to Alpha Matter immediately",
+        "reason": "Ore can be stolen, Alpha Matter cannot",
+        "pattern": "patterns/gameplay-strategies.md#resource-security-pattern",
+        "decisionTree": "patterns/decision-tree-resource-security.json"
+      },
+      "powerManagement": {
+        "principle": "Stay online by maintaining power capacity above consumption",
+        "formula": "(capacity + capacitySecondary) - (load + structsLoad)",
+        "pattern": "patterns/gameplay-strategies.md#power-management-pattern",
+        "decisionTree": "patterns/decision-tree-power-management.json"
+      },
+      "buildRequirements": {
+        "principle": "Verify all requirements before attempting to build",
+        "checklist": [
+          "playerOnline",
+          "fleetOnStation",
+          "commandShipOnline",
+          "sufficientPower",
+          "availableSlot",
+          "buildLimit"
+        ],
+        "pattern": "patterns/gameplay-strategies.md#build-requirements-pattern",
+        "decisionTree": "patterns/decision-tree-build-requirements.json"
+      },
+      "combatPreparation": {
+        "principle": "Scout, assess, prepare, then execute",
+        "workflow": [
+          "scout",
+          "assess",
+          "prepare",
+          "execute"
+        ],
+        "pattern": "patterns/gameplay-strategies.md#combat-preparation-pattern",
+        "decisionTree": "patterns/decision-tree-combat.json"
+      },
+      "gameplayQueries": {
+        "playerOnline": {
+          "query": "schemas/gameplay.json#/gameplay/gameplayQueries/playerOnline",
+          "protocol": "protocols/gameplay-protocol.md#gameplay-state-queries-protocol",
+          "formula": "(load + structsLoad) <= (capacity + capacitySecondary)"
+        },
+        "canBuild": {
+          "query": "schemas/gameplay.json#/gameplay/gameplayQueries/canBuild",
+          "protocol": "protocols/gameplay-protocol.md#gameplay-state-queries-protocol"
+        },
+        "canRaid": {
+          "query": "schemas/gameplay.json#/gameplay/gameplayQueries/canRaid",
+          "protocol": "protocols/gameplay-protocol.md#gameplay-state-queries-protocol"
+        },
+        "canMine": {
+          "query": "schemas/gameplay.json#/gameplay/gameplayQueries/canMine",
+          "protocol": "protocols/gameplay-protocol.md#gameplay-state-queries-protocol"
+        },
+        "canExplore": {
+          "query": "schemas/gameplay.json#/gameplay/gameplayQueries/canExplore",
+          "protocol": "protocols/gameplay-protocol.md#gameplay-state-queries-protocol"
+        }
+      },
+      "actions": {
+        "fleetManagement": {
+          "actions": [
+            "MsgFleetMove"
+          ],
+          "schema": "schemas/actions.json#/actions/MsgFleetMove"
+        },
+        "guildOperations": {
+          "actions": [
+            "MsgGuildCreate",
+            "MsgGuildMembershipJoin",
+            "MsgGuildMembershipLeave",
+            "MsgGuildBankMint",
+            "MsgGuildBankRedeem"
+          ],
+          "schema": "schemas/actions.json#/actions"
+        }
+      }
+    }
+  }
+}
+

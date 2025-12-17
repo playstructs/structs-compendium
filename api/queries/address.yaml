@@ -1,0 +1,51 @@
+version: "1.0.0"
+lastUpdated: "2025-01-XX"
+baseUrl: "http://localhost:1317"
+basePath: "/structs"
+category: "query"
+entity: "Address"
+
+endpoints:
+  - id: "address-by-address"
+    method: "GET"
+    path: "/structs/address/{address}"
+    description: "Get address by blockchain address"
+    category: "query"
+    entity: "Address"
+    parameters:
+      - name: "address"
+        type: "string"
+        required: true
+        format: "blockchain-address"
+        description: "Blockchain address"
+    response:
+      schema: "schemas/entities.json#/definitions/Address"
+      contentType: "application/json"
+  
+  - id: "address-list"
+    method: "GET"
+    path: "/structs/address"
+    description: "List all addresses"
+    category: "query"
+    entity: "Address"
+    pagination: true
+    response:
+      schema: "schemas/entities.json#/definitions/Address[]"
+      contentType: "application/json"
+  
+  - id: "address-by-player"
+    method: "GET"
+    path: "/structs/address_by_player/{playerId}"
+    description: "Get addresses by player"
+    category: "query"
+    entity: "Address"
+    parameters:
+      - name: "playerId"
+        type: "string"
+        required: true
+        format: "entity-id"
+        pattern: "^1-[0-9]+$"
+        description: "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player."
+    response:
+      schema: "schemas/entities.json#/definitions/Address[]"
+      contentType: "application/json"

@@ -1,0 +1,49 @@
+version: "1.0.0"
+lastUpdated: "2025-01-XX"
+baseUrl: "http://localhost:1317"
+basePath: "/structs"
+category: "query"
+entity: "Fleet"
+
+endpoints:
+  - id: "fleet-by-id"
+    method: "GET"
+    path: "/structs/fleet/{id}"
+    description: "Get fleet by ID"
+    category: "query"
+    entity: "Fleet"
+    parameters:
+      - name: "id"
+        type: "string"
+        required: true
+        format: "entity-id"
+        description: "Fleet identifier"
+    response:
+      schema: "schemas/entities/fleet.json"
+      contentType: "application/json"
+  
+  - id: "fleet-list"
+    method: "GET"
+    path: "/structs/fleet"
+    description: "List all fleets"
+    category: "query"
+    entity: "Fleet"
+    pagination: true
+    response:
+      schema: "schemas/entities/fleet.json[]"
+      contentType: "application/json"
+  
+  - id: "fleet-by-index"
+    method: "GET"
+    path: "/structs/fleet_by_index/{index}"
+    description: "Get fleet by index"
+    category: "query"
+    entity: "Fleet"
+    parameters:
+      - name: "index"
+        type: "string"
+        required: true
+        description: "Fleet index"
+    response:
+      schema: "schemas/entities/fleet.json"
+      contentType: "application/json"

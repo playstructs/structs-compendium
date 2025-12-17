@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "title": "Guild Entity Schema",
+  "description": "Guild entity definition - extracted from game-state.json for context window optimization. See schemas/formats.json for format specifications.",
+  "type": "object",
+  "structs:entity": "Guild",
+  "structs:endpoint": "/structs/guild/{id}",
+  "structs:category": "social",
+  "properties": {
+    "Guild": {
+      "type": "object",
+      "description": "Guild core data",
+      "properties": {
+        "id": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^0-[0-9]+$",
+          "description": "Unique guild identifier in format 'type-index' (e.g., '0-1' for guild type 0, index 1). Type 0 = Guild."
+        },
+        "creator": {
+          "type": "string",
+          "structs:format": "blockchain-address",
+          "description": "Blockchain address that created this guild"
+        },
+        "entrySubstationId": {
+          "type": "string",
+          "structs:format": "entity-id",
+          "pattern": "^4-[0-9]+$",
+          "structs:relationship": "Substation",
+          "description": "Entry substation ID for guild. Format: 'type-index' (e.g., '4-3' for substation type 4, index 3). Type 4 = Substation."
+        },
+        "joinInfusionMinimum": {
+          "type": "string",
+          "description": "Minimum infusion required to join (string representation of integer)"
+        },
+        "entryInfusion": {
+          "type": "string",
+          "description": "Entry infusion amount (string representation of integer)"
+        }
+      },
+      "required": ["id", "creator"]
+    },
+    "members": {
+      "type": "array",
+      "description": "Player IDs who are members of this guild",
+      "items": {
+        "type": "string",
+        "structs:format": "entity-id",
+        "pattern": "^1-[0-9]+$",
+        "description": "Player identifier in format 'type-index' (e.g., '1-11' for player type 1, index 11). Type 1 = Player.",
+        "structs:relationship": "Player"
+      }
+    }
+  },
+  "required": ["Guild"],
+  "structs:relationships": {
+    "members": "schemas/entities/player.json",
+    "entrySubstation": "schemas/entities/substation.json"
+  },
+  "structs:verification": {
+    "verified": true,
+    "verifiedBy": "GameCodeAnalyst",
+    "verifiedDate": "2025-01-XX",
+    "verificationMethod": "code-analysis",
+    "confidence": "high",
+    "note": "API response schema. Missing some fields from proto (index, endpoint, owner, primaryReactorId, joinInfusionMinimumBypassByRequest, joinInfusionMinimumBypassByInvite) - these may be in gridAttributes or separate queries. For code-based field definitions, see schemas/entities.json#/definitions/Guild",
+    "codeReference": "proto/structs/structs/guild.proto, x/structs/keeper/guild_cache.go",
+    "databaseReference": "structs.guild table",
+    "verifiedFields": ["id", "creator", "entrySubstationId", "joinInfusionMinimum"],
+    "missingFields": ["index", "endpoint", "owner", "primaryReactorId", "joinInfusionMinimumBypassByRequest", "joinInfusionMinimumBypassByInvite"]
+  }
+}
+

@@ -1,0 +1,651 @@
+{
+  "version": "1.0.0",
+  "id": "economic-calculations",
+  "name": "Economic Calculation Examples",
+  "description": "Complete examples of economic calculations for AI agents",
+  "category": "economic",
+  "calculations": {
+    "energyProduction": {
+      "reactor": {
+        "example1": {
+          "input": {
+            "alphaMatter": 100,
+            "unit": "grams"
+          },
+          "calculation": {
+            "formula": "Energy (kW) = Alpha Matter (grams) × 1",
+            "rate": 1,
+            "calculation": "100 × 1 = 100"
+          },
+          "output": {
+            "energy": 100,
+            "unit": "kW"
+          },
+          "result": {
+            "energyProduced": 100,
+            "unit": "kW",
+            "ephemeral": true,
+            "mustConsumeImmediately": true
+          }
+        },
+        "example2": {
+          "input": {
+            "alphaMatter": 50,
+            "unit": "grams"
+          },
+          "calculation": {
+            "formula": "Energy (kW) = Alpha Matter (grams) × 1",
+            "rate": 1,
+            "calculation": "50 × 1 = 50"
+          },
+          "output": {
+            "energy": 50,
+            "unit": "kW"
+          },
+          "result": {
+            "energyProduced": 50,
+            "unit": "kW",
+            "ephemeral": true,
+            "mustConsumeImmediately": true
+          }
+        }
+      },
+      "fieldGenerator": {
+        "example1": {
+          "input": {
+            "alphaMatter": 100,
+            "unit": "grams"
+          },
+          "calculation": {
+            "formula": "Energy (kW) = Alpha Matter (grams) × 2",
+            "rate": 2,
+            "calculation": "100 × 2 = 200"
+          },
+          "output": {
+            "energy": 200,
+            "unit": "kW"
+          },
+          "result": {
+            "energyProduced": 200,
+            "unit": "kW",
+            "ephemeral": true,
+            "mustConsumeImmediately": true,
+            "risk": "high (design intent; current code is deterministic)",
+            "efficiency": "200% of Reactor"
+          }
+        },
+        "example2": {
+          "input": {
+            "alphaMatter": 50,
+            "unit": "grams"
+          },
+          "calculation": {
+            "formula": "Energy (kW) = Alpha Matter (grams) × 2",
+            "rate": 2,
+            "calculation": "50 × 2 = 100"
+          },
+          "output": {
+            "energy": 100,
+            "unit": "kW"
+          },
+          "result": {
+            "energyProduced": 100,
+            "unit": "kW",
+            "ephemeral": true,
+            "mustConsumeImmediately": true,
+            "risk": "high (design intent; current code is deterministic)"
+          }
+        }
+      },
+      "continentalPowerPlant": {
+        "example1": {
+          "input": {
+            "alphaMatter": 100,
+            "unit": "grams"
+          },
+          "calculation": {
+            "formula": "Energy (kW) = Alpha Matter (grams) × 5",
+            "rate": 5,
+            "calculation": "100 × 5 = 500"
+          },
+          "output": {
+            "energy": 500,
+            "unit": "kW"
+          },
+          "result": {
+            "energyProduced": 500,
+            "unit": "kW",
+            "ephemeral": true,
+            "mustConsumeImmediately": true,
+            "risk": "high (design intent; current code is deterministic)",
+            "efficiency": "500% of Reactor"
+          }
+        }
+      },
+      "worldEngine": {
+        "example1": {
+          "input": {
+            "alphaMatter": 100,
+            "unit": "grams"
+          },
+          "calculation": {
+            "formula": "Energy (kW) = Alpha Matter (grams) × 10",
+            "rate": 10,
+            "calculation": "100 × 10 = 1000"
+          },
+          "output": {
+            "energy": 1000,
+            "unit": "kW"
+          },
+          "result": {
+            "energyProduced": 1000,
+            "unit": "kW",
+            "ephemeral": true,
+            "mustConsumeImmediately": true,
+            "risk": "high (design intent; current code is deterministic)",
+            "efficiency": "1000% of Reactor"
+          }
+        }
+      }
+    },
+    "resourceConversion": {
+      "oreToMatter": {
+        "example1": {
+          "input": {
+            "alphaOre": 100,
+            "unit": "grams"
+          },
+          "calculation": {
+            "formula": "Alpha Matter (grams) = Alpha Ore (grams) × 1",
+            "rate": 1,
+            "calculation": "100 × 1 = 100"
+          },
+          "output": {
+            "alphaMatter": 100,
+            "unit": "grams"
+          },
+          "result": {
+            "alphaMatterCreated": 100,
+            "unit": "grams",
+            "security": {
+              "oreStealable": true,
+              "matterStealable": false,
+              "note": "Ore was stealable, Matter is secure"
+            }
+          }
+        },
+        "example2": {
+          "input": {
+            "alphaOre": 50,
+            "unit": "grams"
+          },
+          "calculation": {
+            "formula": "Alpha Matter (grams) = Alpha Ore (grams) × 1",
+            "rate": 1,
+            "calculation": "50 × 1 = 50"
+          },
+          "output": {
+            "alphaMatter": 50,
+            "unit": "grams"
+          },
+          "result": {
+            "alphaMatterCreated": 50,
+            "unit": "grams",
+            "security": {
+              "oreStealable": true,
+              "matterStealable": false
+            }
+          }
+        }
+      },
+      "blockchainConversion": {
+        "example1": {
+          "input": {
+            "alphaMatter": 100,
+            "unit": "grams"
+          },
+          "calculation": {
+            "formula": "μAlpha = Alpha (grams) × 1,000,000",
+            "conversion": 1000000,
+            "calculation": "100 × 1,000,000 = 100,000,000"
+          },
+          "output": {
+            "micrograms": 100000000,
+            "unit": "μAlpha"
+          },
+          "result": {
+            "micrograms": 100000000,
+            "unit": "μAlpha",
+            "note": "Blockchain uses micrograms for precision"
+          }
+        },
+        "example2": {
+          "input": {
+            "micrograms": 100000000,
+            "unit": "μAlpha"
+          },
+          "calculation": {
+            "formula": "Alpha (grams) = μAlpha / 1,000,000",
+            "conversion": 1000000,
+            "calculation": "100,000,000 / 1,000,000 = 100"
+          },
+          "output": {
+            "alphaMatter": 100,
+            "unit": "grams"
+          },
+          "result": {
+            "alphaMatter": 100,
+            "unit": "grams"
+          }
+        }
+      }
+    },
+    "costCalculations": {
+      "reactorCostPerKW": {
+        "example1": {
+          "input": {
+            "alphaMatterCost": 0.01,
+            "unit": "per gram"
+          },
+          "calculation": {
+            "formula": "Cost per kW = Alpha Matter Cost / 1",
+            "rate": 1,
+            "calculation": "0.01 / 1 = 0.01"
+          },
+          "output": {
+            "costPerKW": 0.01,
+            "unit": "per kW"
+          },
+          "result": {
+            "costPerKW": 0.01,
+            "unit": "per kW"
+          }
+        }
+      },
+      "fieldGeneratorCostPerKW": {
+        "example1": {
+          "input": {
+            "alphaMatterCost": 0.01,
+            "unit": "per gram"
+          },
+          "calculation": {
+            "formula": "Cost per kW = Alpha Matter Cost / 2",
+            "rate": 2,
+            "calculation": "0.01 / 2 = 0.005"
+          },
+          "output": {
+            "costPerKW": 0.005,
+            "unit": "per kW"
+          },
+          "result": {
+            "costPerKW": 0.005,
+            "unit": "per kW",
+            "note": "More efficient than Reactor (50% cost per kW)"
+          }
+        }
+      },
+      "continentalPowerPlantCostPerKW": {
+        "example1": {
+          "input": {
+            "alphaMatterCost": 0.01,
+            "unit": "per gram"
+          },
+          "calculation": {
+            "formula": "Cost per kW = Alpha Matter Cost / 5",
+            "rate": 5,
+            "calculation": "0.01 / 5 = 0.002"
+          },
+          "output": {
+            "costPerKW": 0.002,
+            "unit": "per kW"
+          },
+          "result": {
+            "costPerKW": 0.002,
+            "unit": "per kW",
+            "note": "More efficient than Reactor (20% cost per kW)"
+          }
+        }
+      },
+      "worldEngineCostPerKW": {
+        "example1": {
+          "input": {
+            "alphaMatterCost": 0.01,
+            "unit": "per gram"
+          },
+          "calculation": {
+            "formula": "Cost per kW = Alpha Matter Cost / 10",
+            "rate": 10,
+            "calculation": "0.01 / 10 = 0.001"
+          },
+          "output": {
+            "costPerKW": 0.001,
+            "unit": "per kW"
+          },
+          "result": {
+            "costPerKW": 0.001,
+            "unit": "per kW",
+            "note": "More efficient than Reactor (10% cost per kW)"
+          }
+        }
+      }
+    },
+    "tradingCalculations": {
+      "tradingProfit": {
+        "example1": {
+          "input": {
+            "buyPrice": 0.001,
+            "sellPrice": 0.002,
+            "quantity": 100,
+            "unit": "grams"
+          },
+          "calculation": {
+            "formula": "Profit = (Sell Price - Buy Price) × Quantity",
+            "calculation": "(0.002 - 0.001) × 100 = 0.1"
+          },
+          "output": {
+            "profit": 0.1,
+            "unit": "Alpha Matter"
+          },
+          "result": {
+            "profit": 0.1,
+            "unit": "Alpha Matter",
+            "profitability": "profitable"
+          }
+        },
+        "example2": {
+          "input": {
+            "buyPrice": 0.002,
+            "sellPrice": 0.001,
+            "quantity": 100,
+            "unit": "grams"
+          },
+          "calculation": {
+            "formula": "Profit = (Sell Price - Buy Price) × Quantity",
+            "calculation": "(0.001 - 0.002) × 100 = -0.1"
+          },
+          "output": {
+            "profit": -0.1,
+            "unit": "Alpha Matter"
+          },
+          "result": {
+            "profit": -0.1,
+            "unit": "Alpha Matter",
+            "profitability": "loss"
+          }
+        }
+      },
+      "profitMargin": {
+        "example1": {
+          "input": {
+            "buyPrice": 0.001,
+            "sellPrice": 0.002,
+            "quantity": 100
+          },
+          "calculation": {
+            "formula": "Profit Margin = ((Sell Price - Buy Price) / Buy Price) × 100%",
+            "calculation": "((0.002 - 0.001) / 0.001) × 100% = 100%"
+          },
+          "output": {
+            "profitMargin": 100,
+            "unit": "percent"
+          },
+          "result": {
+            "profitMargin": 100,
+            "unit": "percent",
+            "profitability": "100% profit margin"
+          }
+        },
+        "example2": {
+          "input": {
+            "buyPrice": 0.001,
+            "sellPrice": 0.0015,
+            "quantity": 100
+          },
+          "calculation": {
+            "formula": "Profit Margin = ((Sell Price - Buy Price) / Buy Price) × 100%",
+            "calculation": "((0.0015 - 0.001) / 0.001) × 100% = 50%"
+          },
+          "output": {
+            "profitMargin": 50,
+            "unit": "percent"
+          },
+          "result": {
+            "profitMargin": 50,
+            "unit": "percent",
+            "profitability": "50% profit margin"
+          }
+        }
+      }
+    },
+    "guildTokenCalculations": {
+      "collateralRatio": {
+        "example1": {
+          "input": {
+            "lockedAlphaMatter": 1000,
+            "tokensIssued": 1000,
+            "unit": "grams"
+          },
+          "calculation": {
+            "formula": "Collateral Ratio = (Locked Alpha Matter / Total Tokens Issued) × 100%",
+            "calculation": "(1000 / 1000) × 100% = 100%"
+          },
+          "output": {
+            "collateralRatio": 100,
+            "unit": "percent"
+          },
+          "result": {
+            "collateralRatio": 100,
+            "unit": "percent",
+            "status": "healthy",
+            "note": "100% collateral backing - healthy ratio"
+          }
+        },
+        "example2": {
+          "input": {
+            "lockedAlphaMatter": 500,
+            "tokensIssued": 1000,
+            "unit": "grams"
+          },
+          "calculation": {
+            "formula": "Collateral Ratio = (Locked Alpha Matter / Total Tokens Issued) × 100%",
+            "calculation": "(500 / 1000) × 100% = 50%"
+          },
+          "output": {
+            "collateralRatio": 50,
+            "unit": "percent"
+          },
+          "result": {
+            "collateralRatio": 50,
+            "unit": "percent",
+            "status": "low",
+            "warning": "Low collateral ratio - may reduce token value"
+          }
+        },
+        "example3": {
+          "input": {
+            "lockedAlphaMatter": 2000,
+            "tokensIssued": 1000,
+            "unit": "grams"
+          },
+          "calculation": {
+            "formula": "Collateral Ratio = (Locked Alpha Matter / Total Tokens Issued) × 100%",
+            "calculation": "(2000 / 1000) × 100% = 200%"
+          },
+          "output": {
+            "collateralRatio": 200,
+            "unit": "percent"
+          },
+          "result": {
+            "collateralRatio": 200,
+            "unit": "percent",
+            "status": "excellent",
+            "note": "200% collateral backing - excellent ratio, high trust"
+          }
+        }
+      },
+      "tokenValue": {
+        "example1": {
+          "input": {
+            "lockedAlphaMatter": 1000,
+            "tokensInCirculation": 1000,
+            "unit": "grams"
+          },
+          "calculation": {
+            "formula": "Token Value = Locked Alpha Matter / Tokens in Circulation",
+            "calculation": "1000 / 1000 = 1"
+          },
+          "output": {
+            "tokenValue": 1,
+            "unit": "grams Alpha Matter per token"
+          },
+          "result": {
+            "tokenValue": 1,
+            "unit": "grams Alpha Matter per token",
+            "status": "1:1 backing"
+          }
+        }
+      },
+      "marketCap": {
+        "example1": {
+          "input": {
+            "tokensInCirculation": 1000,
+            "currentPrice": 0.01,
+            "unit": "Alpha Matter per token"
+          },
+          "calculation": {
+            "formula": "Market Cap = Tokens in Circulation × Current Price",
+            "calculation": "1000 × 0.01 = 10"
+          },
+          "output": {
+            "marketCap": 10,
+            "unit": "Alpha Matter"
+          },
+          "result": {
+            "marketCap": 10,
+            "unit": "Alpha Matter"
+          }
+        }
+      }
+    },
+    "efficiencyComparisons": {
+      "reactorVsFieldGenerator": {
+        "example1": {
+          "input": {
+            "alphaMatter": 100,
+            "unit": "grams"
+          },
+          "reactor": {
+            "output": 100,
+            "unit": "kW",
+            "rate": 1
+          },
+          "fieldGenerator": {
+            "output": 200,
+            "unit": "kW",
+            "rate": 2
+          },
+          "comparison": {
+            "efficiency": "Field Generator is 200% of Reactor",
+            "difference": "100 kW more energy from Field Generator",
+            "risk": "Field Generator has higher risk (design intent; not implemented in current code)"
+          },
+          "result": {
+            "recommendation": "Choose Reactor for safety, Field Generator for efficiency",
+            "tradeoff": "Safety vs Efficiency"
+          }
+        }
+      },
+      "allGeneratorTypes": {
+        "example1": {
+          "input": {
+            "alphaMatter": 100,
+            "unit": "grams"
+          },
+          "reactor": {
+            "output": 100,
+            "unit": "kW",
+            "rate": 1,
+            "risk": "low"
+          },
+          "fieldGenerator": {
+            "output": 200,
+            "unit": "kW",
+            "rate": 2,
+            "risk": "high (design intent; current code is deterministic)",
+            "efficiency": "200% of Reactor"
+          },
+          "continentalPowerPlant": {
+            "output": 500,
+            "unit": "kW",
+            "rate": 5,
+            "risk": "high (design intent; current code is deterministic)",
+            "efficiency": "500% of Reactor"
+          },
+          "worldEngine": {
+            "output": 1000,
+            "unit": "kW",
+            "rate": 10,
+            "risk": "high (design intent; current code is deterministic)",
+            "efficiency": "1000% of Reactor"
+          },
+          "comparison": {
+            "mostEfficient": "World Engine (10x)",
+            "mostSafe": "Reactor (1x)",
+            "balanced": "Field Generator (2x)"
+          },
+          "result": {
+            "recommendation": "Choose based on risk tolerance and efficiency needs"
+          }
+        }
+      }
+    }
+  },
+  "validation": {
+    "formulaVerification": {
+      "energyProduction": {
+        "reactor": {
+          "verified": true,
+          "codeReference": "genesis_struct_type.go - GeneratingRate field"
+        },
+        "fieldGenerator": {
+          "verified": true,
+          "codeReference": "genesis_struct_type.go - GeneratingRate field"
+        },
+        "continentalPowerPlant": {
+          "verified": true,
+          "codeReference": "genesis_struct_type.go - GeneratingRate field"
+        },
+        "worldEngine": {
+          "verified": true,
+          "codeReference": "genesis_struct_type.go - GeneratingRate field"
+        }
+      },
+      "resourceConversion": {
+        "oreToMatter": {
+          "verified": true,
+          "note": "1:1 conversion (1 ore = 1 gram Alpha Matter) verified against code via ai/schemas/formulas.json#resource.ore-refining-conversion"
+        }
+      },
+      "costCalculations": {
+        "verified": false,
+        "note": "Theoretical calculations, needs code verification"
+      },
+      "tradingCalculations": {
+        "verified": true,
+        "note": "Mathematical calculations"
+      },
+      "guildTokenCalculations": {
+        "verified": false,
+        "note": "Theoretical calculations, needs code verification"
+      }
+    }
+  },
+  "bestPractices": {
+    "alwaysVerifyInputs": "Verify input values are positive numbers",
+    "checkUnits": "Ensure units match (grams, kW, etc.)",
+    "validateResults": "Verify calculation results are reasonable",
+    "handleEphemeralEnergy": "Remember energy must be consumed immediately",
+    "considerSecurity": "Remember ore is stealable, matter is not"
+  }
+}
+

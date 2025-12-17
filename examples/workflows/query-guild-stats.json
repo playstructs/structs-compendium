@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "structs:workflow": "query-guild-stats",
+  "description": "Query guild statistics including member count and power stats",
+  "category": "query",
+  "prerequisites": [
+    "guild_id"
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "endpoint": "webapp-guild-by-id",
+      "method": "GET",
+      "url": "http://localhost:8080/api/guild/{guild_id}",
+      "description": "Get guild information",
+      "parameters": {
+        "guild_id": "2-1"
+      },
+      "extract": {
+        "guild_id": "response.id",
+        "guild_name": "response.name"
+      }
+    },
+    {
+      "step": 2,
+      "endpoint": "webapp-guild-member-count",
+      "method": "GET",
+      "url": "http://localhost:8080/api/guild/{guild_id}/members/count",
+      "description": "Get guild member count",
+      "parameters": {
+        "guild_id": "{{step1.extract.guild_id}}"
+      },
+      "extract": {
+        "member_count": "response.count"
+      }
+    },
+    {
+      "step": 3,
+      "endpoint": "webapp-guild-power-stats",
+      "method": "GET",
+      "url": "http://localhost:8080/api/guild/{guild_id}/power/stats",
+      "description": "Get guild power statistics",
+      "parameters": {
+        "guild_id": "{{step1.extract.guild_id}}"
+      },
+      "extract": {
+        "power_stats": "response"
+      }
+    }
+  ],
+  "result": {
+    "guild": {
+      "id": "{{step1.extract.guild_id}}",
+      "name": "{{step1.extract.guild_name}}",
+      "member_count": "{{step2.extract.member_count}}",
+      "power_stats": "{{step3.extract.power_stats}}"
+    }
+  },
+  "errorHandling": {
+    "step1": {
+      "404": "Guild not found - verify guild_id"
+    },
+    "step2": {
+      "404": "Guild not found - verify guild_id"
+    },
+    "step3": {
+      "404": "Guild not found - verify guild_id"
+    }
+  },
+  "notes": "This workflow demonstrates parallel queries that can be executed concurrently since they don't depend on each other (steps 2 and 3)."
+}
+
