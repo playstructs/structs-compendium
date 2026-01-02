@@ -1,8 +1,9 @@
 # Fleet Lifecycle
 
-**Version**: 1.0.0  
+**Version**: 1.1.0  
 **Category**: Lifecycle  
-**Status**: Stable
+**Status**: Stable  
+**Last Updated**: January 1, 2026
 
 ## Overview
 
@@ -103,6 +104,12 @@ This document describes the Fleet entity lifecycle, focusing on status transitio
 - Raiding capability changes (away only)
 
 **Validation**: Transaction may broadcast but fleet not moved if requirements not met. Always verify game state after broadcast.
+
+**v0.8.0-beta Improvements**:
+- Fleet movement logic has been improved and bug fixes applied
+- More reliable fleet status transitions
+- Better validation of movement requirements
+- Improved error handling for invalid movements
 
 **Code Reference**: `x/structs/keeper/msg_server_fleet_move.go`
 
@@ -285,5 +292,5 @@ This document describes the Fleet entity lifecycle, focusing on status transitio
 
 ---
 
-*Last Updated: January 2025*
+*Last Updated: January 1, 2026*
 

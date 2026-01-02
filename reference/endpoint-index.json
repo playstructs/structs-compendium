@@ -1,10 +1,10 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "title": "Endpoint Index",
   "description": "Complete index of all API endpoints for AI agents",
   "type": "object",
-  "lastUpdated": "2025-01-XX",
+  "lastUpdated": "2026-01-01",
   "endpoints": [
     {
       "id": "player-by-id",

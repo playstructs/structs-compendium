@@ -1,8 +1,8 @@
 # AI Agent Guide
 
-**Version**: 1.0.0  
+**Version**: 1.1.0  
 **Purpose**: Comprehensive guide for AI agents working with Structs  
-**Last Updated**: December 7, 2025
+**Last Updated**: January 1, 2026
 
 ---
 
@@ -98,6 +98,7 @@ All game actions are submitted as transactions:
 - `schemas/entities.json` - Entity definitions
 - `schemas/game-state.json` - Complete game state structure
 - `schemas/formats.json` - ID format specifications
+- `schemas/database-schema.json` - PostgreSQL database schema (v0.8.0-beta)
 
 **Minimal schemas** (for simple operations):
 - `schemas/minimal/player-essential.json`
@@ -394,6 +395,16 @@ All game actions are submitted as transactions:
 - Attack: `struct-attack`
 - Explore Planet: `planet-explore`
 
+### Database Schema
+
+**Quick Reference**: `schemas/database-schema.json`
+
+**Database Information**:
+- PostgreSQL database managed by structs-pg repository
+- Schema changes tracked from November-December 2025
+- Key tables: struct, struct_type, signer_tx, permission
+- See `schemas/database-schema.json` for complete database change log
+
 ### Patterns
 
 **Quick Reference**: `patterns/QUICK_REFERENCE.md`
@@ -536,6 +547,6 @@ This guide is designed as a **starting point** that can be customized for your s
 
 ---
 
-*AI Agent Guide Version: 1.0.0 - December 7, 2025*
+*AI Agent Guide Version: 1.1.0 - January 1, 2026*
 
 *This guide is designed as a starting point and can be customized for your specific project needs.*

@@ -1,7 +1,7 @@
 # API Quick Reference
 
-**Version**: 1.0.0  
-**Last Updated**: December 7, 2025  
+**Version**: 1.1.0  
+**Last Updated**: January 1, 2026  
 **Purpose**: Quick reference guide for AI agents
 
 ---

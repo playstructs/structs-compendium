@@ -1,0 +1,152 @@
+{
+  "version": "1.0.0",
+  "name": "Permission Checking Workflow",
+  "description": "Workflow for checking permissions including Hash permission (v0.8.0-beta)",
+  "category": "authentication",
+  "workflow": {
+    "name": "Check Player Permissions",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Query Object Permissions",
+        "description": "Get all permissions for a specific object",
+        "request": {
+          "method": "GET",
+          "endpoint": "/structs/permission/object/{objectId}",
+          "example": {
+            "objectId": "0-1",
+            "response": [
+              {
+                "permissionId": "0-1@1-11",
+                "value": "127",
+                "objectType": "guild",
+                "objectIndex": "1",
+                "objectId": "0-1",
+                "playerId": "1-11"
+              },
+              {
+                "permissionId": "0-1@1-22",
+                "value": "63",
+                "objectType": "guild",
+                "objectIndex": "1",
+                "objectId": "0-1",
+                "playerId": "1-22"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "step": 2,
+        "action": "Filter for Specific Player",
+        "description": "Find permission for specific player",
+        "filter": {
+          "playerId": "1-11",
+          "matchingPermission": {
+            "permissionId": "0-1@1-11",
+            "value": "127"
+          }
+        }
+      },
+      {
+        "step": 3,
+        "action": "Check Hash Permission",
+        "description": "Check if permission value includes Hash permission bit (64)",
+        "check": {
+          "code": "(parseInt(permission.value) & 64) !== 0",
+          "example": {
+            "permissionValue": "127",
+            "hasHashPermission": true,
+            "explanation": "127 & 64 = 64 (non-zero, has Hash permission)"
+          }
+        }
+      },
+      {
+        "step": 4,
+        "action": "Check Other Permissions",
+        "description": "Check for other permission bits if needed",
+        "checks": {
+          "hasAllPermissions": {
+            "value": 127,
+            "description": "Has all permissions including Hash"
+          },
+          "hasStandardPermissions": {
+            "value": 63,
+            "description": "Has standard permissions but not Hash"
+          },
+          "hasHashOnly": {
+            "value": 64,
+            "description": "Has Hash permission only"
+          }
+        }
+      }
+    ]
+  },
+  "alternativeWorkflow": {
+    "name": "Query Player Permissions",
+    "description": "Get all permissions for a specific player",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Query Player Permissions",
+        "description": "Get all permissions for a player",
+        "request": {
+          "method": "GET",
+          "endpoint": "/structs/permission/player/{playerId}",
+          "example": {
+            "playerId": "1-11",
+            "response": [
+              {
+                "permissionId": "0-1@1-11",
+                "value": "127",
+                "objectId": "0-1",
+                "playerId": "1-11"
+              },
+              {
+                "permissionId": "2-1@1-11",
+                "value": "64",
+                "objectId": "2-1",
+                "playerId": "1-11"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "step": 2,
+        "action": "Filter Permissions with Hash",
+        "description": "Find all permissions that include Hash permission bit",
+        "filter": {
+          "code": "permissions.filter(p => (parseInt(p.value) & 64) !== 0)",
+          "result": [
+            {
+              "permissionId": "0-1@1-11",
+              "value": "127",
+              "hasHashPermission": true
+            },
+            {
+              "permissionId": "2-1@1-11",
+              "value": "64",
+              "hasHashPermission": true
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "useCases": {
+    "beforeTransactionSigning": {
+      "description": "Check Hash permission before signing transaction",
+      "workflow": "Check if player has Hash permission on relevant object before allowing transaction signing"
+    },
+    "accessControl": {
+      "description": "Control access to objects based on Hash permission",
+      "workflow": "Verify Hash permission before allowing access to protected resources"
+    },
+    "permissionAudit": {
+      "description": "Audit all Hash permissions for a player or object",
+      "workflow": "Query and filter permissions to find all Hash permission grants"
+    }
+  }
+}
+

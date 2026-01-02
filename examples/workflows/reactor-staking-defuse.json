@@ -1,0 +1,227 @@
+{
+  "version": "1.0.0",
+  "name": "Reactor Staking - Defuse Workflow",
+  "description": "Detailed workflow for defusing reactor to undelegate validation stake (v0.8.0-beta)",
+  "category": "economic",
+  "v0.8.0-beta": {
+    "feature": "reactor_staking",
+    "purpose": "validation_undelegation"
+  },
+  "workflow": {
+    "name": "Reactor Defuse for Validation Undelegation",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Check Prerequisites",
+        "description": "Verify reactor delegation status before defusing",
+        "checks": {
+          "playerOnline": {
+            "description": "Player must be online (not halted)",
+            "query": "GET /structs/player/{playerId}",
+            "expectedField": "player.online",
+            "expectedValue": true
+          },
+          "reactorExists": {
+            "description": "Reactor must exist and be owned by player",
+            "query": "GET /structs/reactor/{reactorId}",
+            "expectedField": "reactor.owner",
+            "expectedValue": "{playerId}"
+          },
+          "delegationStatus": {
+            "description": "Reactor must have active delegation",
+            "query": "GET /structs/reactor/{reactorId}",
+            "expectedField": "reactor.delegationStatus",
+            "expectedValue": "active",
+            "note": "Cannot defuse if status is 'migrating' or 'none'"
+          },
+          "delegationAmount": {
+            "description": "Check current delegation amount",
+            "query": "GET /structs/reactor/{reactorId}",
+            "expectedField": "reactor.delegationAmount",
+            "minimumValue": "{defuseAmount}"
+          }
+        }
+      },
+      {
+        "step": 2,
+        "action": "Calculate Defuse Amount",
+        "description": "Determine amount to defuse (can be partial or full)",
+        "calculations": {
+          "fullDefuse": {
+            "value": "reactor.delegationAmount",
+            "description": "Undelegate all staked amount"
+          },
+          "partialDefuse": {
+            "value": "custom_amount",
+            "description": "Undelegate partial amount (must be <= delegationAmount)",
+            "minimum": "1000000000",
+            "note": "Partial defuse is allowed"
+          }
+        }
+      },
+      {
+        "step": 3,
+        "action": "Submit Defuse Transaction",
+        "description": "Submit MsgReactorDefuse transaction for validation undelegation",
+        "request": {
+          "method": "POST",
+          "endpoint": "/cosmos/tx/v1beta1/txs",
+          "body": {
+            "body": {
+              "messages": [
+                {
+                  "@type": "/structs.structs.MsgReactorDefuse",
+                  "creator": "structs1...",
+                  "reactorId": "3-1",
+                  "destinationType": 1,
+                  "destinationId": "1-11",
+                  "alphaMatterAmount": "10000000000"
+                }
+              ]
+            }
+          }
+        },
+        "expectedResponse": {
+          "txResponse": {
+            "code": 0,
+            "txhash": "transaction_hash"
+          }
+        }
+      },
+      {
+        "step": 4,
+        "action": "Wait for Transaction Confirmation",
+        "description": "Wait for transaction to be included in a block",
+        "polling": {
+          "endpoint": "GET /cosmos/tx/v1beta1/txs/{txhash}",
+          "interval": "2 seconds",
+          "maxAttempts": 30,
+          "expectedStatus": "confirmed"
+        }
+      },
+      {
+        "step": 5,
+        "action": "Verify Undelegation Status",
+        "description": "Query reactor to confirm undelegation is in progress",
+        "verification": {
+          "query": "GET /structs/reactor/{reactorId}",
+          "expectedFields": {
+            "reactor.delegationStatus": "undelegating",
+            "reactor.undelegationPeriod": "blocks_remaining"
+          },
+          "note": "Undelegation period must pass before Alpha Matter is returned"
+        }
+      },
+      {
+        "step": 6,
+        "action": "Monitor Undelegation Period",
+        "description": "Wait for undelegation period to complete",
+        "monitoring": {
+          "query": "GET /structs/reactor/{reactorId}",
+          "interval": "check every block",
+          "expectedTransition": {
+            "from": "undelegating",
+            "to": "none",
+            "when": "undelegationPeriod === 0"
+          }
+        }
+      },
+      {
+        "step": 7,
+        "action": "Verify Alpha Matter Returned",
+        "description": "Confirm Alpha Matter was returned to player after undelegation period",
+        "verification": {
+          "query": "GET /structs/player/{playerId}",
+          "expectedFields": {
+            "player.alphaMatter": "increased_by_defuse_amount",
+            "reactor.delegationStatus": "none"
+          }
+        }
+      }
+    ]
+  },
+  "errorHandling": {
+    "playerHalted": {
+      "errorCode": "PLAYER_HALTED",
+      "description": "Player is offline (halted)",
+      "recovery": {
+        "action": "Wait for player to come online",
+        "retry": true,
+        "retryDelay": "30 seconds"
+      }
+    },
+    "noActiveDelegation": {
+      "errorCode": "INVALID_STATE",
+      "description": "Reactor has no active delegation to undelegate",
+      "recovery": {
+        "action": "Check reactor delegation status",
+        "retry": false
+      }
+    },
+    "insufficientDelegationAmount": {
+      "errorCode": "INSUFFICIENT_FUNDS",
+      "description": "Requested defuse amount exceeds delegation amount",
+      "recovery": {
+        "action": "Reduce defuse amount to match delegation amount",
+        "retry": true
+      }
+    },
+    "migratingState": {
+      "errorCode": "INVALID_STATE",
+      "description": "Reactor is in migrating state, cannot defuse",
+      "recovery": {
+        "action": "Wait for migration to complete",
+        "retry": true,
+        "retryDelay": "check migration status"
+      }
+    },
+    "transactionFailed": {
+      "errorCode": "GENERAL_ERROR",
+      "description": "Transaction failed to broadcast or execute",
+      "recovery": {
+        "action": "Check transaction response for error details",
+        "retry": true,
+        "retryDelay": "5 seconds"
+      }
+    }
+  },
+  "permissionChecking": {
+    "requiredPermissions": {
+      "playerOwnership": {
+        "description": "Player must own the reactor",
+        "check": "reactor.owner === playerId"
+      },
+      "reactorAccess": {
+        "description": "Player must have access to reactor",
+        "check": "GET /structs/permission/object/{reactorId}",
+        "expectedPermission": "player has permission on reactor"
+      }
+    }
+  },
+  "examples": {
+    "fullDefuse": {
+      "scenario": "Fully undelegate all staked amount",
+      "delegationAmount": "10000000000",
+      "defuseAmount": "10000000000",
+      "expectedResult": {
+        "delegationStatus": "undelegating",
+        "remainingDelegation": "0"
+      }
+    },
+    "partialDefuse": {
+      "scenario": "Partially undelegate staked amount",
+      "delegationAmount": "10000000000",
+      "defuseAmount": "5000000000",
+      "expectedResult": {
+        "delegationStatus": "active",
+        "remainingDelegation": "5000000000"
+      }
+    },
+    "cancelDefusion": {
+      "scenario": "Cancel undelegation before period completes",
+      "note": "Use MsgReactorCancelDefusion to cancel undelegation",
+      "workflow": "examples/workflows/reactor-staking-cancel-defusion.json"
+    }
+  }
+}
+

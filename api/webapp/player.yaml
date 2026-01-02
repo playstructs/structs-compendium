@@ -1,9 +1,18 @@
 # Webapp Player API Endpoints
 
-**Version**: 1.0.0  
+**Version**: 1.1.0  
 **Category**: webapp  
 **Entity**: Player  
-**Base URL**: ${webappBaseUrl} (default: http://localhost:8080)
+**Base URL**: ${webappBaseUrl} (default: http://localhost:8080)  
+**Last Updated**: January 1, 2026
+
+---
+
+## v0.8.0-beta Notes
+
+**Reactor Staking**: Player endpoints may include reactor staking summary information in v0.8.0-beta. Reactor staking is managed at the player level.
+
+**See**: `reviews/webapp-v0.8.0-beta-review.md` for review status
 
 ---
 
@@ -146,5 +155,29 @@ endpoints:
 
 ---
 
-*Last Updated: January 2025*
+## Response Schema (v0.8.0-beta Considerations)
+
+Player responses may include reactor staking summary:
+
+```json
+{
+  "player": {
+    "id": "1-11",
+    "username": "PlayerName",
+    ...
+  },
+  "reactorStaking": {
+    "totalStaked": "...",
+    "delegationStatus": "active",
+    "reactors": [...]
+  },
+  ...
+}
+```
+
+**Note**: Response schema updates are under review. See `reviews/webapp-v0.8.0-beta-review.md` for verification status.
+
+---
+
+*Last Updated: January 1, 2026*
 

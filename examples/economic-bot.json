@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "Economic Bot Example",
   "description": "Example AI bot implementation for economic operations in Structs",
   "category": "economic",
@@ -247,6 +247,144 @@
           "note": "2x efficiency but higher risk"
         }
       ]
+    },
+    "reactorStakingFlow": {
+      "scenario": "Reactor staking and validation delegation (v0.8.0-beta)",
+      "description": "Example workflow for reactor staking and validation delegation",
+      "detailedWorkflows": {
+        "infuse": "examples/workflows/reactor-staking-infuse.json",
+        "defuse": "examples/workflows/reactor-staking-defuse.json",
+        "beginMigration": "examples/workflows/reactor-staking-begin-migration.json",
+        "cancelDefusion": "examples/workflows/reactor-staking-cancel-defusion.json"
+      },
+      "steps": [
+        {
+          "step": 1,
+          "action": "Delegate Validation Stake",
+          "type": "MsgReactorInfuse",
+          "purpose": "validation_delegation",
+          "description": "Use Reactor Infuse to delegate validation stake to a validator",
+          "request": {
+            "body": {
+              "body": {
+                "messages": [
+                  {
+                    "@type": "/structs.structs.MsgReactorInfuse",
+                    "creator": "structs1...",
+                    "reactorId": "3-1",
+                    "destinationType": 1,
+                    "destinationId": "1-11",
+                    "alphaMatterAmount": "1000000000",
+                    "note": "When used for staking, this delegates validation stake"
+                  }
+                ]
+              }
+            }
+          },
+          "expectedResult": {
+            "delegationStatus": "active",
+            "validator": "validator_address",
+            "delegationAmount": "1000000000"
+          },
+          "errorHandling": {
+            "playerHalted": "Wait for player to come online",
+            "insufficientAlphaMatter": "Mine and refine more Alpha Matter",
+            "invalidDelegationStatus": "Wait for migration to complete or cancel defusion"
+          },
+          "permissionCheck": {
+            "query": "GET /structs/permission/object/{reactorId}",
+            "required": "player has permission on reactor"
+          }
+        },
+        {
+          "step": 2,
+          "action": "Begin Redelegation",
+          "type": "MsgReactorBeginMigration",
+          "purpose": "validation_redelegation",
+          "description": "Begin redelegation process to move stake to a different validator",
+          "request": {
+            "body": {
+              "body": {
+                "messages": [
+                  {
+                    "@type": "/structs.structs.MsgReactorBeginMigration",
+                    "creator": "structs1...",
+                    "reactorId": "3-1"
+                  }
+                ]
+              }
+            }
+          },
+          "expectedResult": {
+            "delegationStatus": "migrating",
+            "migrationInProgress": true
+          },
+          "errorHandling": {
+            "noActiveDelegation": "Cannot migrate without active delegation",
+            "alreadyMigrating": "Wait for current migration to complete"
+          }
+        },
+        {
+          "step": 3,
+          "action": "Undelegate Validation Stake",
+          "type": "MsgReactorDefuse",
+          "purpose": "validation_undelegation",
+          "description": "Use Reactor Defuse to undelegate validation stake",
+          "request": {
+            "body": {
+              "body": {
+                "messages": [
+                  {
+                    "@type": "/structs.structs.MsgReactorDefuse",
+                    "creator": "structs1...",
+                    "reactorId": "3-1",
+                    "destinationType": 1,
+                    "destinationId": "1-11",
+                    "alphaMatterAmount": "1000000000",
+                    "note": "When used for unstaking, this undelegates validation stake"
+                  }
+                ]
+              }
+            }
+          },
+          "expectedResult": {
+            "delegationStatus": "undelegating",
+            "undelegationPeriod": "blocks_remaining"
+          },
+          "errorHandling": {
+            "noActiveDelegation": "Cannot undelegate without active delegation",
+            "insufficientDelegationAmount": "Reduce defuse amount to match delegation amount"
+          }
+        },
+        {
+          "step": 4,
+          "action": "Cancel Undelegation (Optional)",
+          "type": "MsgReactorCancelDefusion",
+          "purpose": "cancel_undelegation",
+          "description": "Cancel an ongoing undelegation process",
+          "request": {
+            "body": {
+              "body": {
+                "messages": [
+                  {
+                    "@type": "/structs.structs.MsgReactorCancelDefusion",
+                    "creator": "structs1...",
+                    "reactorId": "3-1"
+                  }
+                ]
+              }
+            }
+          },
+          "expectedResult": {
+            "delegationStatus": "active",
+            "undelegationCancelled": true
+          },
+          "errorHandling": {
+            "notUndelegating": "Can only cancel if status is 'undelegating'"
+          }
+        }
+      ],
+      "note": "Reactor staking is managed at the player level. Validation delegation is abstracted via Reactor Infuse/Defuse actions. See detailed workflows for comprehensive error handling and permission checking."
     }
   },
   "errorHandling": {

@@ -1,8 +1,9 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "title": "StructType Entity Schema",
   "description": "StructType entity definition - extracted from game-state.json for context window optimization. See schemas/formats.json for format specifications.",
+  "lastUpdated": "2026-01-01",
   "type": "object",
   "structs:entity": "StructType",
   "structs:endpoint": "/structs/struct_type/{id}",
@@ -184,7 +185,19 @@
     "verificationMethod": "code-analysis",
     "confidence": "high",
     "codeReference": "proto/structs/structs/struct.proto:26, x/structs/types/struct.pb.go",
-    "databaseReference": "structs.struct_type table"
+    "databaseReference": "structs.struct_type table",
+    "v0.8.0-beta": {
+      "databaseChanges": {
+        "added": [
+          "cheatsheet_details (2025-11-29)",
+          "cheatsheet_extended_details (2025-12-02)"
+        ],
+        "removed": [
+          "deprecated charge columns for mine and refine (2025-12-08)"
+        ],
+        "note": "Cheatsheet details added for better struct type documentation. Deprecated charge columns removed from database."
+      }
+    }
   }
 }
 

@@ -1,8 +1,32 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "title": "Structs Error Codes",
   "description": "Complete catalog of error codes for AI agents",
+  "structs:v0.8.0-beta": {
+    "resolvedBugs": [
+      {
+        "bug": "GetInfusionByID array split bug",
+        "status": "resolved",
+        "description": "Bug in GetInfusionByID array split logic has been resolved"
+      },
+      {
+        "bug": "EventGuildBankAddress format bug",
+        "status": "resolved",
+        "description": "Bug in EventGuildBankAddress format has been resolved"
+      },
+      {
+        "bug": "BankAddress format logging bug",
+        "status": "resolved",
+        "description": "Bug in BankAddress format logging has been resolved"
+      },
+      {
+        "bug": "Fleet movement logic",
+        "status": "resolved",
+        "description": "Fleet movement bug fixes and improvements applied"
+      }
+    ]
+  },
   "type": "object",
   "structs:category": "errors",
   "errorCodes": {

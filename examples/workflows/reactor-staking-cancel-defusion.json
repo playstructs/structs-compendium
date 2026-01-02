@@ -1,0 +1,186 @@
+{
+  "version": "1.0.0",
+  "name": "Reactor Staking - Cancel Defusion Workflow",
+  "description": "Detailed workflow for canceling an ongoing undelegation process (v0.8.0-beta)",
+  "category": "economic",
+  "v0.8.0-beta": {
+    "feature": "reactor_staking",
+    "purpose": "cancel_undelegation"
+  },
+  "workflow": {
+    "name": "Reactor Cancel Defusion to Restore Delegation",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Check Prerequisites",
+        "description": "Verify reactor is in undelegating state",
+        "checks": {
+          "playerOnline": {
+            "description": "Player must be online (not halted)",
+            "query": "GET /structs/player/{playerId}",
+            "expectedField": "player.online",
+            "expectedValue": true
+          },
+          "reactorExists": {
+            "description": "Reactor must exist and be owned by player",
+            "query": "GET /structs/reactor/{reactorId}",
+            "expectedField": "reactor.owner",
+            "expectedValue": "{playerId}"
+          },
+          "delegationStatus": {
+            "description": "Reactor must be in undelegating state",
+            "query": "GET /structs/reactor/{reactorId}",
+            "expectedField": "reactor.delegationStatus",
+            "expectedValue": "undelegating",
+            "note": "Can only cancel if status is 'undelegating'"
+          },
+          "undelegationPeriod": {
+            "description": "Check remaining undelegation period",
+            "query": "GET /structs/reactor/{reactorId}",
+            "expectedField": "reactor.undelegationPeriod",
+            "note": "Can cancel at any point during undelegation period"
+          }
+        }
+      },
+      {
+        "step": 2,
+        "action": "Submit Cancel Defusion Transaction",
+        "description": "Submit MsgReactorCancelDefusion transaction to cancel undelegation",
+        "request": {
+          "method": "POST",
+          "endpoint": "/cosmos/tx/v1beta1/txs",
+          "body": {
+            "body": {
+              "messages": [
+                {
+                  "@type": "/structs.structs.MsgReactorCancelDefusion",
+                  "creator": "structs1...",
+                  "reactorId": "3-1"
+                }
+              ]
+            }
+          }
+        },
+        "expectedResponse": {
+          "txResponse": {
+            "code": 0,
+            "txhash": "transaction_hash"
+          }
+        }
+      },
+      {
+        "step": 3,
+        "action": "Wait for Transaction Confirmation",
+        "description": "Wait for transaction to be included in a block",
+        "polling": {
+          "endpoint": "GET /cosmos/tx/v1beta1/txs/{txhash}",
+          "interval": "2 seconds",
+          "maxAttempts": 30,
+          "expectedStatus": "confirmed"
+        }
+      },
+      {
+        "step": 4,
+        "action": "Verify Delegation Restored",
+        "description": "Query reactor to confirm delegation is active again",
+        "verification": {
+          "query": "GET /structs/reactor/{reactorId}",
+          "expectedFields": {
+            "reactor.delegationStatus": "active",
+            "reactor.delegationAmount": "original_amount",
+            "reactor.undelegationCancelled": true
+          },
+          "note": "Delegation amount should be restored to pre-undelegation value"
+        }
+      },
+      {
+        "step": 5,
+        "action": "Verify No Alpha Matter Returned",
+        "description": "Confirm Alpha Matter was not returned (undelegation cancelled)",
+        "verification": {
+          "query": "GET /structs/player/{playerId}",
+          "expectedFields": {
+            "player.alphaMatter": "unchanged",
+            "note": "Alpha Matter remains staked since undelegation was cancelled"
+          }
+        }
+      }
+    ]
+  },
+  "errorHandling": {
+    "playerHalted": {
+      "errorCode": "PLAYER_HALTED",
+      "description": "Player is offline (halted)",
+      "recovery": {
+        "action": "Wait for player to come online",
+        "retry": true,
+        "retryDelay": "30 seconds"
+      }
+    },
+    "notUndelegating": {
+      "errorCode": "INVALID_STATE",
+      "description": "Reactor is not in undelegating state",
+      "recovery": {
+        "action": "Check reactor delegation status - must be 'undelegating'",
+        "retry": false
+      }
+    },
+    "alreadyActive": {
+      "errorCode": "INVALID_STATE",
+      "description": "Reactor already has active delegation",
+      "recovery": {
+        "action": "No action needed - delegation is already active",
+        "retry": false
+      }
+    },
+    "transactionFailed": {
+      "errorCode": "GENERAL_ERROR",
+      "description": "Transaction failed to broadcast or execute",
+      "recovery": {
+        "action": "Check transaction response for error details",
+        "retry": true,
+        "retryDelay": "5 seconds"
+      }
+    }
+  },
+  "permissionChecking": {
+    "requiredPermissions": {
+      "playerOwnership": {
+        "description": "Player must own the reactor",
+        "check": "reactor.owner === playerId"
+      },
+      "reactorAccess": {
+        "description": "Player must have access to reactor",
+        "check": "GET /structs/permission/object/{reactorId}",
+        "expectedPermission": "player has permission on reactor"
+      }
+    }
+  },
+  "examples": {
+    "cancelEarlyUndelegation": {
+      "scenario": "Cancel undelegation shortly after starting",
+      "undelegationPeriod": "100 blocks remaining",
+      "expectedResult": {
+        "delegationStatus": "active",
+        "undelegationCancelled": true
+      }
+    },
+    "cancelLateUndelegation": {
+      "scenario": "Cancel undelegation near end of period",
+      "undelegationPeriod": "1 block remaining",
+      "expectedResult": {
+        "delegationStatus": "active",
+        "undelegationCancelled": true
+      }
+    },
+    "changeOfMind": {
+      "scenario": "Player changes mind about undelegating",
+      "description": "Cancel undelegation to restore active delegation",
+      "expectedResult": {
+        "delegationStatus": "active",
+        "delegationAmount": "restored_to_original"
+      }
+    }
+  }
+}
+

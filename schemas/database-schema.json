@@ -1,0 +1,230 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.1.0",
+  "title": "Structs Database Schema",
+  "description": "PostgreSQL database schema for Structs guild infrastructure. Managed by structs-pg repository using Sqitch.",
+  "type": "object",
+  "structs:category": "database",
+  "structs:source": "https://github.com/playstructs/structs-pg",
+  "lastUpdated": "2026-01-01",
+  "database": {
+    "name": "structs",
+    "type": "PostgreSQL",
+    "management": "Sqitch",
+    "repository": "https://github.com/playstructs/structs-pg"
+  },
+  "v0.8.0-beta": {
+    "changes": [
+      {
+        "date": "2025-11-22",
+        "change": "function-signer-tx-player",
+        "description": "Latest messages for testnet 103"
+      },
+      {
+        "date": "2025-11-29",
+        "change": "table-struct-type-cheatsheet-details",
+        "description": "Added cheatsheet details to struct_type table",
+        "impact": "New columns for cheatsheet information in struct_type"
+      },
+      {
+        "date": "2025-12-02",
+        "change": "table-struct-type-extended-cheatsheet",
+        "description": "Added extended cheatsheet details to struct_type",
+        "impact": "Additional cheatsheet columns added"
+      },
+      {
+        "date": "2025-12-03",
+        "change": "table-struct-type-update-cheatsheet",
+        "description": "Updated extended cheatsheet details to struct_type",
+        "impact": "Cheatsheet columns refined"
+      },
+      {
+        "date": "2025-12-08",
+        "change": "remove-deprecated-charge-columns",
+        "description": "Removed deprecated Charge Bar columns for mine and refine",
+        "tables": ["struct_type", "view.struct", "view.work"],
+        "triggers": ["cache-trigger-add-queue"],
+        "impact": "Deprecated charge columns removed from struct_type, views, and cache triggers"
+      },
+      {
+        "date": "2025-12-13",
+        "change": "view-work-fixed-raid-logic",
+        "description": "Fixed raid logic in view.work",
+        "impact": "Improved raid task filtering in work view"
+      },
+      {
+        "date": "2025-12-15",
+        "change": "table-signer-tx-complete-input-changes",
+        "description": "Hash Complete nonces were INTEGER instead of CHARACTER VARYING",
+        "impact": "Fixed nonce data type for hash complete transactions"
+      },
+      {
+        "date": "2025-12-18",
+        "change": "view-permission-add-permission-hash",
+        "description": "Added new permission_hash level",
+        "impact": "New permission level added to permission view",
+        "related": "Hash permission bit (value 64) in API layer"
+      },
+      {
+        "date": "2025-12-18",
+        "change": "table-signer-tx-permission-update",
+        "description": "Updated tx signing permission levels",
+        "impact": "Transaction signing now supports Hash permission level"
+      },
+      {
+        "date": "2025-12-18",
+        "change": "table-signer-tx-add-tx-types",
+        "description": "Updated tx types",
+        "impact": "Additional transaction types added"
+      },
+      {
+        "date": "2025-12-18",
+        "change": "cache-trigger-struct-type-fix",
+        "description": "Fix to Struct Type cache commit",
+        "impact": "Cache trigger improvements for struct_type"
+      },
+      {
+        "date": "2025-12-19",
+        "change": "trigger-grass-grid-p-values",
+        "description": "Fixed grass grid p values",
+        "impact": "GRASS grid trigger improvements"
+      },
+      {
+        "date": "2025-12-27",
+        "change": "view-work-exclusion-logic",
+        "description": "Improved view.work logic to exclude impossible tasks",
+        "impact": "Better filtering of impossible tasks in work view"
+      },
+      {
+        "date": "2025-12-29",
+        "change": "table-struct-add-destroyed",
+        "description": "New destroyed column on struct table",
+        "impact": "Struct table now tracks destroyed status",
+        "related": "StructSweepDelay (5 blocks) - destroyed structs persist for 5 blocks"
+      },
+      {
+        "date": "2025-12-29",
+        "change": "function-signer-account-bug-fix",
+        "description": "Resolved bug in the signer",
+        "impact": "Signer function bug fix"
+      },
+      {
+        "date": "2025-12-29",
+        "change": "table-player-address-pending-permissions",
+        "description": "permissions column was missing for device adding",
+        "impact": "Added permissions column to player_address_pending table"
+      }
+    ]
+  },
+  "tables": {
+    "struct_type": {
+      "description": "Struct type definitions with all properties",
+      "v0.8.0-beta": {
+        "added": [
+          "cheatsheet_details",
+          "cheatsheet_extended_details"
+        ],
+        "removed": [
+          "deprecated charge columns for mine and refine"
+        ],
+        "note": "Cheatsheet details added for better struct type documentation. Deprecated charge columns removed."
+      }
+    },
+    "struct": {
+      "description": "Struct instances",
+      "v0.8.0-beta": {
+        "added": [
+          "destroyed"
+        ],
+        "note": "destroyed column tracks struct destruction status. Related to StructSweepDelay (5 blocks)."
+      }
+    },
+    "signer_tx": {
+      "description": "Transaction signing information",
+      "v0.8.0-beta": {
+        "changes": [
+          "Hash Complete nonces changed from INTEGER to CHARACTER VARYING",
+          "Updated permission levels to support Hash permission",
+          "Added new transaction types"
+        ]
+      }
+    },
+    "player_address_pending": {
+      "description": "Pending player address additions",
+      "v0.8.0-beta": {
+        "added": [
+          "permissions"
+        ],
+        "note": "permissions column added for device adding functionality"
+      }
+    }
+  },
+  "views": {
+    "permission": {
+      "description": "Permission view",
+      "v0.8.0-beta": {
+        "added": [
+          "permission_hash level"
+        ],
+        "note": "New permission_hash level added. Maps to Hash permission bit (value 64) in API layer."
+      }
+    },
+    "work": {
+      "description": "Work/task view",
+      "v0.8.0-beta": {
+        "improvements": [
+          "Fixed raid logic",
+          "Improved exclusion logic to exclude impossible tasks"
+        ],
+        "removed": [
+          "Deprecated charge columns"
+        ]
+      }
+    },
+    "struct": {
+      "description": "Struct view",
+      "v0.8.0-beta": {
+        "removed": [
+          "Deprecated charge columns"
+        ]
+      }
+    }
+  },
+  "functions": {
+    "signer_tx_player": {
+      "description": "Transaction signing for player",
+      "v0.8.0-beta": {
+        "updated": "2025-11-22 - Latest messages for testnet 103"
+      }
+    },
+    "signer_account": {
+      "description": "Account signing function",
+      "v0.8.0-beta": {
+        "bug_fix": "2025-12-29 - Resolved bug in the signer"
+      }
+    }
+  },
+  "triggers": {
+    "cache_trigger_add_queue": {
+      "description": "Cache trigger for queue management",
+      "v0.8.0-beta": {
+        "changes": [
+          "Removed deprecated charge columns",
+          "Fixed struct type cache commit"
+        ]
+      }
+    },
+    "grass_grid": {
+      "description": "GRASS grid trigger",
+      "v0.8.0-beta": {
+        "fix": "2025-12-19 - Fixed grass grid p values"
+      }
+    }
+  },
+  "structs:verification": {
+    "verified": false,
+    "note": "Database schema changes tracked from structs-pg repository Sqitch deployment plan",
+    "source": "https://github.com/playstructs/structs-pg"
+  }
+}
+

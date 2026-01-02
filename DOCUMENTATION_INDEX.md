@@ -1,7 +1,7 @@
 # Documentation Index
 
-**Version**: 1.0.0  
-**Last Updated**: December 7, 2025  
+**Version**: 1.1.0  
+**Last Updated**: January 1, 2026  
 **Purpose**: Complete index of all AI-first documentation for easy discovery
 
 ---
@@ -188,6 +188,7 @@ This index provides a comprehensive catalog of all AI-first documentation, organ
 - **`requests.json`** - API request schemas
 - **`errors.json`** - Error code definitions
 - **`formats.json`** - Format specifications
+- **`database-schema.json`** - PostgreSQL database schema documentation (v0.8.0-beta)
 
 ### Minimal Schemas
 
@@ -517,5 +518,5 @@ Individual query endpoint files:
 
 ---
 
-*Documentation Index Version: 1.0.0 - December 7, 2025*
+*Documentation Index Version: 1.1.0 - January 1, 2026*
 

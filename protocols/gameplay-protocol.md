@@ -1,8 +1,9 @@
 # Gameplay Protocol
 
-**Version**: 1.0.0  
+**Version**: 1.1.0  
 **Category**: Gameplay  
-**Status**: Stable
+**Status**: Stable  
+**Last Updated**: January 1, 2026
 
 ## Overview
 
@@ -248,6 +249,7 @@ This protocol defines how AI agents interact with Structs gameplay mechanics. It
 {
   "status": "resolved",
   "outcome": {
+    "status": "victory",
     "victory": true,
     "alphaMatterGained": 5,
     "unitsDestroyed": ["enemy-struct-id"],
@@ -263,6 +265,23 @@ This protocol defines how AI agents interact with Structs gameplay mechanics. It
   }
 }
 ```
+
+**Raid Outcome Statuses**:
+- `"victory"`: Attacker successfully completed the raid and gained resources
+- `"defeat"`: Attacker lost the raid (defender successfully defended)
+- `"attackerRetreated"`: Attacker retreated from the raid before completion (new in v0.8.0-beta)
+
+**AttackerRetreated Status**:
+The `attackerRetreated` status indicates that the attacker chose to retreat from a raid before it was completed. This can occur when:
+- Attacker decides to withdraw during the raid
+- Attacker's forces are insufficient to continue
+- Strategic decision to preserve forces
+
+When `attackerRetreated` status is returned:
+- No resources are gained by the attacker
+- No resources are lost by the defender
+- Attacker's fleet remains intact
+- Raid is considered incomplete
 
 **Combat Mechanics**:
 - **Evasion**: Based on weapon type (guided vs unguided)

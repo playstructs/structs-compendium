@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "title": "Structs Gameplay Schema",
   "description": "Gameplay mechanics, systems, and patterns for AI agents",
   "type": "object",
@@ -128,9 +128,14 @@
           "type": "object",
           "description": "Combat outcome",
           "properties": {
+            "status": {
+              "type": "string",
+              "enum": ["victory", "defeat", "attackerRetreated"],
+              "description": "Combat outcome status. 'victory' = attacker won, 'defeat' = attacker lost, 'attackerRetreated' = attacker retreated from raid"
+            },
             "victory": {
               "type": "boolean",
-              "description": "Whether attacker won"
+              "description": "Whether attacker won (deprecated: use status field instead)"
             },
             "alphaMatterGained": {
               "type": "number",
@@ -437,6 +442,17 @@
     }
   },
   "gameplay": {
+    "constants": {
+      "StructSweepDelay": {
+        "value": 5,
+        "unit": "blocks",
+        "description": "Block-based delay before struct slots are cleared after destruction (v0.8.0-beta)",
+        "v0.8.0-beta": {
+          "change": "Struct sweeping now has a block-based delay. Planet/fleet back references for slots are not cleared until the delay is met.",
+          "implications": "Slots may appear occupied for 5 blocks after struct destruction"
+        }
+      }
+    },
     "resourceTypes": {
       "alphaMatter": {
         "id": "alphaMatter",

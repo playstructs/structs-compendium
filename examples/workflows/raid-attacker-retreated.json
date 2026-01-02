@@ -1,0 +1,319 @@
+{
+  "version": "1.0.0",
+  "name": "Raid Attacker Retreated Workflow",
+  "description": "Detailed workflow for handling attackerRetreated raid outcome (v0.8.0-beta)",
+  "category": "gameplay",
+  "v0.8.0-beta": {
+    "feature": "attackerRetreated",
+    "status": "New raid outcome status"
+  },
+  "workflow": {
+    "name": "Handle Attacker Retreated Status",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Initiate Raid",
+        "description": "Start raid on target planet",
+        "request": {
+          "action": "raid",
+          "type": "raid",
+          "target": "2-1",
+          "fleetId": "9-1",
+          "verify": {
+            "playerOnline": true,
+            "fleetAway": true,
+            "commandShipOnline": true,
+            "proofOfWork": true
+          }
+        }
+      },
+      {
+        "step": 2,
+        "action": "Wait for Raid Completion",
+        "description": "Wait for raid to complete (may result in retreat)",
+        "polling": {
+          "endpoint": "GET /structs/planet/{planetId}",
+          "interval": "2 seconds",
+          "maxAttempts": 60,
+          "checkField": "planet.raidStatus"
+        }
+      },
+      {
+        "step": 3,
+        "action": "Check Raid Outcome",
+        "description": "Query raid outcome status",
+        "query": {
+          "endpoint": "GET /structs/planet/{planetId}",
+          "expectedFields": {
+            "planet.raidStatus": "complete",
+            "planet.raidOutcome": {
+              "status": "attackerRetreated"
+            }
+          }
+        }
+      },
+      {
+        "step": 4,
+        "action": "Handle Attacker Retreated Status",
+        "description": "Process attackerRetreated outcome",
+        "handling": {
+          "resourcesGained": false,
+          "resourcesLost": false,
+          "fleetIntact": true,
+          "actions": [
+            "No resources transferred",
+            "Fleet remains intact",
+            "No damage to attacker or defender",
+            "Raid considered incomplete"
+          ]
+        }
+      },
+      {
+        "step": 5,
+        "action": "Verify Fleet Status",
+        "description": "Confirm fleet is intact and ready",
+        "verification": {
+          "query": "GET /structs/fleet/{fleetId}",
+          "expectedFields": {
+            "fleet.status": "away",
+            "fleet.ships": "intact",
+            "fleet.commandShip": "online"
+          }
+        }
+      },
+      {
+        "step": 6,
+        "action": "Verify Resource Status",
+        "description": "Confirm no resources were transferred",
+        "verification": {
+          "attackerResources": {
+            "query": "GET /structs/player/{attackerId}",
+            "expectedFields": {
+              "player.alphaMatter": "unchanged",
+              "player.ore": "unchanged"
+            }
+          },
+          "defenderResources": {
+            "query": "GET /structs/player/{defenderId}",
+            "expectedFields": {
+              "player.alphaMatter": "unchanged",
+              "player.ore": "unchanged"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "raidOutcomeScenarios": {
+    "attackerRetreated": {
+      "status": "attackerRetreated",
+      "description": "Attacker retreated from raid before completion",
+      "outcome": {
+        "resourcesGained": false,
+        "resourcesLost": false,
+        "fleetIntact": true,
+        "raidComplete": false
+      },
+      "response": {
+        "status": "raidComplete",
+        "outcome": {
+          "status": "attackerRetreated",
+          "victory": false,
+          "alphaMatterGained": 0,
+          "oreStolen": 0,
+          "unitsDestroyed": [],
+          "resourcesLost": {
+            "ore": 0
+          }
+        }
+      }
+    },
+    "victory": {
+      "status": "victory",
+      "description": "Attacker successfully completed raid",
+      "outcome": {
+        "resourcesGained": true,
+        "resourcesLost": false,
+        "fleetIntact": true,
+        "raidComplete": true
+      },
+      "response": {
+        "status": "raidComplete",
+        "outcome": {
+          "status": "victory",
+          "victory": true,
+          "alphaMatterGained": 5,
+          "oreStolen": 10,
+          "unitsDestroyed": ["enemy-struct-id"]
+        }
+      }
+    },
+    "defeat": {
+      "status": "defeat",
+      "description": "Attacker lost the raid",
+      "outcome": {
+        "resourcesGained": false,
+        "resourcesLost": false,
+        "fleetIntact": false,
+        "raidComplete": true
+      },
+      "response": {
+        "status": "raidComplete",
+        "outcome": {
+          "status": "defeat",
+          "victory": false,
+          "alphaMatterGained": 0,
+          "oreStolen": 0,
+          "unitsDestroyed": ["attacker-struct-id"]
+        }
+      }
+    }
+  },
+  "retreatHandlingPatterns": {
+    "pattern1": {
+      "name": "Strategic Retreat",
+      "description": "Retreat when forces are insufficient",
+      "condition": "fleetHealth < threshold",
+      "action": "Retreat to preserve fleet",
+      "result": "attackerRetreated status"
+    },
+    "pattern2": {
+      "name": "Tactical Withdrawal",
+      "description": "Retreat to avoid losses",
+      "condition": "defenderStrength > attackerStrength",
+      "action": "Withdraw before taking losses",
+      "result": "attackerRetreated status"
+    },
+    "pattern3": {
+      "name": "Change of Plans",
+      "description": "Retreat due to changed circumstances",
+      "condition": "external factors changed",
+      "action": "Abort raid mission",
+      "result": "attackerRetreated status"
+    }
+  },
+  "resourceManagement": {
+    "onRetreat": {
+      "description": "Resource management when attacker retreats",
+      "attacker": {
+        "alphaMatter": "unchanged",
+        "ore": "unchanged",
+        "fleet": "intact",
+        "losses": "none"
+      },
+      "defender": {
+        "alphaMatter": "unchanged",
+        "ore": "unchanged",
+        "defenses": "intact",
+        "losses": "none"
+      },
+      "note": "No resources are transferred when attacker retreats"
+    },
+    "comparison": {
+      "victory": {
+        "attacker": {
+          "alphaMatterGained": "positive",
+          "oreStolen": "positive"
+        },
+        "defender": {
+          "oreLost": "positive",
+          "defensesDamaged": "possible"
+        }
+      },
+      "defeat": {
+        "attacker": {
+          "alphaMatterGained": 0,
+          "fleetDamaged": "possible"
+        },
+        "defender": {
+          "resourcesLost": 0,
+          "defensesIntact": true
+        }
+      },
+      "attackerRetreated": {
+        "attacker": {
+          "alphaMatterGained": 0,
+          "fleetIntact": true
+        },
+        "defender": {
+          "resourcesLost": 0,
+          "defensesIntact": true
+        }
+      }
+    }
+  },
+  "statusChecking": {
+    "checkRaidStatus": {
+      "description": "Check current raid status",
+      "query": {
+        "endpoint": "GET /structs/planet/{planetId}",
+        "fields": [
+          "planet.raidStatus",
+          "planet.raidOutcome.status",
+          "planet.raidOutcome.victory"
+        ]
+      }
+    },
+    "checkAttackerRetreated": {
+      "description": "Check if raid resulted in attackerRetreated",
+      "code": {
+        "javascript": "const isAttackerRetreated = (raidOutcome) => raidOutcome.status === 'attackerRetreated';",
+        "python": "def is_attacker_retreated(raid_outcome):\n    return raid_outcome.status == 'attackerRetreated'",
+        "go": "func isAttackerRetreated(raidOutcome RaidOutcome) bool {\n    return raidOutcome.Status == \"attackerRetreated\"\n}"
+      }
+    },
+    "handleAllOutcomes": {
+      "description": "Handle all possible raid outcomes",
+      "code": {
+        "javascript": "switch (raidOutcome.status) {\n  case 'victory':\n    handleVictory(raidOutcome);\n    break;\n  case 'defeat':\n    handleDefeat(raidOutcome);\n    break;\n  case 'attackerRetreated':\n    handleRetreat(raidOutcome);\n    break;\n}",
+        "python": "if raid_outcome.status == 'victory':\n    handle_victory(raid_outcome)\nelif raid_outcome.status == 'defeat':\n    handle_defeat(raid_outcome)\nelif raid_outcome.status == 'attackerRetreated':\n    handle_retreat(raid_outcome)"
+      }
+    }
+  },
+  "streamingEvents": {
+    "planetRaidStatusEvent": {
+      "description": "Streaming event for raid status changes",
+      "eventType": "PlanetRaidStatusEvent",
+      "schema": {
+        "category": "raid_status",
+        "data": {
+          "status": {
+            "type": "string",
+            "enum": ["victory", "defeat", "attackerRetreated"]
+          },
+          "attackerId": "string",
+          "planetId": "string"
+        }
+      },
+      "example": {
+        "category": "raid_status",
+        "data": {
+          "status": "attackerRetreated",
+          "attackerId": "1-11",
+          "planetId": "2-1"
+        }
+      }
+    }
+  },
+  "examples": {
+    "retreatScenario1": {
+      "scenario": "Attacker retreats due to strong defenses",
+      "workflow": "Attacker initiates raid, sees strong defenses, retreats",
+      "outcome": "attackerRetreated",
+      "resources": "No resources transferred"
+    },
+    "retreatScenario2": {
+      "scenario": "Attacker retreats to preserve fleet",
+      "workflow": "Attacker's fleet takes damage, decides to retreat",
+      "outcome": "attackerRetreated",
+      "resources": "Fleet intact, no resources lost"
+    },
+    "retreatScenario3": {
+      "scenario": "Attacker retreats after change of plans",
+      "workflow": "Attacker aborts raid mission",
+      "outcome": "attackerRetreated",
+      "resources": "No resources transferred"
+    }
+  }
+}
+

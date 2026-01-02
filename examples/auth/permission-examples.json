@@ -1,0 +1,377 @@
+{
+  "version": "1.0.0",
+  "name": "Hash Permission Examples",
+  "description": "Examples for Hash permission bit manipulation, checking patterns, combination, and validation (v0.8.0-beta)",
+  "category": "authentication",
+  "v0.8.0-beta": {
+    "feature": "hash_permission",
+    "permissionBit": 64
+  },
+  "permissionBits": {
+    "hashPermission": {
+      "value": 64,
+      "description": "Hash permission bit (v0.8.0-beta)",
+      "purpose": "Allows transaction signing with Hash permission level"
+    },
+    "commonValues": {
+      "allPermissions": {
+        "value": 127,
+        "description": "All permissions including Hash (1+2+4+8+16+32+64)",
+        "binary": "1111111"
+      },
+      "hashOnly": {
+        "value": 64,
+        "description": "Hash permission only",
+        "binary": "1000000"
+      },
+      "standardPermissions": {
+        "value": 63,
+        "description": "Standard permissions without Hash (1+2+4+8+16+32)",
+        "binary": "111111"
+      }
+    }
+  },
+  "bitManipulation": {
+    "checkHashPermission": {
+      "description": "Check if permission value includes Hash permission bit",
+      "code": {
+        "javascript": "const hasHashPermission = (permissionValue) => (parseInt(permissionValue) & 64) !== 0;",
+        "python": "def has_hash_permission(permission_value):\n    return (int(permission_value) & 64) != 0",
+        "go": "func hasHashPermission(permissionValue int) bool {\n    return (permissionValue & 64) != 0\n}"
+      },
+      "examples": {
+        "hasHash": {
+          "permissionValue": "127",
+          "result": true,
+          "explanation": "127 includes bit 64 (Hash permission)"
+        },
+        "hasHashOnly": {
+          "permissionValue": "64",
+          "result": true,
+          "explanation": "64 is exactly Hash permission bit"
+        },
+        "noHash": {
+          "permissionValue": "63",
+          "result": false,
+          "explanation": "63 does not include bit 64"
+        }
+      }
+    },
+    "addHashPermission": {
+      "description": "Add Hash permission bit to existing permission value",
+      "code": {
+        "javascript": "const addHashPermission = (permissionValue) => parseInt(permissionValue) | 64;",
+        "python": "def add_hash_permission(permission_value):\n    return int(permission_value) | 64",
+        "go": "func addHashPermission(permissionValue int) int {\n    return permissionValue | 64\n}"
+      },
+      "examples": {
+        "addToStandard": {
+          "before": "63",
+          "after": "127",
+          "explanation": "63 | 64 = 127 (adds Hash to standard permissions)"
+        },
+        "addToNone": {
+          "before": "0",
+          "after": "64",
+          "explanation": "0 | 64 = 64 (adds Hash to no permissions)"
+        },
+        "alreadyHasHash": {
+          "before": "127",
+          "after": "127",
+          "explanation": "127 already includes Hash, no change"
+        }
+      }
+    },
+    "removeHashPermission": {
+      "description": "Remove Hash permission bit from existing permission value",
+      "code": {
+        "javascript": "const removeHashPermission = (permissionValue) => parseInt(permissionValue) & ~64;",
+        "python": "def remove_hash_permission(permission_value):\n    return int(permission_value) & ~64",
+        "go": "func removeHashPermission(permissionValue int) int {\n    return permissionValue & ^64\n}"
+      },
+      "examples": {
+        "removeFromAll": {
+          "before": "127",
+          "after": "63",
+          "explanation": "127 & ~64 = 63 (removes Hash from all permissions)"
+        },
+        "removeFromHashOnly": {
+          "before": "64",
+          "after": "0",
+          "explanation": "64 & ~64 = 0 (removes Hash, leaves no permissions)"
+        },
+        "noHashToRemove": {
+          "before": "63",
+          "after": "63",
+          "explanation": "63 doesn't have Hash, no change"
+        }
+      }
+    },
+    "toggleHashPermission": {
+      "description": "Toggle Hash permission bit (add if missing, remove if present)",
+      "code": {
+        "javascript": "const toggleHashPermission = (permissionValue) => parseInt(permissionValue) ^ 64;",
+        "python": "def toggle_hash_permission(permission_value):\n    return int(permission_value) ^ 64",
+        "go": "func toggleHashPermission(permissionValue int) int {\n    return permissionValue ^ 64\n}"
+      },
+      "examples": {
+        "toggleOn": {
+          "before": "63",
+          "after": "127",
+          "explanation": "63 ^ 64 = 127 (adds Hash)"
+        },
+        "toggleOff": {
+          "before": "127",
+          "after": "63",
+          "explanation": "127 ^ 64 = 63 (removes Hash)"
+        }
+      }
+    }
+  },
+  "permissionChecking": {
+    "checkPermissionOnObject": {
+      "description": "Check if player has Hash permission on an object",
+      "workflow": {
+        "step1": {
+          "action": "Query permissions for object",
+          "endpoint": "GET /structs/permission/object/{objectId}",
+          "example": {
+            "objectId": "0-1",
+            "response": [
+              {
+                "permissionId": "0-1@1-11",
+                "value": "127",
+                "objectId": "0-1",
+                "playerId": "1-11"
+              }
+            ]
+          }
+        },
+        "step2": {
+          "action": "Filter permissions for player",
+          "filter": "permission.playerId === {playerId}",
+          "example": {
+            "playerId": "1-11",
+            "matchingPermission": {
+              "permissionId": "0-1@1-11",
+              "value": "127"
+            }
+          }
+        },
+        "step3": {
+          "action": "Check Hash permission bit",
+          "check": "(parseInt(permission.value) & 64) !== 0",
+          "example": {
+            "permissionValue": "127",
+            "hasHashPermission": true
+          }
+        }
+      }
+    },
+    "checkPermissionForPlayer": {
+      "description": "Check all permissions for a player",
+      "workflow": {
+        "step1": {
+          "action": "Query permissions for player",
+          "endpoint": "GET /structs/permission/player/{playerId}",
+          "example": {
+            "playerId": "1-11",
+            "response": [
+              {
+                "permissionId": "0-1@1-11",
+                "value": "127",
+                "objectId": "0-1",
+                "playerId": "1-11"
+              },
+              {
+                "permissionId": "2-1@1-11",
+                "value": "64",
+                "objectId": "2-1",
+                "playerId": "1-11"
+              }
+            ]
+          }
+        },
+        "step2": {
+          "action": "Filter permissions with Hash bit",
+          "filter": "permissions.filter(p => (parseInt(p.value) & 64) !== 0)",
+          "example": {
+            "filteredPermissions": [
+              {
+                "permissionId": "0-1@1-11",
+                "value": "127",
+                "hasHashPermission": true
+              },
+              {
+                "permissionId": "2-1@1-11",
+                "value": "64",
+                "hasHashPermission": true
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "permissionCombination": {
+    "combinePermissions": {
+      "description": "Combine multiple permission bits using bitwise OR",
+      "code": {
+        "javascript": "const combinePermissions = (...bits) => bits.reduce((acc, bit) => acc | bit, 0);",
+        "python": "def combine_permissions(*bits):\n    return reduce(lambda acc, bit: acc | bit, bits, 0)",
+        "go": "func combinePermissions(bits ...int) int {\n    result := 0\n    for _, bit := range bits {\n        result |= bit\n    }\n    return result\n}"
+      },
+      "examples": {
+        "standardPlusHash": {
+          "standardPermissions": 63,
+          "hashPermission": 64,
+          "combined": 127,
+          "explanation": "63 | 64 = 127 (standard permissions + Hash)"
+        },
+        "multipleBits": {
+          "bits": [1, 2, 4, 64],
+          "combined": 71,
+          "explanation": "1 | 2 | 4 | 64 = 71"
+        }
+      }
+    },
+    "checkMultiplePermissions": {
+      "description": "Check if permission value includes multiple permission bits",
+      "code": {
+        "javascript": "const hasAllPermissions = (permissionValue, ...requiredBits) => {\n  const value = parseInt(permissionValue);\n  return requiredBits.every(bit => (value & bit) !== 0);\n};",
+        "python": "def has_all_permissions(permission_value, *required_bits):\n    value = int(permission_value)\n    return all((value & bit) != 0 for bit in required_bits)",
+        "go": "func hasAllPermissions(permissionValue int, requiredBits ...int) bool {\n    for _, bit := range requiredBits {\n        if (permissionValue & bit) == 0 {\n            return false\n        }\n    }\n    return true\n}"
+      },
+      "examples": {
+        "hasStandardAndHash": {
+          "permissionValue": "127",
+          "requiredBits": [63, 64],
+          "result": true,
+          "explanation": "127 includes both standard (63) and Hash (64)"
+        },
+        "missingHash": {
+          "permissionValue": "63",
+          "requiredBits": [63, 64],
+          "result": false,
+          "explanation": "63 has standard but missing Hash (64)"
+        }
+      }
+    }
+  },
+  "permissionValidation": {
+    "validatePermissionValue": {
+      "description": "Validate that permission value is within valid range",
+      "code": {
+        "javascript": "const isValidPermissionValue = (value) => {\n  const num = parseInt(value);\n  return num >= 0 && num <= 127 && Number.isInteger(num);\n};",
+        "python": "def is_valid_permission_value(value):\n    try:\n        num = int(value)\n        return 0 <= num <= 127\n    except ValueError:\n        return False",
+        "go": "func isValidPermissionValue(value string) bool {\n    num, err := strconv.Atoi(value)\n    if err != nil {\n        return false\n    }\n    return num >= 0 && num <= 127\n}"
+      },
+      "examples": {
+        "validValue": {
+          "value": "127",
+          "isValid": true
+        },
+        "validHashOnly": {
+          "value": "64",
+          "isValid": true
+        },
+        "invalidTooHigh": {
+          "value": "128",
+          "isValid": false,
+          "reason": "Exceeds maximum permission value (127)"
+        },
+        "invalidNegative": {
+          "value": "-1",
+          "isValid": false,
+          "reason": "Negative values not allowed"
+        },
+        "invalidNonNumeric": {
+          "value": "abc",
+          "isValid": false,
+          "reason": "Not a valid number"
+        }
+      }
+    },
+    "validateHashPermissionFormat": {
+      "description": "Validate Hash permission is properly formatted in database",
+      "databaseCheck": {
+        "query": "SELECT permission_hash FROM permission WHERE object_id = ? AND player_id = ?",
+        "expectedValues": {
+          "hasHashPermission": "permission_hash = true OR permission_hash = 1",
+          "noHashPermission": "permission_hash = false OR permission_hash = 0"
+        }
+      },
+      "apiMapping": {
+        "description": "Database permission_hash maps to API permission value bit 64",
+        "databaseToApi": {
+          "permission_hash = true": "permission.value & 64 !== 0",
+          "permission_hash = false": "permission.value & 64 === 0"
+        }
+      }
+    }
+  },
+  "examples": {
+    "grantHashPermission": {
+      "scenario": "Grant Hash permission to a player on an object",
+      "workflow": {
+        "step1": {
+          "action": "Check current permission",
+          "query": "GET /structs/permission/object/{objectId}",
+          "filter": "permission.playerId === {playerId}"
+        },
+        "step2": {
+          "action": "Calculate new permission value",
+          "calculation": "newValue = currentValue | 64",
+          "example": {
+            "currentValue": "63",
+            "newValue": "127"
+          }
+        },
+        "step3": {
+          "action": "Update permission (via transaction)",
+          "note": "Permission updates require appropriate transaction"
+        }
+      }
+    },
+    "revokeHashPermission": {
+      "scenario": "Revoke Hash permission from a player on an object",
+      "workflow": {
+        "step1": {
+          "action": "Check current permission",
+          "query": "GET /structs/permission/object/{objectId}",
+          "filter": "permission.playerId === {playerId}"
+        },
+        "step2": {
+          "action": "Calculate new permission value",
+          "calculation": "newValue = currentValue & ~64",
+          "example": {
+            "currentValue": "127",
+            "newValue": "63"
+          }
+        },
+        "step3": {
+          "action": "Update permission (via transaction)",
+          "note": "Permission updates require appropriate transaction"
+        }
+      }
+    },
+    "checkBeforeTransaction": {
+      "scenario": "Check Hash permission before signing transaction",
+      "workflow": {
+        "step1": {
+          "action": "Query player permissions",
+          "query": "GET /structs/permission/player/{playerId}"
+        },
+        "step2": {
+          "action": "Check if player has Hash permission on relevant object",
+          "check": "(parseInt(permission.value) & 64) !== 0"
+        },
+        "step3": {
+          "action": "Proceed with transaction if permission exists",
+          "condition": "hasHashPermission === true"
+        }
+      }
+    }
+  }
+}
+

@@ -191,6 +191,24 @@ Gameplay strategy patterns for AI agents.
 - Managing expansion
 - Following proven gameplay patterns
 
+### `performance-optimization.md`
+Performance optimization tips for AI agents (v0.8.0-beta).
+
+**Covers**:
+- Reactor staking query optimization
+- Permission checking optimization
+- Database query optimization
+- Caching strategies for new features
+- Parallel request patterns
+- General optimization tips
+
+**Use When**:
+- Optimizing API call performance
+- Reducing query times
+- Improving cache effectiveness
+- Optimizing permission checks
+- Improving database query performance
+
 ### Decision Trees
 
 Structured JSON decision trees for common gameplay scenarios:
@@ -356,5 +374,6 @@ For a quick lookup guide to find the right pattern, see:
 
 ---
 
-*API Documentation Specialist - December 7, 2025*
+*API Documentation Specialist - January 1, 2026*  
+*v0.8.0-beta: Added performance optimization guide*
 

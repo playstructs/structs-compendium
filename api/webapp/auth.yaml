@@ -1,9 +1,18 @@
 # Webapp Authentication API Endpoints
 
-**Version**: 1.0.0  
+**Version**: 1.1.0  
 **Category**: webapp  
 **Entity**: Auth  
-**Base URL**: ${webappBaseUrl} (default: http://localhost:8080)
+**Base URL**: ${webappBaseUrl} (default: http://localhost:8080)  
+**Last Updated**: January 1, 2026
+
+---
+
+## v0.8.0-beta Notes
+
+**Hash Permission**: Authentication and authorization may need to support Hash permission (bit 64) in v0.8.0-beta. Permission checking may include permission_hash information.
+
+**See**: `reviews/webapp-v0.8.0-beta-review.md` for review status
 
 ---
 
@@ -43,5 +52,5 @@ endpoints:
 
 ---
 
-*Last Updated: January 2025*
+*Last Updated: January 1, 2026*
 

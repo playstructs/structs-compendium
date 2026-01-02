@@ -1,7 +1,8 @@
 # Webapp API Endpoints
 
-**Version**: 1.0.0  
-**Purpose**: Webapp endpoints split from `endpoints.yaml` for context window efficiency
+**Version**: 1.1.0  
+**Purpose**: Webapp endpoints split from `endpoints.yaml` for context window efficiency  
+**Last Updated**: January 1, 2026
 
 ---
 
@@ -10,6 +11,8 @@
 This directory contains webapp API endpoints organized by entity type. This allows AI agents to load only the webapp endpoints they need, reducing context window usage.
 
 **Implementation**: The webapp API is implemented in a PHP Symfony application (`structs-webapp`). This is the main user-facing API for the game. API authentication is implemented in the PHP Symfony application.
+
+**v0.8.0-beta Review**: Webapp API documentation is being reviewed for v0.8.0-beta changes. See `reviews/webapp-v0.8.0-beta-review.md` for review status and checklist.
 
 **Use Case**: Load specific entity webapp endpoints when working with that entity, instead of loading the entire `endpoints.yaml` (1153 lines).
 
@@ -83,5 +86,24 @@ This directory contains webapp API endpoints organized by entity type. This allo
 
 ---
 
-*Last Updated: December 7, 2025*
+## v0.8.0-beta Status
+
+**Review Status**: In Progress  
+**Review Document**: `../../reviews/webapp-v0.8.0-beta-review.md`
+
+### Potential Updates Needed
+
+- **Reactor Endpoints**: May need new reactor-specific endpoints for staking information
+- **Infusion Endpoint**: May need updates for reactor staking and validation delegation
+- **Struct Endpoint**: Needs `destroyed` field documentation
+- **Planet Raid Endpoint**: Needs `attackerRetreated` status documentation
+- **Struct Type Endpoint**: Needs cheatsheet fields documentation
+- **Player Endpoint**: May need reactor staking summary
+- **Hash Permission**: May affect authentication and permission checking
+
+**See**: `reviews/webapp-v0.8.0-beta-review.md` for complete review checklist
+
+---
+
+*Last Updated: January 1, 2026*
 

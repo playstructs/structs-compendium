@@ -849,7 +849,7 @@
         },
         "value": {
           "type": "string",
-          "description": "Permission value (numeric string, e.g., '127' for full permissions)"
+          "description": "Permission value (numeric string, e.g., '127' for full permissions). Permission values are bit-based flags. Common values: 127 (all permissions), 64 (Hash permission bit, v0.8.0-beta). Permission bits can be combined using bitwise OR."
         },
         "objectType": {
           "type": "string",

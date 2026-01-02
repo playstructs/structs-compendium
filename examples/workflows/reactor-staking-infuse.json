@@ -1,0 +1,224 @@
+{
+  "version": "1.0.0",
+  "name": "Reactor Staking - Infuse Workflow",
+  "description": "Detailed workflow for infusing reactor with Alpha Matter for validation delegation (v0.8.0-beta)",
+  "category": "economic",
+  "v0.8.0-beta": {
+    "feature": "reactor_staking",
+    "purpose": "validation_delegation"
+  },
+  "workflow": {
+    "name": "Reactor Infuse for Validation Delegation",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Check Prerequisites",
+        "description": "Verify player and reactor status before infusing",
+        "checks": {
+          "playerOnline": {
+            "description": "Player must be online (not halted)",
+            "query": "GET /structs/player/{playerId}",
+            "expectedField": "player.online",
+            "expectedValue": true
+          },
+          "reactorExists": {
+            "description": "Reactor must exist and be owned by player",
+            "query": "GET /structs/reactor/{reactorId}",
+            "expectedField": "reactor.owner",
+            "expectedValue": "{playerId}"
+          },
+          "sufficientAlphaMatter": {
+            "description": "Player must have sufficient Alpha Matter",
+            "query": "GET /structs/player/{playerId}",
+            "expectedField": "player.alphaMatter",
+            "minimumValue": "{infuseAmount}"
+          },
+          "delegationStatus": {
+            "description": "Check current delegation status",
+            "query": "GET /structs/reactor/{reactorId}",
+            "expectedField": "reactor.delegationStatus",
+            "allowedValues": ["none", "active", "undelegating"],
+            "note": "Cannot infuse if status is 'migrating'"
+          }
+        }
+      },
+      {
+        "step": 2,
+        "action": "Calculate Infusion Amount",
+        "description": "Determine amount to infuse based on staking strategy",
+        "calculations": {
+          "minimumAmount": {
+            "value": "1000000000",
+            "unit": "nanograms",
+            "description": "Minimum amount for validation delegation"
+          },
+          "recommendedAmount": {
+            "value": "10000000000",
+            "unit": "nanograms",
+            "description": "Recommended amount for meaningful delegation"
+          },
+          "maxAmount": {
+            "value": "player.alphaMatter",
+            "description": "Maximum is player's available Alpha Matter"
+          }
+        }
+      },
+      {
+        "step": 3,
+        "action": "Submit Infuse Transaction",
+        "description": "Submit MsgReactorInfuse transaction for validation delegation",
+        "request": {
+          "method": "POST",
+          "endpoint": "/cosmos/tx/v1beta1/txs",
+          "body": {
+            "body": {
+              "messages": [
+                {
+                  "@type": "/structs.structs.MsgReactorInfuse",
+                  "creator": "structs1...",
+                  "reactorId": "3-1",
+                  "destinationType": 1,
+                  "destinationId": "1-11",
+                  "alphaMatterAmount": "10000000000"
+                }
+              ]
+            }
+          }
+        },
+        "expectedResponse": {
+          "txResponse": {
+            "code": 0,
+            "txhash": "transaction_hash"
+          }
+        }
+      },
+      {
+        "step": 4,
+        "action": "Wait for Transaction Confirmation",
+        "description": "Wait for transaction to be included in a block",
+        "polling": {
+          "endpoint": "GET /cosmos/tx/v1beta1/txs/{txhash}",
+          "interval": "2 seconds",
+          "maxAttempts": 30,
+          "expectedStatus": "confirmed"
+        }
+      },
+      {
+        "step": 5,
+        "action": "Verify Delegation Status",
+        "description": "Query reactor to confirm delegation is active",
+        "verification": {
+          "query": "GET /structs/reactor/{reactorId}",
+          "expectedFields": {
+            "reactor.delegationStatus": "active",
+            "reactor.delegationAmount": "10000000000",
+            "reactor.validator": "validator_address"
+          }
+        }
+      },
+      {
+        "step": 6,
+        "action": "Verify Player Resources",
+        "description": "Confirm Alpha Matter was deducted from player",
+        "verification": {
+          "query": "GET /structs/player/{playerId}",
+          "expectedFields": {
+            "player.alphaMatter": "decreased_by_infuse_amount"
+          }
+        }
+      }
+    ]
+  },
+  "errorHandling": {
+    "playerHalted": {
+      "errorCode": "PLAYER_HALTED",
+      "description": "Player is offline (halted)",
+      "recovery": {
+        "action": "Wait for player to come online",
+        "retry": true,
+        "retryDelay": "30 seconds"
+      }
+    },
+    "insufficientAlphaMatter": {
+      "errorCode": "INSUFFICIENT_FUNDS",
+      "description": "Player does not have enough Alpha Matter",
+      "recovery": {
+        "action": "Mine and refine more Alpha Matter",
+        "retry": false
+      }
+    },
+    "reactorNotFound": {
+      "errorCode": "ENTITY_NOT_FOUND",
+      "description": "Reactor does not exist",
+      "recovery": {
+        "action": "Verify reactor ID is correct",
+        "retry": false
+      }
+    },
+    "invalidDelegationStatus": {
+      "errorCode": "INVALID_STATE",
+      "description": "Reactor is in migrating state",
+      "recovery": {
+        "action": "Wait for migration to complete or cancel defusion",
+        "retry": true,
+        "retryDelay": "check migration status"
+      }
+    },
+    "transactionFailed": {
+      "errorCode": "GENERAL_ERROR",
+      "description": "Transaction failed to broadcast or execute",
+      "recovery": {
+        "action": "Check transaction response for error details",
+        "retry": true,
+        "retryDelay": "5 seconds"
+      }
+    }
+  },
+  "permissionChecking": {
+    "requiredPermissions": {
+      "playerOwnership": {
+        "description": "Player must own the reactor",
+        "check": "reactor.owner === playerId"
+      },
+      "reactorAccess": {
+        "description": "Player must have access to reactor",
+        "check": "GET /structs/permission/object/{reactorId}",
+        "expectedPermission": "player has permission on reactor"
+      }
+    },
+    "permissionValidation": {
+      "step": "Before step 3",
+      "query": "GET /structs/permission/object/{reactorId}",
+      "filter": "permission.playerId === {playerId}",
+      "required": "permission.value includes appropriate bits"
+    }
+  },
+  "examples": {
+    "basicInfusion": {
+      "scenario": "Basic validation delegation with minimum amount",
+      "amount": "1000000000",
+      "expectedResult": {
+        "delegationStatus": "active",
+        "delegationAmount": "1000000000"
+      }
+    },
+    "largeInfusion": {
+      "scenario": "Large validation delegation for significant stake",
+      "amount": "100000000000",
+      "expectedResult": {
+        "delegationStatus": "active",
+        "delegationAmount": "100000000000"
+      }
+    },
+    "partialInfusion": {
+      "scenario": "Add to existing delegation",
+      "existingAmount": "5000000000",
+      "additionalAmount": "5000000000",
+      "expectedResult": {
+        "delegationStatus": "active",
+        "delegationAmount": "10000000000"
+      }
+    }
+  }
+}
+

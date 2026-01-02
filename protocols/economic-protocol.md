@@ -1,8 +1,9 @@
 # Economic Protocol
 
-**Version**: 1.0.0  
+**Version**: 1.1.0  
 **Category**: Economic  
-**Status**: Stable
+**Status**: Stable  
+**Last Updated**: January 1, 2026
 
 ## Overview
 
@@ -223,6 +224,186 @@ The Economic Protocol defines how AI agents should interact with economic system
   }
 }
 ```
+
+## Reactor Staking and Validation Delegation (v0.8.0-beta)
+
+### Overview
+
+Reactor staking functionality allows players to delegate validation stake through reactor operations. Staking is now managed at the player level, and validation delegation is abstracted via Reactor Infuse/Defuse actions.
+
+### Key Concepts
+
+**Player-Level Management**: Reactor staking is managed at the player level, not at the individual reactor level. This allows for centralized staking management across all of a player's reactors.
+
+**Validation Delegation**: Validation delegation is abstracted through reactor operations:
+- **Reactor Infuse**: Handles both energy production and validation delegation
+- **Reactor Defuse**: Handles both energy removal and validation undelegation
+- **Reactor Begin Migration**: Begins redelegation process
+- **Reactor Cancel Defusion**: Cancels undelegation process
+
+### Delegation Statuses
+
+```json
+{
+  "delegationStatuses": {
+    "active": {
+      "description": "Actively delegated to validator",
+      "canPerform": ["defuse", "beginMigration"]
+    },
+    "undelegating": {
+      "description": "In undelegation period",
+      "canPerform": ["cancelDefusion"]
+    },
+    "migrating": {
+      "description": "In migration/redelegation process",
+      "canPerform": ["completeMigration"]
+    }
+  }
+}
+```
+
+### Delegation Workflow
+
+**1. Delegate Validation Stake (Infuse)**
+
+```json
+{
+  "action": "MsgReactorInfuse",
+  "purpose": "validation_delegation",
+  "description": "Use Reactor Infuse to delegate validation stake to a validator",
+  "request": {
+    "body": {
+      "body": {
+        "messages": [
+          {
+            "@type": "/structs.structs.MsgReactorInfuse",
+            "creator": "structs1...",
+            "reactorId": "3-1",
+            "amount": "1000000000",
+            "note": "When used for staking, this delegates validation stake"
+          }
+        ]
+      }
+    }
+  },
+  "response": {
+    "delegationStatus": "active",
+    "validator": "validator_address",
+    "delegationAmount": "1000000000"
+  }
+}
+```
+
+**2. Undelegate Validation Stake (Defuse)**
+
+```json
+{
+  "action": "MsgReactorDefuse",
+  "purpose": "validation_undelegation",
+  "description": "Use Reactor Defuse to undelegate validation stake",
+  "request": {
+    "body": {
+      "body": {
+        "messages": [
+          {
+            "@type": "/structs.structs.MsgReactorDefuse",
+            "creator": "structs1...",
+            "reactorId": "3-1",
+            "amount": "1000000000",
+            "note": "When used for unstaking, this undelegates validation stake"
+          }
+        ]
+      }
+    }
+  },
+  "response": {
+    "delegationStatus": "undelegating",
+    "undelegationPeriod": "blocks_remaining"
+  }
+}
+```
+
+**3. Begin Redelegation (Begin Migration)**
+
+```json
+{
+  "action": "MsgReactorBeginMigration",
+  "purpose": "validation_redelegation",
+  "description": "Begin redelegation process to move stake to a different validator",
+  "request": {
+    "body": {
+      "body": {
+        "messages": [
+          {
+            "@type": "/structs.structs.MsgReactorBeginMigration",
+            "creator": "structs1...",
+            "reactorId": "3-1"
+          }
+        ]
+      }
+    }
+  },
+  "response": {
+    "delegationStatus": "migrating",
+    "migrationInProgress": true
+  }
+}
+```
+
+**4. Cancel Undelegation (Cancel Defusion)**
+
+```json
+{
+  "action": "MsgReactorCancelDefusion",
+  "purpose": "cancel_undelegation",
+  "description": "Cancel an ongoing undelegation process",
+  "request": {
+    "body": {
+      "body": {
+        "messages": [
+          {
+            "@type": "/structs.structs.MsgReactorCancelDefusion",
+            "creator": "structs1...",
+            "reactorId": "3-1"
+          }
+        ]
+      }
+    }
+  },
+  "response": {
+    "delegationStatus": "active",
+    "undelegationCancelled": true
+  }
+}
+```
+
+### Membership Join Process (v0.8.0-beta)
+
+The membership join process has been improved to streamline redelegation of staked assets during migration:
+
+```json
+{
+  "workflow": {
+    "step": 1,
+    "action": "MsgGuildMembershipJoin",
+    "description": "Join a guild",
+    "note": "Staked assets are automatically redelegated during the migration process"
+  },
+  "improvements": {
+    "v0.8.0-beta": {
+      "streamlinedRedelegation": "Redelegation of staked assets is now streamlined during membership migration",
+      "automaticProcessing": "Staking redelegation happens automatically as part of the join process"
+    }
+  }
+}
+```
+
+### Best Practices
+
+1. **Monitor Delegation Status**: Always check the reactor's delegation status before performing staking operations
+2. **Undelegation Period**: Be aware of the undelegation period when undelegating stake
+3. **Migration Timing**: Plan redelegations carefully to avoid downtime
+4. **Player-Level Management**: Remember that staking is managed at the player level, not reactor level
 
 ## Economic Structs
 
@@ -554,5 +735,5 @@ The Economic Protocol defines how AI agents should interact with economic system
 
 ---
 
-*Last Updated: December 7, 2025*
+*Last Updated: January 1, 2026*
 

@@ -1,8 +1,8 @@
 # AI Documentation Loading Strategy
 
-**Version**: 1.0.0  
+**Version**: 1.1.0  
 **Purpose**: Guide AI agents on how to efficiently load documentation to maximize context window usage  
-**Last Updated**: January 2025
+**Last Updated**: January 1, 2026
 
 ---
 
@@ -510,5 +510,5 @@ schemas/formats.json
 
 ---
 
-*Last Updated: January 2025*
+*Last Updated: January 1, 2026*
 

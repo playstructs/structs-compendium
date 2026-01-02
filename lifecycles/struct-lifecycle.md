@@ -1,8 +1,9 @@
 # Struct Lifecycle
 
-**Version**: 1.0.0  
+**Version**: 1.1.0  
 **Category**: Lifecycle  
-**Status**: Stable
+**Status**: Stable  
+**Last Updated**: January 1, 2026
 
 ## Overview
 
@@ -273,9 +274,19 @@ This document describes the complete lifecycle of a Struct entity, from initial 
 - All attributes cleared
 - Power capacity released
 - Owner struct count decremented
-- Slot on planet/fleet freed
+- Slot on planet/fleet freed (after delay - see StructSweepDelay below)
 
 **Validation**: Always verify struct no longer exists after destruction.
+
+**StructSweepDelay (v0.8.0-beta)**:
+- **Delay**: 5 blocks
+- **Description**: Struct sweeping now has a block-based delay before slots are cleared
+- **Slot Reference Persistence**: Planet/fleet back references for slots are not cleared until the delay is met
+- **Implications**: 
+  - Slot may appear occupied for 5 blocks after struct destruction
+  - Planet/fleet slot arrays may still reference destroyed struct ID during delay period
+  - After 5 blocks, slot is fully cleared and available for new structs
+- **Code Reference**: `StructSweepDelay = 5` blocks
 
 ---
 
@@ -422,5 +433,5 @@ This document describes the complete lifecycle of a Struct entity, from initial 
 
 ---
 
-*Last Updated: January 2025*
+*Last Updated: January 1, 2026*
 

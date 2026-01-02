@@ -1,9 +1,21 @@
 # Webapp Planet API Endpoints
 
-**Version**: 1.0.0  
+**Version**: 1.1.0  
 **Category**: webapp  
 **Entity**: Planet  
-**Base URL**: ${webappBaseUrl} (default: http://localhost:8080)
+**Base URL**: ${webappBaseUrl} (default: http://localhost:8080)  
+**Last Updated**: January 1, 2026
+
+---
+
+## v0.8.0-beta Notes
+
+**Raid Status Updates** (✅ Verified):
+- **attackerRetreated Status**: The `attackerRetreated` status is defined in the frontend constants (`src/js/constants/RaidStatus.js`). Status value: `'attackerRetreated'`.
+- **Active Raid Queries**: Active raid endpoints (`/api/planet/{planet_id}/raid/active`) only return raids with status `'initiated'` or `'ongoing'`. The `attackerRetreated` status would appear in completed raid queries or raid history.
+- This status indicates the attacker retreated from the raid before completion.
+
+**See**: `reviews/webapp-review-findings.md` for code review verification
 
 ---
 
@@ -99,5 +111,24 @@ endpoints:
 
 ---
 
-*Last Updated: January 2025*
+## Response Schema (v0.8.0-beta Considerations)
+
+Raid responses may include the new `attackerRetreated` status:
+
+```json
+{
+  "raid": {
+    "id": "...",
+    "status": "attackerRetreated",
+    "outcome": "attackerRetreated",
+    ...
+  }
+}
+```
+
+**Note**: Response schema updates are under review. See `reviews/webapp-v0.8.0-beta-review.md` for verification status.
+
+---
+
+*Last Updated: January 1, 2026*
 

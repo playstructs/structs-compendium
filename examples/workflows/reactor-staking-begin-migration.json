@@ -1,0 +1,167 @@
+{
+  "version": "1.0.0",
+  "name": "Reactor Staking - Begin Migration Workflow",
+  "description": "Detailed workflow for beginning redelegation to a different validator (v0.8.0-beta)",
+  "category": "economic",
+  "v0.8.0-beta": {
+    "feature": "reactor_staking",
+    "purpose": "validation_redelegation"
+  },
+  "workflow": {
+    "name": "Reactor Begin Migration for Redelegation",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Check Prerequisites",
+        "description": "Verify reactor delegation status before beginning migration",
+        "checks": {
+          "playerOnline": {
+            "description": "Player must be online (not halted)",
+            "query": "GET /structs/player/{playerId}",
+            "expectedField": "player.online",
+            "expectedValue": true
+          },
+          "reactorExists": {
+            "description": "Reactor must exist and be owned by player",
+            "query": "GET /structs/reactor/{reactorId}",
+            "expectedField": "reactor.owner",
+            "expectedValue": "{playerId}"
+          },
+          "delegationStatus": {
+            "description": "Reactor must have active delegation",
+            "query": "GET /structs/reactor/{reactorId}",
+            "expectedField": "reactor.delegationStatus",
+            "expectedValue": "active",
+            "note": "Cannot begin migration if status is not 'active'"
+          },
+          "targetValidator": {
+            "description": "Target validator must be specified (implicit in migration)",
+            "note": "Migration redelegates to validator associated with new destination"
+          }
+        }
+      },
+      {
+        "step": 2,
+        "action": "Submit Begin Migration Transaction",
+        "description": "Submit MsgReactorBeginMigration transaction to start redelegation",
+        "request": {
+          "method": "POST",
+          "endpoint": "/cosmos/tx/v1beta1/txs",
+          "body": {
+            "body": {
+              "messages": [
+                {
+                  "@type": "/structs.structs.MsgReactorBeginMigration",
+                  "creator": "structs1...",
+                  "reactorId": "3-1"
+                }
+              ]
+            }
+          }
+        },
+        "expectedResponse": {
+          "txResponse": {
+            "code": 0,
+            "txhash": "transaction_hash"
+          }
+        }
+      },
+      {
+        "step": 3,
+        "action": "Wait for Transaction Confirmation",
+        "description": "Wait for transaction to be included in a block",
+        "polling": {
+          "endpoint": "GET /cosmos/tx/v1beta1/txs/{txhash}",
+          "interval": "2 seconds",
+          "maxAttempts": 30,
+          "expectedStatus": "confirmed"
+        }
+      },
+      {
+        "step": 4,
+        "action": "Verify Migration Status",
+        "description": "Query reactor to confirm migration is in progress",
+        "verification": {
+          "query": "GET /structs/reactor/{reactorId}",
+          "expectedFields": {
+            "reactor.delegationStatus": "migrating",
+            "reactor.migrationInProgress": true
+          }
+        }
+      },
+      {
+        "step": 5,
+        "action": "Complete Migration",
+        "description": "Migration completes automatically when joining guild or changing destination",
+        "note": "Migration is typically completed as part of guild membership join process",
+        "relatedWorkflow": "examples/workflows/guild-membership-join.json"
+      }
+    ]
+  },
+  "errorHandling": {
+    "playerHalted": {
+      "errorCode": "PLAYER_HALTED",
+      "description": "Player is offline (halted)",
+      "recovery": {
+        "action": "Wait for player to come online",
+        "retry": true,
+        "retryDelay": "30 seconds"
+      }
+    },
+    "noActiveDelegation": {
+      "errorCode": "INVALID_STATE",
+      "description": "Reactor has no active delegation to migrate",
+      "recovery": {
+        "action": "Check reactor delegation status",
+        "retry": false
+      }
+    },
+    "alreadyMigrating": {
+      "errorCode": "INVALID_STATE",
+      "description": "Reactor is already in migrating state",
+      "recovery": {
+        "action": "Wait for current migration to complete",
+        "retry": false
+      }
+    },
+    "transactionFailed": {
+      "errorCode": "GENERAL_ERROR",
+      "description": "Transaction failed to broadcast or execute",
+      "recovery": {
+        "action": "Check transaction response for error details",
+        "retry": true,
+        "retryDelay": "5 seconds"
+      }
+    }
+  },
+  "permissionChecking": {
+    "requiredPermissions": {
+      "playerOwnership": {
+        "description": "Player must own the reactor",
+        "check": "reactor.owner === playerId"
+      },
+      "reactorAccess": {
+        "description": "Player must have access to reactor",
+        "check": "GET /structs/permission/object/{reactorId}",
+        "expectedPermission": "player has permission on reactor"
+      }
+    }
+  },
+  "examples": {
+    "redelegationToNewValidator": {
+      "scenario": "Redelegate to a different validator",
+      "currentValidator": "validator_address_1",
+      "targetValidator": "validator_address_2",
+      "expectedResult": {
+        "delegationStatus": "migrating",
+        "migrationInProgress": true
+      }
+    },
+    "guildMembershipMigration": {
+      "scenario": "Migration as part of guild membership join",
+      "note": "Migration happens automatically during guild join",
+      "workflow": "examples/workflows/guild-membership-join.json"
+    }
+  }
+}
+

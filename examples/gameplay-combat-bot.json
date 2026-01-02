@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "Combat Bot Example",
   "description": "Example bot that scouts targets, assembles forces, and executes attacks",
   "type": "gameplay",
@@ -154,9 +154,35 @@
         "expectedResponse": {
           "status": "raidComplete",
           "outcome": {
+            "status": "victory",
             "victory": true,
             "oreStolen": 10,
             "alphaMatterGained": 0
+          }
+        },
+        "possibleOutcomes": {
+          "victory": {
+            "status": "victory",
+            "description": "Attacker successfully completed the raid",
+            "resourcesGained": true
+          },
+          "defeat": {
+            "status": "defeat",
+            "description": "Attacker lost the raid",
+            "resourcesGained": false
+          },
+          "attackerRetreated": {
+            "status": "attackerRetreated",
+            "description": "Attacker retreated from the raid (v0.8.0-beta)",
+            "resourcesGained": false,
+            "fleetIntact": true,
+            "note": "No resources gained or lost when attacker retreats",
+            "detailedWorkflow": "examples/workflows/raid-attacker-retreated.json",
+            "handling": {
+              "verifyFleetStatus": "Query fleet to confirm it's intact",
+              "verifyResources": "Confirm no resources were transferred",
+              "nextAction": "Fleet can be used for another raid attempt"
+            }
           }
         }
       }

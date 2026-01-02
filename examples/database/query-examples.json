@@ -1,0 +1,383 @@
+{
+  "version": "1.0.0",
+  "name": "Database Schema Query Examples",
+  "description": "Examples for querying database schema changes in v0.8.0-beta",
+  "category": "database",
+  "v0.8.0-beta": {
+    "features": [
+      "destroyed_structs",
+      "cheatsheet_details",
+      "permission_hash",
+      "signer_tx_changes"
+    ]
+  },
+  "queries": {
+    "destroyedStructs": {
+      "description": "Query destroyed structs (v0.8.0-beta)",
+      "databaseChange": {
+        "date": "2025-12-29",
+        "change": "table-struct-add-destroyed",
+        "description": "New destroyed column on struct table",
+        "related": "StructSweepDelay (5 blocks) - destroyed structs persist for 5 blocks"
+      },
+      "queries": {
+        "findDestroyedStructs": {
+          "description": "Find all destroyed structs",
+          "sql": "SELECT * FROM struct WHERE destroyed = true",
+          "example": {
+            "columns": [
+              "id",
+              "owner_id",
+              "struct_type_id",
+              "location_type",
+              "location_id",
+              "status",
+              "destroyed",
+              "created_at",
+              "updated_at"
+            ],
+            "result": [
+              {
+                "id": "5-1",
+                "owner_id": "1-11",
+                "struct_type_id": 14,
+                "location_type": 1,
+                "location_id": "2-1",
+                "status": 0,
+                "destroyed": true,
+                "created_at": "2026-01-01T10:00:00Z",
+                "updated_at": "2026-01-01T10:05:00Z"
+              }
+            ]
+          }
+        },
+        "findDestroyedStructsByOwner": {
+          "description": "Find destroyed structs for a specific player",
+          "sql": "SELECT * FROM struct WHERE owner_id = ? AND destroyed = true",
+          "parameters": {
+            "owner_id": "1-11"
+          },
+          "example": {
+            "result": [
+              {
+                "id": "5-1",
+                "owner_id": "1-11",
+                "destroyed": true
+              }
+            ]
+          }
+        },
+        "findDestroyedStructsOnPlanet": {
+          "description": "Find destroyed structs on a specific planet",
+          "sql": "SELECT * FROM struct WHERE location_type = 1 AND location_id = ? AND destroyed = true",
+          "parameters": {
+            "location_id": "2-1"
+          },
+          "note": "Destroyed structs persist for StructSweepDelay (5 blocks) before slot clearing"
+        },
+        "countDestroyedStructs": {
+          "description": "Count destroyed structs",
+          "sql": "SELECT COUNT(*) FROM struct WHERE destroyed = true",
+          "example": {
+            "count": 5
+          }
+        },
+        "findRecentlyDestroyed": {
+          "description": "Find structs destroyed within last N blocks",
+          "sql": "SELECT * FROM struct WHERE destroyed = true AND updated_at > NOW() - INTERVAL '5 blocks'",
+          "note": "Useful for monitoring StructSweepDelay period"
+        }
+      },
+      "useCases": {
+        "monitorSweepDelay": {
+          "description": "Monitor structs during StructSweepDelay period",
+          "workflow": "Query destroyed structs to track which are still in delay period"
+        },
+        "cleanupTracking": {
+          "description": "Track struct cleanup after destruction",
+          "workflow": "Query destroyed structs to verify cleanup after 5 blocks"
+        }
+      }
+    },
+    "cheatsheetDetails": {
+      "description": "Query cheatsheet details from struct_type table (v0.8.0-beta)",
+      "databaseChanges": [
+        {
+          "date": "2025-11-29",
+          "change": "table-struct-type-cheatsheet-details",
+          "description": "Added cheatsheet details to struct_type table"
+        },
+        {
+          "date": "2025-12-02",
+          "change": "table-struct-type-extended-cheatsheet",
+          "description": "Added extended cheatsheet details to struct_type"
+        },
+        {
+          "date": "2025-12-03",
+          "change": "table-struct-type-update-cheatsheet",
+          "description": "Updated extended cheatsheet details to struct_type"
+        }
+      ],
+      "queries": {
+        "getCheatsheetDetails": {
+          "description": "Get cheatsheet details for a struct type",
+          "sql": "SELECT cheatsheet_details, cheatsheet_extended_details FROM struct_type WHERE id = ?",
+          "parameters": {
+            "id": 14
+          },
+          "example": {
+            "result": {
+              "id": 14,
+              "name": "Command Ship",
+              "cheatsheet_details": "Command ship details...",
+              "cheatsheet_extended_details": "Extended command ship details..."
+            }
+          }
+        },
+        "getAllCheatsheetDetails": {
+          "description": "Get cheatsheet details for all struct types",
+          "sql": "SELECT id, name, cheatsheet_details, cheatsheet_extended_details FROM struct_type WHERE cheatsheet_details IS NOT NULL",
+          "example": {
+            "result": [
+              {
+                "id": 14,
+                "name": "Command Ship",
+                "cheatsheet_details": "...",
+                "cheatsheet_extended_details": "..."
+              }
+            ]
+          }
+        },
+        "searchCheatsheetContent": {
+          "description": "Search cheatsheet content for specific keywords",
+          "sql": "SELECT * FROM struct_type WHERE cheatsheet_details LIKE ? OR cheatsheet_extended_details LIKE ?",
+          "parameters": {
+            "pattern": "%keyword%"
+          },
+          "note": "Useful for finding struct types by cheatsheet content"
+        }
+      },
+      "useCases": {
+        "documentationGeneration": {
+          "description": "Generate documentation from cheatsheet details",
+          "workflow": "Query cheatsheet details to build comprehensive struct type documentation"
+        },
+        "structTypeLookup": {
+          "description": "Look up struct type information",
+          "workflow": "Query cheatsheet details to get quick reference information"
+        }
+      }
+    },
+    "permissionHash": {
+      "description": "Query permission_hash level from permission view (v0.8.0-beta)",
+      "databaseChange": {
+        "date": "2025-12-18",
+        "change": "view-permission-add-permission-hash",
+        "description": "Added new permission_hash level",
+        "related": "Hash permission bit (value 64) in API layer"
+      },
+      "queries": {
+        "getPermissionHash": {
+          "description": "Get permission_hash for a specific permission",
+          "sql": "SELECT permission_hash FROM permission WHERE object_id = ? AND player_id = ?",
+          "parameters": {
+            "object_id": "0-1",
+            "player_id": "1-11"
+          },
+          "example": {
+            "result": {
+              "object_id": "0-1",
+              "player_id": "1-11",
+              "permission_hash": true,
+              "note": "permission_hash = true maps to API permission.value & 64 !== 0"
+            }
+          }
+        },
+        "getAllHashPermissions": {
+          "description": "Get all permissions with Hash permission",
+          "sql": "SELECT * FROM permission WHERE permission_hash = true",
+          "example": {
+            "result": [
+              {
+                "object_id": "0-1",
+                "player_id": "1-11",
+                "permission_hash": true,
+                "val": 127
+              },
+              {
+                "object_id": "2-1",
+                "player_id": "1-11",
+                "permission_hash": true,
+                "val": 64
+              }
+            ]
+          }
+        },
+        "getHashPermissionsForPlayer": {
+          "description": "Get all Hash permissions for a specific player",
+          "sql": "SELECT * FROM permission WHERE player_id = ? AND permission_hash = true",
+          "parameters": {
+            "player_id": "1-11"
+          },
+          "example": {
+            "result": [
+              {
+                "object_id": "0-1",
+                "player_id": "1-11",
+                "permission_hash": true
+              }
+            ]
+          }
+        },
+        "getHashPermissionsForObject": {
+          "description": "Get all Hash permissions for a specific object",
+          "sql": "SELECT * FROM permission WHERE object_id = ? AND permission_hash = true",
+          "parameters": {
+            "object_id": "0-1"
+          },
+          "example": {
+            "result": [
+              {
+                "object_id": "0-1",
+                "player_id": "1-11",
+                "permission_hash": true
+              }
+            ]
+          }
+        },
+        "countHashPermissions": {
+          "description": "Count permissions with Hash permission",
+          "sql": "SELECT COUNT(*) FROM permission WHERE permission_hash = true",
+          "example": {
+            "count": 10
+          }
+        }
+      },
+      "apiMapping": {
+        "description": "Database permission_hash maps to API permission value bit 64",
+        "databaseToApi": {
+          "permission_hash = true": "permission.value & 64 !== 0",
+          "permission_hash = false": "permission.value & 64 === 0"
+        },
+        "example": {
+          "database": {
+            "permission_hash": true,
+            "val": 127
+          },
+          "api": {
+            "value": "127",
+            "hasHashPermission": true
+          }
+        }
+      },
+      "useCases": {
+        "permissionAudit": {
+          "description": "Audit all Hash permissions",
+          "workflow": "Query permission_hash to find all Hash permission grants"
+        },
+        "accessControl": {
+          "description": "Check Hash permission for access control",
+          "workflow": "Query permission_hash to verify player has Hash permission"
+        }
+      }
+    },
+    "signerTxChanges": {
+      "description": "Query signer_tx table changes (v0.8.0-beta)",
+      "databaseChanges": [
+        {
+          "date": "2025-12-15",
+          "change": "table-signer-tx-complete-input-changes",
+          "description": "Hash Complete nonces changed from INTEGER to CHARACTER VARYING"
+        },
+        {
+          "date": "2025-12-18",
+          "change": "table-signer-tx-permission-update",
+          "description": "Updated tx signing permission levels to support Hash permission"
+        },
+        {
+          "date": "2025-12-18",
+          "change": "table-signer-tx-add-tx-types",
+          "description": "Updated tx types"
+        }
+      ],
+      "queries": {
+        "getSignerTxByHash": {
+          "description": "Get signer transaction by hash",
+          "sql": "SELECT * FROM signer_tx WHERE tx_hash = ?",
+          "parameters": {
+            "tx_hash": "transaction_hash"
+          },
+          "example": {
+            "result": {
+              "tx_hash": "transaction_hash",
+              "permission_level": "hash",
+              "tx_type": "struct_build_complete",
+              "nonce": "proof_of_work_nonce",
+              "note": "nonce is now CHARACTER VARYING (was INTEGER)"
+            }
+          }
+        },
+        "getSignerTxByPermissionLevel": {
+          "description": "Get transactions signed with Hash permission level",
+          "sql": "SELECT * FROM signer_tx WHERE permission_level = 'hash'",
+          "example": {
+            "result": [
+              {
+                "tx_hash": "tx1",
+                "permission_level": "hash",
+                "tx_type": "struct_build_complete"
+              }
+            ]
+          }
+        },
+        "getSignerTxByType": {
+          "description": "Get transactions by type",
+          "sql": "SELECT * FROM signer_tx WHERE tx_type = ?",
+          "parameters": {
+            "tx_type": "struct_build_complete"
+          },
+          "note": "New transaction types added in v0.8.0-beta"
+        },
+        "getSignerTxWithHashNonce": {
+          "description": "Get transactions with Hash Complete nonces (CHARACTER VARYING)",
+          "sql": "SELECT * FROM signer_tx WHERE tx_type LIKE '%complete%' AND nonce IS NOT NULL",
+          "note": "Nonces for Hash Complete transactions are now CHARACTER VARYING instead of INTEGER"
+        },
+        "getRecentSignerTx": {
+          "description": "Get recent signer transactions",
+          "sql": "SELECT * FROM signer_tx ORDER BY created_at DESC LIMIT ?",
+          "parameters": {
+            "limit": 100
+          }
+        }
+      },
+      "useCases": {
+        "transactionAudit": {
+          "description": "Audit transactions signed with Hash permission",
+          "workflow": "Query signer_tx to track all Hash permission transactions"
+        },
+        "nonceVerification": {
+          "description": "Verify proof-of-work nonces",
+          "workflow": "Query signer_tx to verify nonce format (CHARACTER VARYING)"
+        },
+        "transactionTypeTracking": {
+          "description": "Track transaction types",
+          "workflow": "Query signer_tx to analyze transaction type distribution"
+        }
+      }
+    }
+  },
+  "combinedQueries": {
+    "destroyedStructsWithDetails": {
+      "description": "Get destroyed structs with struct type details",
+      "sql": "SELECT s.*, st.name, st.cheatsheet_details FROM struct s JOIN struct_type st ON s.struct_type_id = st.id WHERE s.destroyed = true",
+      "useCase": "Get comprehensive information about destroyed structs"
+    },
+    "permissionsWithHashForPlayer": {
+      "description": "Get all permissions with Hash permission for a player",
+      "sql": "SELECT * FROM permission WHERE player_id = ? AND permission_hash = true",
+      "useCase": "Audit all Hash permissions for a specific player"
+    }
+  }
+}
+

@@ -1,9 +1,10 @@
 # Webapp Ledger API Endpoints
 
-**Version**: 1.0.0  
+**Version**: 1.1.0  
 **Category**: webapp  
 **Entity**: Ledger  
-**Base URL**: ${webappBaseUrl} (default: http://localhost:8080)
+**Base URL**: ${webappBaseUrl} (default: http://localhost:8080)  
+**Last Updated**: January 1, 2026
 
 ---
 
@@ -52,5 +53,5 @@ endpoints:
 
 ---
 
-*Last Updated: January 2025*
+*Last Updated: January 1, 2026*
 

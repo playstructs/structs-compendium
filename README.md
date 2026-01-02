@@ -12,7 +12,6 @@ In the distant future the species of the galaxy are embroiled in a race for Alph
 ## Directory Structure
 
 ```
-ai/
 ├── README.md                    # This file
 ├── AGENTS.md                    # 🤖 AI Agent Guide: Comprehensive guide for AI agents
 ├── LOADING_STRATEGY.md          # 🔴 READ FIRST: How to efficiently load documentation

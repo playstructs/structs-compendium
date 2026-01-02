@@ -240,7 +240,7 @@
       "endpoint": "/structs/permission/{permissionId}",
       "listEndpoint": "/structs/permission",
       "schema": "schemas/entities.json#/definitions/Permission",
-      "description": "A permission (access control)",
+      "description": "A permission (access control). Permission values are bit-based flags. Hash permission (bit value 64) added in v0.8.0-beta.",
       "relationships": {
         "grantedTo": ["Player"],
         "appliesTo": ["Planet", "Struct", "Fleet"]

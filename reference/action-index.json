@@ -1,10 +1,10 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "title": "Action Index",
   "description": "Complete index of all game actions for AI agents",
   "type": "object",
-  "lastUpdated": "2025-01-XX",
+  "lastUpdated": "2026-01-01",
   "structs:verified": true,
   "actions": [
     {
@@ -131,10 +131,14 @@
       "schema": "schemas/actions.json#/actions/MsgReactorInfuse",
       "schemaPath": "schemas/actions.json",
       "endpoint": "POST /cosmos/tx/v1beta1/txs",
-      "description": "Add Alpha Matter to reactor for energy production",
+      "description": "Add Alpha Matter to reactor for energy production. Also handles validation delegation (v0.8.0-beta).",
       "verified": true,
       "codeReference": "x/structs/keeper/msg_server_reactor_infuse.go",
-      "protoReference": "proto/structs/structs/tx.proto:95"
+      "protoReference": "proto/structs/structs/tx.proto:95",
+      "v0.8.0-beta": {
+        "validationDelegation": "This action now abstracts validation delegation. When used for staking, it delegates validation stake to a validator.",
+        "playerLevelManagement": "Reactor staking is managed at the player level."
+      }
     },
     {
       "id": "reactor-defuse",
@@ -144,10 +148,44 @@
       "schema": "schemas/actions.json#/actions/MsgReactorDefuse",
       "schemaPath": "schemas/actions.json",
       "endpoint": "POST /cosmos/tx/v1beta1/txs",
-      "description": "Remove Alpha Matter from reactor",
+      "description": "Remove Alpha Matter from reactor. Also handles validation undelegation (v0.8.0-beta).",
       "verified": true,
       "codeReference": "x/structs/keeper/msg_server_reactor_defuse.go",
-      "protoReference": "proto/structs/structs/tx.proto:96"
+      "protoReference": "proto/structs/structs/tx.proto:96",
+      "v0.8.0-beta": {
+        "validationUndelegation": "This action now abstracts validation undelegation. When used for unstaking, it undelegates validation stake from a validator.",
+        "playerLevelManagement": "Reactor staking is managed at the player level."
+      }
+    },
+    {
+      "id": "reactor-begin-migration",
+      "name": "Begin Reactor Migration",
+      "category": "resource",
+      "messageType": "/structs.structs.MsgReactorBeginMigration",
+      "schema": "schemas/actions.json#/actions/MsgReactorBeginMigration",
+      "schemaPath": "schemas/actions.json",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "description": "Begin redelegation process for reactor validation stake (v0.8.0-beta). Abstracted validation begin redelegation via Reactor Begin Migration.",
+      "verified": false,
+      "v0.8.0-beta": {
+        "validationRedelegation": "This action begins the redelegation process for validation stake.",
+        "playerLevelManagement": "Reactor staking is managed at the player level."
+      }
+    },
+    {
+      "id": "reactor-cancel-defusion",
+      "name": "Cancel Reactor Defusion",
+      "category": "resource",
+      "messageType": "/structs.structs.MsgReactorCancelDefusion",
+      "schema": "schemas/actions.json#/actions/MsgReactorCancelDefusion",
+      "schemaPath": "schemas/actions.json",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "description": "Cancel undelegation process for reactor validation stake (v0.8.0-beta). Abstracted validation cancel undelegation via Reactor Cancel Defusion.",
+      "verified": false,
+      "v0.8.0-beta": {
+        "validationCancelUndelegation": "This action cancels an ongoing undelegation process.",
+        "playerLevelManagement": "Reactor staking is managed at the player level."
+      }
     },
     {
       "id": "reactor-allocate",
@@ -518,13 +556,13 @@
     }
   ],
   "summary": {
-    "total": 34,
+    "total": 36,
     "verified": 26,
     "deprecated": 7,
     "categories": {
       "construction": 2,
       "combat": 2,
-      "resource": 7,
+      "resource": 9,
       "economic": 5,
       "exploration": 1,
       "fleet": 1,
@@ -538,10 +576,10 @@
   "structs:verification": {
     "verified": true,
     "verifiedBy": "GameCodeAnalyst",
-    "verifiedDate": "2025-01-XX",
+    "verifiedDate": "2026-01-01",
     "verificationMethod": "code-analysis",
     "confidence": "high",
-    "note": "26 actions fully verified with code references. 7 actions are deprecated (marked with replacement actions). 1 action (reactor-allocate) is deprecated with no direct replacement (use allocation system). 4 replacement actions added: substation-allocation-connect, agreement-open, guild-membership-kick, struct-generator-infuse."
+    "note": "26 actions fully verified with code references. 7 actions are deprecated (marked with replacement actions). 1 action (reactor-allocate) is deprecated with no direct replacement (use allocation system). 4 replacement actions added: substation-allocation-connect, agreement-open, guild-membership-kick, struct-generator-infuse. v0.8.0-beta: Added reactor-begin-migration and reactor-cancel-defusion actions. Updated reactor-infuse and reactor-defuse with validation delegation functionality."
   }
 }
 

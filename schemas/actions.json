@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "title": "Structs Action Definitions",
   "description": "Complete catalog of all game actions/commands for AI agents",
   "type": "object",
@@ -1079,7 +1079,11 @@
       "category": "resource",
       "endpoint": "POST /cosmos/tx/v1beta1/txs",
       "messageType": "/structs.structs.MsgReactorInfuse",
-      "description": "Add Alpha Matter to reactor for energy production",
+      "description": "Add Alpha Matter to reactor for energy production. Also handles validation delegation (v0.8.0-beta). Reactor staking is now managed at player level, and validation delegation is abstracted via this action.",
+      "structs:v0.8.0-beta": {
+        "validationDelegation": "This action now abstracts validation delegation. When used for staking, it delegates validation stake to a validator.",
+        "playerLevelManagement": "Reactor staking is managed at the player level, not reactor level."
+      },
       "requiredFields": ["creator", "reactorId", "amount"],
       "optionalFields": [],
       "requirements": {
@@ -1116,7 +1120,11 @@
       "category": "resource",
       "endpoint": "POST /cosmos/tx/v1beta1/txs",
       "messageType": "/structs.structs.MsgReactorDefuse",
-      "description": "Remove Alpha Matter from reactor",
+      "description": "Remove Alpha Matter from reactor. Also handles validation undelegation (v0.8.0-beta). Validation undelegation is abstracted via this action.",
+      "structs:v0.8.0-beta": {
+        "validationUndelegation": "This action now abstracts validation undelegation. When used for unstaking, it undelegates validation stake from a validator.",
+        "playerLevelManagement": "Reactor staking is managed at the player level, not reactor level."
+      },
       "requiredFields": ["creator", "reactorId", "amount"],
       "optionalFields": [],
       "requirements": {
@@ -1136,6 +1144,70 @@
                 "creator": "structs1...",
                 "reactorId": "1-1",
                 "amount": "1000000"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgReactorBeginMigration": {
+      "id": "reactor-begin-migration",
+      "name": "Begin Reactor Migration",
+      "category": "resource",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgReactorBeginMigration",
+      "description": "Begin redelegation process for reactor validation stake (v0.8.0-beta). Abstracted validation begin redelegation via Reactor Begin Migration.",
+      "requiredFields": ["creator", "reactorId"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "reactorExists": true,
+        "hasActiveDelegation": true
+      },
+      "structs:v0.8.0-beta": {
+        "validationRedelegation": "This action begins the redelegation process for validation stake.",
+        "playerLevelManagement": "Reactor staking is managed at the player level."
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgReactorBeginMigration",
+                "creator": "structs1...",
+                "reactorId": "3-1"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "MsgReactorCancelDefusion": {
+      "id": "reactor-cancel-defusion",
+      "name": "Cancel Reactor Defusion",
+      "category": "resource",
+      "endpoint": "POST /cosmos/tx/v1beta1/txs",
+      "messageType": "/structs.structs.MsgReactorCancelDefusion",
+      "description": "Cancel undelegation process for reactor validation stake (v0.8.0-beta). Abstracted validation cancel undelegation via Reactor Cancel Defusion.",
+      "requiredFields": ["creator", "reactorId"],
+      "optionalFields": [],
+      "requirements": {
+        "playerOnline": true,
+        "reactorExists": true,
+        "inUndelegationPeriod": true
+      },
+      "structs:v0.8.0-beta": {
+        "validationCancelUndelegation": "This action cancels an ongoing undelegation process.",
+        "playerLevelManagement": "Reactor staking is managed at the player level."
+      },
+      "example": {
+        "body": {
+          "body": {
+            "messages": [
+              {
+                "@type": "/structs.structs.MsgReactorCancelDefusion",
+                "creator": "structs1...",
+                "reactorId": "3-1"
               }
             ]
           }
@@ -1212,7 +1284,7 @@
   "structs:actionCategories": {
     "construction": ["MsgStructBuild", "MsgStructBuildInitiate", "MsgStructBuildComplete"],
     "combat": ["MsgStructAttack", "MsgPlanetRaidComplete"],
-    "resource": ["MsgReactorAllocate", "MsgReactorInfuse", "MsgReactorDefuse", "MsgSubstationConnect", "MsgSubstationCreate", "MsgSubstationPlayerConnect", "MsgStructOreMinerComplete", "MsgStructOreRefineryComplete"],
+    "resource": ["MsgReactorAllocate", "MsgReactorInfuse", "MsgReactorDefuse", "MsgReactorBeginMigration", "MsgReactorCancelDefusion", "MsgSubstationConnect", "MsgSubstationCreate", "MsgSubstationPlayerConnect", "MsgStructOreMinerComplete", "MsgStructOreRefineryComplete"],
     "economic": ["MsgProviderCreate", "MsgAgreementCreate", "MsgOreMining", "MsgOreRefining", "MsgGeneratorAllocate"],
     "exploration": ["MsgPlanetExplore"],
     "fleet": ["MsgFleetMove"],

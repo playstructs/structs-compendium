@@ -4,7 +4,7 @@
   "title": "Entity Index",
   "description": "Complete index of all game entities for AI agents",
   "type": "object",
-  "lastUpdated": "2025-01-XX",
+  "lastUpdated": "2026-01-01",
   "structs:verified": true,
   "entities": [
     {
@@ -78,7 +78,12 @@
       "description": "A struct (unit) in the game",
       "verified": true,
       "fieldsVerified": true,
-      "keyFields": ["id", "typeId", "ownerId", "status", "buildDraw", "passiveDraw"],
+      "keyFields": ["id", "typeId", "ownerId", "status", "buildDraw", "passiveDraw", "destroyed"],
+      "v0.8.0-beta": {
+        "newFields": ["destroyed"],
+        "description": "destroyed field added to track struct destruction status. Related to StructSweepDelay (5 blocks).",
+        "database": "struct.destroyed column added 2025-12-29"
+      },
       "relationships": {
         "ownedBy": ["Player"],
         "typeOf": ["StructType"],
@@ -91,7 +96,8 @@
         "attributes": "/structs/struct_attribute/{structId}/{attributeType}",
         "allAttributes": "/structs/struct_attribute"
       },
-      "codeReference": "x/structs/types/struct.pb.go, x/structs/keeper/struct_cache.go"
+      "codeReference": "x/structs/types/struct.pb.go, x/structs/keeper/struct_cache.go",
+      "databaseReference": "structs.struct table (includes destroyed column added 2025-12-29)"
     },
     {
       "id": "struct-type",
@@ -106,6 +112,18 @@
       "verified": true,
       "fieldsVerified": true,
       "keyFields": ["id", "class", "category", "buildLimit", "buildDifficulty", "buildDraw", "passiveDraw", "maxHealth"],
+      "v0.8.0-beta": {
+        "databaseChanges": {
+          "added": ["cheatsheet_details", "cheatsheet_extended_details"],
+          "removed": ["deprecated charge columns for mine and refine"],
+          "dates": {
+            "cheatsheet_details": "2025-11-29",
+            "cheatsheet_extended_details": "2025-12-02",
+            "removed_charge_columns": "2025-12-08"
+          }
+        },
+        "description": "Database schema updated with cheatsheet details. Deprecated charge columns removed."
+      },
       "relationships": {
         "instances": ["Struct"]
       },
@@ -114,7 +132,7 @@
         "all": "/structs/struct_type"
       },
       "codeReference": "proto/structs/structs/struct.proto:26, x/structs/types/struct.pb.go",
-      "databaseReference": "structs.struct_type table (80+ columns)"
+      "databaseReference": "structs.struct_type table (80+ columns, includes cheatsheet_details and cheatsheet_extended_details added in v0.8.0-beta)"
     },
     {
       "id": "fleet",
@@ -177,11 +195,15 @@
       "description": "A reactor (energy production)",
       "verified": true,
       "fieldsVerified": true,
-      "keyFields": ["id", "ownerId", "validator", "guildId", "defaultCommission"],
+      "keyFields": ["id", "ownerId", "validator", "guildId", "defaultCommission", "staking"],
       "relationships": {
         "ownedBy": ["Player"],
         "belongsTo": ["Guild"],
         "locatedOn": ["Planet"]
+      },
+      "v0.8.0-beta": {
+        "newFeatures": ["reactor_staking", "validation_delegation"],
+        "description": "Reactor staking now managed at player level. Validation delegation abstracted via Reactor Infuse/Defuse actions."
       },
       "queryPatterns": {
         "byId": "/structs/reactor/{id}",
@@ -323,10 +345,14 @@
       "listEndpoint": "/structs/permission",
       "schema": "schemas/entities.json#/definitions/Permission",
       "schemaPath": "schemas/entities.json",
-      "description": "A permission (access control)",
+      "description": "A permission (access control). Permission values are bit-based flags. Hash permission (bit value 64) added in v0.8.0-beta.",
       "verified": true,
       "fieldsVerified": true,
       "keyFields": ["permissionId", "value"],
+      "v0.8.0-beta": {
+        "newFeatures": ["hash_permission"],
+        "description": "Hash permission bit (value 64) added to permission system. Permission values are bit-based flags that can be combined using bitwise OR."
+      },
       "relationships": {
         "grantedTo": ["Player"],
         "appliesTo": ["Planet", "Struct", "Fleet"]

@@ -1,7 +1,7 @@
 # Action Quick Reference
 
-**Version**: 1.0.0  
-**Last Updated**: December 7, 2025  
+**Version**: 1.1.0  
+**Last Updated**: January 1, 2026  
 **Purpose**: Quick reference guide for AI agents performing game actions
 
 ---
@@ -81,12 +81,21 @@ This guide provides a quick reference for all game actions available to AI agent
 - `struct-ore-refinery-complete` - Complete ore refining (requires proof-of-work)
 
 **Power**:
-- `reactor-infuse` - Infuse reactor with resources (produces energy)
-- `reactor-defuse` - Defuse reactor (remove resources)
+- `reactor-infuse` - Infuse reactor with resources (produces energy). Also handles validation delegation (v0.8.0-beta)
+- `reactor-defuse` - Defuse reactor (remove resources). Also handles validation undelegation (v0.8.0-beta)
+- `reactor-begin-migration` - Begin redelegation process for reactor validation stake (v0.8.0-beta)
+- `reactor-cancel-defusion` - Cancel undelegation process for reactor validation stake (v0.8.0-beta)
 - `substation-create` - Create substation
 - `substation-player-connect` - Connect player to substation
 - ⚠️ **Deprecated**: `reactor-allocate` (use allocation system instead)
 - ⚠️ **Deprecated**: `substation-connect` (use `MsgSubstationAllocationConnect` instead)
+
+**Reactor Staking (v0.8.0-beta)**:
+- Reactor staking is now managed at player level
+- Validation delegation is abstracted via Reactor Infuse/Defuse actions
+- Use `reactor-infuse` for delegation, `reactor-defuse` for undelegation
+- Use `reactor-begin-migration` to begin redelegation
+- Use `reactor-cancel-defusion` to cancel undelegation
 
 **Requirements**:
 - Player online
@@ -413,14 +422,16 @@ The following actions are **deprecated** and should not be used. Use the replace
 **Resource**:
 - `struct-ore-miner-complete`
 - `struct-ore-refinery-complete`
-- `reactor-allocate`
+- `reactor-infuse` (validation delegation)
+- `reactor-defuse` (validation undelegation)
 - `substation-create`
 
 **Economic**:
 - `provider-create`
-- `agreement-create`
-- `ore-mining`
-- `ore-refining`
+- `agreement-open`
+- ⚠️ **Deprecated**: `agreement-create` (use `agreement-open` instead)
+- ⚠️ **Deprecated**: `ore-mining` (use `struct-ore-miner-complete` instead)
+- ⚠️ **Deprecated**: `ore-refining` (use `struct-ore-refinery-complete` instead)
 
 **Exploration**:
 - `planet-explore`
@@ -492,5 +503,5 @@ The following actions are **deprecated** and should not be used. Use the replace
 
 ---
 
-*API Documentation Specialist - December 7, 2025*
+*Last Updated: January 1, 2026*
 

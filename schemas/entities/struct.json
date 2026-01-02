@@ -1,8 +1,9 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "title": "Struct Entity Schema",
   "description": "Struct entity definition - extracted from game-state.json for context window optimization. See schemas/formats.json for format specifications.",
+  "lastUpdated": "2026-01-01",
   "type": "object",
   "structs:entity": "Struct",
   "structs:endpoint": "/structs/struct/{id}",
@@ -39,6 +40,14 @@
         "locationId": {
           "type": "string",
           "description": "Location ID (planet ID or fleet ID)"
+        },
+        "destroyed": {
+          "type": "boolean",
+          "description": "Whether the struct has been destroyed (v0.8.0-beta). Destroyed structs persist for StructSweepDelay (5 blocks) before being fully removed.",
+          "v0.8.0-beta": {
+            "database": "struct.destroyed column added 2025-12-29",
+            "related": "StructSweepDelay (5 blocks) - destroyed structs persist for 5 blocks before slot clearing"
+          }
         }
       },
       "required": ["id", "owner", "structType", "locationType", "locationId"]
@@ -66,7 +75,7 @@
   "structs:verification": {
     "verified": true,
     "verifiedBy": "GameCodeAnalyst",
-    "verifiedDate": "2025-01-XX",
+    "verifiedDate": "2026-01-01",
     "verificationMethod": "code-analysis",
     "confidence": "high",
     "note": "API response schema. For code-based field definitions with power draw, charge costs, and formulas, see schemas/entities.json#/definitions/Struct",

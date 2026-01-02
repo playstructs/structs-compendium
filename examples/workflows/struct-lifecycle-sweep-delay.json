@@ -1,0 +1,410 @@
+{
+  "version": "1.0.0",
+  "name": "Struct Lifecycle - Sweep Delay Workflow",
+  "description": "Detailed workflow for StructSweepDelay behavior after struct destruction (v0.8.0-beta)",
+  "category": "lifecycle",
+  "v0.8.0-beta": {
+    "feature": "StructSweepDelay",
+    "delay": 5,
+    "unit": "blocks",
+    "description": "Block-based delay before struct slots are cleared after destruction"
+  },
+  "workflow": {
+    "name": "Struct Destruction and Sweep Delay",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Check Struct Before Destruction",
+        "description": "Query struct to verify it exists and get slot information",
+        "query": {
+          "endpoint": "GET /structs/struct/{structId}",
+          "expectedFields": {
+            "struct.id": "5-1",
+            "struct.locationType": 1,
+            "struct.locationId": "2-1",
+            "struct.status": "online",
+            "struct.destroyed": false
+          }
+        },
+        "slotInfo": {
+          "query": "GET /structs/planet/{planetId}",
+          "expectedFields": {
+            "planet.slots": {
+              "space": ["5-1", null, null, null],
+              "note": "Struct occupies slot 0 in space ambit"
+            }
+          }
+        }
+      },
+      {
+        "step": 2,
+        "action": "Destroy Struct",
+        "description": "Destroy struct (via combat, planet completion, or explicit action)",
+        "triggers": [
+          "Combat destruction",
+          "Planet completion",
+          "Explicit destruction action"
+        ],
+        "expectedResult": {
+          "struct.destroyed": true,
+          "struct.status": 0,
+          "note": "Struct is marked as destroyed but persists for StructSweepDelay period"
+        }
+      },
+      {
+        "step": 3,
+        "action": "Verify Struct Destroyed",
+        "description": "Query struct to confirm destroyed status",
+        "query": {
+          "endpoint": "GET /structs/struct/{structId}",
+          "expectedFields": {
+            "struct.destroyed": true,
+            "struct.status": 0
+          }
+        },
+        "databaseQuery": {
+          "sql": "SELECT * FROM struct WHERE id = ? AND destroyed = true",
+          "note": "Destroyed structs are queryable during delay period"
+        }
+      },
+      {
+        "step": 4,
+        "action": "Check Slot During Delay Period",
+        "description": "Query planet/fleet slots during StructSweepDelay period (blocks 0-4)",
+        "delayPeriod": {
+          "blocks": [0, 1, 2, 3, 4],
+          "description": "During these blocks, slot may still reference destroyed struct"
+        },
+        "queries": {
+          "block0": {
+            "query": "GET /structs/planet/{planetId}",
+            "expectedFields": {
+              "planet.slots.space[0]": "5-1",
+              "note": "Slot still references destroyed struct ID"
+            }
+          },
+          "block1": {
+            "query": "GET /structs/planet/{planetId}",
+            "expectedFields": {
+              "planet.slots.space[0]": "5-1",
+              "note": "Slot still references destroyed struct ID"
+            }
+          },
+          "block4": {
+            "query": "GET /structs/planet/{planetId}",
+            "expectedFields": {
+              "planet.slots.space[0]": "5-1",
+              "note": "Slot still references destroyed struct ID (last block of delay)"
+            }
+          }
+        }
+      },
+      {
+        "step": 5,
+        "action": "Wait for Sweep Delay to Complete",
+        "description": "Wait for StructSweepDelay (5 blocks) to complete",
+        "monitoring": {
+          "method": "Poll planet/fleet slots",
+          "interval": "Every block",
+          "maxBlocks": 5,
+          "checkField": "planet.slots.space[0]"
+        }
+      },
+      {
+        "step": 6,
+        "action": "Verify Slot Cleared After Delay",
+        "description": "Query planet/fleet after StructSweepDelay to confirm slot is cleared",
+        "query": {
+          "endpoint": "GET /structs/planet/{planetId}",
+          "expectedFields": {
+            "planet.slots.space[0]": null,
+            "note": "Slot is cleared after 5 blocks, available for new structs"
+          }
+        },
+        "databaseQuery": {
+          "sql": "SELECT slots FROM planet WHERE id = ?",
+          "expectedResult": {
+            "slots": {
+              "space": [null, null, null, null],
+              "note": "Slot 0 is now null (cleared)"
+            }
+          }
+        }
+      },
+      {
+        "step": 7,
+        "action": "Verify Struct No Longer Queryable",
+        "description": "Confirm destroyed struct is no longer queryable after delay",
+        "query": {
+          "endpoint": "GET /structs/struct/{structId}",
+          "expectedResponse": {
+            "code": 404,
+            "error": "ENTITY_NOT_FOUND",
+            "note": "Struct is fully removed after sweep delay"
+          }
+        },
+        "databaseQuery": {
+          "sql": "SELECT * FROM struct WHERE id = ?",
+          "expectedResult": {
+            "rows": 0,
+            "note": "Struct removed from database after sweep delay"
+          }
+        }
+      }
+    ]
+  },
+  "structDestructionTiming": {
+    "timeline": {
+      "block0": {
+        "event": "Struct destroyed",
+        "struct.destroyed": true,
+        "slot.status": "occupied (references destroyed struct)",
+        "struct.queryable": true
+      },
+      "block1": {
+        "event": "Delay period continues",
+        "struct.destroyed": true,
+        "slot.status": "occupied (references destroyed struct)",
+        "struct.queryable": true
+      },
+      "block2": {
+        "event": "Delay period continues",
+        "struct.destroyed": true,
+        "slot.status": "occupied (references destroyed struct)",
+        "struct.queryable": true
+      },
+      "block3": {
+        "event": "Delay period continues",
+        "struct.destroyed": true,
+        "slot.status": "occupied (references destroyed struct)",
+        "struct.queryable": true
+      },
+      "block4": {
+        "event": "Last block of delay",
+        "struct.destroyed": true,
+        "slot.status": "occupied (references destroyed struct)",
+        "struct.queryable": true
+      },
+      "block5": {
+        "event": "Sweep delay complete",
+        "struct.destroyed": true,
+        "slot.status": "cleared (null)",
+        "struct.queryable": false,
+        "note": "Struct fully removed, slot available for new structs"
+      }
+    }
+  },
+  "slotClearingBehavior": {
+    "duringDelay": {
+      "description": "Slot behavior during StructSweepDelay period (blocks 0-4)",
+      "slotStatus": "occupied",
+      "slotValue": "destroyed_struct_id",
+      "availableForNewStruct": false,
+      "note": "Slot back reference persists during delay"
+    },
+    "afterDelay": {
+      "description": "Slot behavior after StructSweepDelay completes (block 5+)",
+      "slotStatus": "cleared",
+      "slotValue": null,
+      "availableForNewStruct": true,
+      "note": "Slot is fully cleared and available"
+    },
+    "planetSlots": {
+      "description": "Planet slot clearing behavior",
+      "example": {
+        "beforeDestruction": {
+          "slots": {
+            "space": ["5-1", "5-2", null, null],
+            "air": [null, null, null, null],
+            "land": [null, null, null, null],
+            "water": [null, null, null, null]
+          }
+        },
+        "duringDelay": {
+          "slots": {
+            "space": ["5-1", "5-2", null, null],
+            "note": "Slot 0 still references destroyed struct 5-1"
+          }
+        },
+        "afterDelay": {
+          "slots": {
+            "space": [null, "5-2", null, null],
+            "note": "Slot 0 is cleared, slot 1 still has struct 5-2"
+          }
+        }
+      }
+    },
+    "fleetSlots": {
+      "description": "Fleet slot clearing behavior",
+      "example": {
+        "beforeDestruction": {
+          "slots": {
+            "space": ["5-3", null, null, null]
+          }
+        },
+        "duringDelay": {
+          "slots": {
+            "space": ["5-3", null, null, null],
+            "note": "Slot still references destroyed struct"
+          }
+        },
+        "afterDelay": {
+          "slots": {
+            "space": [null, null, null, null],
+            "note": "Slot is cleared"
+          }
+        }
+      }
+    }
+  },
+  "queryPatterns": {
+    "duringDelay": {
+      "description": "Query patterns during StructSweepDelay period",
+      "queries": {
+        "queryDestroyedStruct": {
+          "endpoint": "GET /structs/struct/{structId}",
+          "expectedResult": {
+            "struct.destroyed": true,
+            "struct.status": 0,
+            "note": "Struct is queryable but destroyed"
+          }
+        },
+        "queryPlanetSlots": {
+          "endpoint": "GET /structs/planet/{planetId}",
+          "expectedResult": {
+            "planet.slots.space[0]": "destroyed_struct_id",
+            "note": "Slot still references destroyed struct"
+          }
+        },
+        "queryDestroyedStructs": {
+          "database": "SELECT * FROM struct WHERE destroyed = true",
+          "expectedResult": {
+            "rows": "All destroyed structs including those in delay period"
+          }
+        }
+      }
+    },
+    "afterDelay": {
+      "description": "Query patterns after StructSweepDelay completes",
+      "queries": {
+        "queryDestroyedStruct": {
+          "endpoint": "GET /structs/struct/{structId}",
+          "expectedResult": {
+            "code": 404,
+            "error": "ENTITY_NOT_FOUND",
+            "note": "Struct no longer exists"
+          }
+        },
+        "queryPlanetSlots": {
+          "endpoint": "GET /structs/planet/{planetId}",
+          "expectedResult": {
+            "planet.slots.space[0]": null,
+            "note": "Slot is cleared and available"
+          }
+        },
+        "queryDestroyedStructs": {
+          "database": "SELECT * FROM struct WHERE destroyed = true",
+          "expectedResult": {
+            "rows": "Only structs still in delay period, not fully swept ones"
+          }
+        }
+      }
+    }
+  },
+  "stateTransitions": {
+    "structStates": {
+      "beforeDestruction": {
+        "status": "online",
+        "destroyed": false,
+        "queryable": true,
+        "slotOccupied": true
+      },
+      "afterDestruction": {
+        "status": 0,
+        "destroyed": true,
+        "queryable": true,
+        "slotOccupied": true,
+        "note": "In StructSweepDelay period"
+      },
+      "afterSweepDelay": {
+        "status": "removed",
+        "destroyed": true,
+        "queryable": false,
+        "slotOccupied": false,
+        "note": "Fully removed after delay"
+      }
+    },
+    "slotStates": {
+      "beforeDestruction": {
+        "status": "occupied",
+        "value": "struct_id",
+        "available": false
+      },
+      "duringDelay": {
+        "status": "occupied",
+        "value": "destroyed_struct_id",
+        "available": false,
+        "note": "References destroyed struct"
+      },
+      "afterDelay": {
+        "status": "cleared",
+        "value": null,
+        "available": true,
+        "note": "Slot cleared and available"
+      }
+    }
+  },
+  "examples": {
+    "combatDestruction": {
+      "scenario": "Struct destroyed in combat",
+      "workflow": [
+        "Struct attacked and destroyed",
+        "Struct marked as destroyed",
+        "Slot remains occupied for 5 blocks",
+        "After 5 blocks, slot cleared"
+      ]
+    },
+    "planetCompletion": {
+      "scenario": "All structs destroyed on planet completion",
+      "workflow": [
+        "Planet completion triggers struct destruction",
+        "All structs marked as destroyed",
+        "Slots remain occupied for 5 blocks each",
+        "After 5 blocks, all slots cleared"
+      ]
+    },
+    "explicitDestruction": {
+      "scenario": "Player explicitly destroys struct",
+      "workflow": [
+        "Player destroys struct",
+        "Struct marked as destroyed",
+        "Slot remains occupied for 5 blocks",
+        "After 5 blocks, slot cleared"
+      ]
+    },
+    "buildingAfterDelay": {
+      "scenario": "Build new struct after sweep delay",
+      "workflow": [
+        "Struct destroyed",
+        "Wait 5 blocks for sweep delay",
+        "Slot cleared",
+        "Build new struct in cleared slot"
+      ]
+    }
+  },
+  "monitoring": {
+    "trackSweepDelay": {
+      "description": "Monitor structs during sweep delay period",
+      "query": "SELECT * FROM struct WHERE destroyed = true",
+      "polling": "Check every block",
+      "action": "Track which structs are in delay period"
+    },
+    "waitForSlotClear": {
+      "description": "Wait for slot to clear before building",
+      "query": "GET /structs/planet/{planetId}",
+      "check": "planet.slots.space[slotIndex] === null",
+      "action": "Only build when slot is cleared"
+    }
+  }
+}
+

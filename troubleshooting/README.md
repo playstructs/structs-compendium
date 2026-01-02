@@ -27,6 +27,12 @@ This directory contains troubleshooting guides for common issues AI agents encou
 - **`common-issues.md`** - Common issues and solutions
 - **`error-codes.md`** - Error code reference
 
+### Feature-Specific Troubleshooting (v0.8.0-beta)
+
+- **`reactor-staking-issues.md`** - Reactor staking and validation delegation troubleshooting
+- **`permission-issues.md`** - Hash permission and permission bit manipulation troubleshooting
+- **`edge-cases.md`** - Edge cases and gotchas for v0.8.0-beta features
+
 ---
 
 ## Common Issue Categories
@@ -64,8 +70,10 @@ This directory contains troubleshooting guides for common issues AI agents encou
 
 1. Review `common-issues.md` for your issue
 2. Check `error-codes.md` for error meanings
-3. Review relevant dependency chains
-4. Check validation patterns
+3. Check feature-specific guides: `reactor-staking-issues.md`, `permission-issues.md`
+4. Review `edge-cases.md` for non-obvious behaviors
+5. Review relevant dependency chains
+6. Check validation patterns
 
 ### Step 3: Apply Solution
 
@@ -91,5 +99,6 @@ This directory contains troubleshooting guides for common issues AI agents encou
 
 ---
 
-*Last Updated: December 7, 2025*
+*Last Updated: January 1, 2026*  
+*v0.8.0-beta: Added reactor staking, permission, and edge cases guides*
 
